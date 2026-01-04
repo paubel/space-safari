@@ -37,7 +37,7 @@ Bädda in bild
 
 # Chapter 11 - The Local Interstellar Cloud and the Local Bubble
 
-![Animation of the formation of the local bubble](<[grid-px-fr.gif](https://upload.wikimedia.org/wikipedia/commons/8/86/Localbubble_formation.gif)>)
+![Animation of the formation of the local bubble](https://upload.wikimedia.org/wikipedia/commons/8/86/Localbubble_formation.gif))
 
 # Chapter 12 - Our Nearest Stars
 
