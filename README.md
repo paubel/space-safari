@@ -1,5 +1,20 @@
 # Space Safari – A Journey Through Our Cosmic Neighborhood
 
+## Headline level 2
+
+MALL
+[Quiz 1](./quiz/quiz-w1-kap1/index.html){:target="\_blank"}
+
+[grid-max-min.html](./grid-max-min.html){:download="grid-max-min.html} Högerklicka välj "ladda ner länk"
+
+[Länk till denna sida](https://paubel.github.io/webbutveckling1/)
+[Länk till Visual Studio Code](https://code.visualstudio.com)
+
+Bädda in bild
+![Blanda px med fr ](grid-px-fr.gif)
+
+---
+
 # Chapter 1 - The Sun and the Edge of Home
 
 # Chapter 2 - Human Satellites and Exploration
@@ -21,6 +36,8 @@
 # Chapter 10 - Beyond the Solar System: Worlds Around Other Stars
 
 # Chapter 11 - The Local Interstellar Cloud and the Local Bubble
+
+![Animation of the formation of the local bubble](<[grid-px-fr.gif](https://upload.wikimedia.org/wikipedia/commons/8/86/Localbubble_formation.gif)>)
 
 # Chapter 12 - Our Nearest Stars
 
