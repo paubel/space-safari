@@ -15,8 +15,12 @@ function setupMenuToggle() {
 
   if (menuToggle) {
     menuToggle.addEventListener("click", () => {
-      sideMenu.classList.add("active");
-      document.body.classList.add("menu-open");
+      if (sideMenu.classList.contains("active")) {
+        closeMenu();
+      } else {
+        sideMenu.classList.add("active");
+        document.body.classList.add("menu-open");
+      }
     });
   }
 
