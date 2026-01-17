@@ -1,0 +1,239 @@
+// Space Safari - Simplified JavaScript
+
+let chaptersData = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadChaptersData();
+  setupMenuToggle();
+});
+
+function setupMenuToggle() {
+  const menuToggle = document.getElementById("menu-toggle");
+  const menuClose = document.getElementById("menu-close");
+  const sideMenu = document.getElementById("side-menu");
+  const chapterLinks = document.querySelectorAll(".side-menu .chapter-link");
+
+  if (menuToggle) {
+    menuToggle.addEventListener("click", () => {
+      sideMenu.classList.add("active");
+      document.body.classList.add("menu-open");
+    });
+  }
+
+  if (menuClose) {
+    menuClose.addEventListener("click", (e) => {
+      e.preventDefault();
+      closeMenu();
+    });
+  }
+
+  chapterLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      closeMenu();
+    });
+  });
+
+  // Close menu when clicking overlay on mobile
+  document.addEventListener("click", (e) => {
+    if (
+      sideMenu.classList.contains("active") &&
+      !sideMenu.contains(e.target) &&
+      !menuToggle.contains(e.target)
+    ) {
+      closeMenu();
+    }
+  });
+}
+
+function closeMenu() {
+  const sideMenu = document.getElementById("side-menu");
+  sideMenu.classList.remove("active");
+  document.body.classList.remove("menu-open");
+}
+
+function loadChaptersData() {
+  const jsonPath = document.body.classList.contains("chapter-page")
+    ? "../data/chapters.json"
+    : "data/chapters.json";
+
+  fetch(jsonPath)
+    .then((response) => response.json())
+    .then((data) => {
+      chaptersData = data.chapters;
+      renderChapterMenu();
+
+      // Render homepage menu if it exists
+      const homepageMenu = document.getElementById("chapters-menu-homepage");
+      if (homepageMenu) {
+        renderChapterMenuFullWidth(homepageMenu);
+      }
+    })
+    .catch((error) => console.error("Error loading chapters:", error));
+}
+
+function renderChapterMenu() {
+  const menu = document.getElementById("chapters-menu");
+  if (!menu) return;
+
+  menu.innerHTML = "";
+  chaptersData.forEach((chapter) => {
+    const link = document.createElement("a");
+    const isChapterPage = document.body.classList.contains("chapter-page");
+    link.href = isChapterPage
+      ? `chapter-${chapter.number}.html`
+      : `chapters/chapter-${chapter.number}.html`;
+    link.className = "chapter-link";
+
+    link.innerHTML = `<span class="chapter-number">${String(chapter.number).padStart(2, "0")}</span><span class="chapter-title">${chapter.title}</span>`;
+
+    menu.appendChild(link);
+  });
+}
+
+function renderChapterMenuFullWidth(menuElement) {
+  menuElement.innerHTML = "";
+  chaptersData.forEach((chapter) => {
+    const link = document.createElement("a");
+    link.href = `chapters/chapter-${chapter.number}.html`;
+    link.className = "chapter-link";
+
+    link.innerHTML = `<span class="chapter-number">${String(chapter.number).padStart(2, "0")}</span><span class="chapter-title">${chapter.title}</span>`;
+
+    menuElement.appendChild(link);
+  });
+}
+
+function getChapter(chapterNumber) {
+  return chaptersData.find((ch) => ch.number === parseInt(chapterNumber));
+}
+
+function getPreviousChapter(chapterNumber) {
+  const chapter = getChapter(chapterNumber);
+  if (!chapter || chapter.id === 1) return null;
+  return getChapter(chapter.id - 1);
+}
+
+function getNextChapter(chapterNumber) {
+  const chapter = getChapter(chapterNumber);
+  if (!chapter || chapter.id === chaptersData.length) return null;
+  return getChapter(chapter.id + 1);
+}
+
+function renderChapterPage(chapterNumber) {
+  const chapter = getChapter(chapterNumber);
+  if (!chapter) {
+    window.location.href = "/";
+    return;
+  }
+
+  document.title = `${chapter.title} - Space Safari`;
+
+  const header = document.querySelector(".chapter-header");
+  if (header) {
+    header.innerHTML = `
+            <h1>Chapter ${chapter.number}: ${chapter.title}</h1>
+            <div class="chapter-meta">
+                <span>📚 ${chapter.sections.length} sections</span>
+                <span>🎬 ${chapter.videoSuggestions.length} videos</span>
+                <span>🔗 ${chapter.resources.length} resources</span>
+            </div>
+        `;
+  }
+
+  const summary = document.querySelector("#chapter-summary");
+  if (summary) {
+    summary.innerHTML = `
+            <div class="content-section">
+                <h3>Overview</h3>
+                <p>${chapter.summary}</p>
+                <div class="key-topics">
+                    ${chapter.keyTopics.map((topic) => `<span>${topic}</span>`).join("")}
+                </div>
+            </div>
+        `;
+  }
+
+  const sections = document.querySelector("#chapter-sections");
+  if (sections) {
+    sections.innerHTML = `
+            <div class="content-section">
+                <h3>Sections</h3>
+                <ul>
+                    ${chapter.sections.map((section) => `<li>${section}</li>`).join("")}
+                </ul>
+            </div>
+        `;
+  }
+
+  const videosContainer = document.querySelector("#chapter-videos");
+  if (videosContainer) {
+    let html = '<h3>Videos</h3><div class="video-grid">';
+    chapter.videoSuggestions.forEach((video) => {
+      html += `
+                <div class="video-card">
+                    <div style="font-size: 2rem;">🎬</div>
+                    <h4>${video.title}</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">${video.source}</p>
+                    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(video.title + " " + video.source)}" target="_blank">Watch on YouTube</a>
+                </div>
+            `;
+    });
+    html += "</div>";
+    videosContainer.innerHTML = html;
+  }
+
+  const resourcesContainer = document.querySelector("#chapter-resources");
+  if (resourcesContainer) {
+    let html = '<h3>Resources</h3><div class="resource-list">';
+    chapter.resources.forEach((resource) => {
+      html += `
+                <div class="resource-item">
+                    <h4>${resource.title}</h4>
+                    <p>${resource.description}</p>
+                    <a href="${resource.url}" target="_blank">Visit →</a>
+                </div>
+            `;
+    });
+    html += "</div>";
+    resourcesContainer.innerHTML = html;
+  }
+
+  const navContainer = document.querySelector(".chapter-nav");
+  if (navContainer) {
+    const prevChapter = getPreviousChapter(chapterNumber);
+    const nextChapter = getNextChapter(chapterNumber);
+
+    let html = "";
+
+    if (prevChapter) {
+      html += `
+                <a href="chapter-${prevChapter.number}.html" class="nav-button">
+                    <div>
+                        <div class="nav-label">← Previous</div>
+                        <div class="nav-title">${prevChapter.title}</div>
+                    </div>
+                </a>
+            `;
+    } else {
+      html += `<a href="../index.html" class="nav-button"><div class="nav-label">← Home</div></a>`;
+    }
+
+    if (nextChapter) {
+      html += `
+                <a href="chapter-${nextChapter.number}.html" class="nav-button">
+                    <div style="text-align: right;">
+                        <div class="nav-label">Next →</div>
+                        <div class="nav-title">${nextChapter.title}</div>
+                    </div>
+                </a>
+            `;
+    }
+
+    navContainer.innerHTML = html;
+  }
+}
+
+window.spacesafari = {
+  getChapter,
+  renderChapterPage,
+};

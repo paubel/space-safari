@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter - Space Safari</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="chapter-page">
+    <!-- Navigation Menu -->
+    <nav class="navbar">
+        <a href="../index.html" class="logo">🌌 Space Safari</a>
+        <button class="menu-toggle" id="menu-toggle">☰</button>
+    </nav>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="side-menu">
+        <a href="../index.html" class="menu-close" id="menu-close">✕</a>
+        <h3>All Chapters</h3>
+        <nav class="chapter-menu" id="chapters-menu"></nav>
+    </div>
+
+    <div class="container chapter-page">
+        <header>
+            <h1><a href="../index.html" style="color: var(--accent); text-decoration: none;">🌌 Space Safari</a></h1>
+        </header>
+
+        <div class="chapter-header"></div>
+
+        <section id="chapter-summary"></section>
+        
+        <section id="chapter-sections"></section>
+
+        <section id="chapter-videos"></section>
+
+        <section id="chapter-resources"></section>
+
+        <div class="chapter-nav"></div>
+
+        <footer>
+            <p><a href="../index.html">← Back to All Chapters</a></p>
+            <p style="margin-top: 1rem;">Resources: <a href="https://www.nasa.gov/" target="_blank">NASA</a> • <a href="https://www.esa.int/" target="_blank">ESA</a></p>
+        </footer>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script>
+        const match = window.location.pathname.match(/chapter-(\d+)\.html/);
+        if (match) {
+            const chapterNumber = parseInt(match[1]);
+            const interval = setInterval(() => {
+                if (window.spacesafari && window.spacesafari.getChapter(chapterNumber)) {
+                    clearInterval(interval);
+                    window.spacesafari.renderChapterPage(chapterNumber);
+                }
+            }, 100);
+        }
+    </script>
+</body>
+</html>

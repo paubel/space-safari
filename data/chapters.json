@@ -1,0 +1,977 @@
+{
+  "chapters": [
+    {
+      "id": 1,
+      "number": 1,
+      "title": "The Sun and the Edge of Home",
+      "description": "Explore our nearest star and its profound influence on all life in our solar system.",
+      "sections": [
+        "Our Star",
+        "Structure of the Sun",
+        "Light and Color",
+        "Magnetism and Solar Activity",
+        "A Star Among Billions",
+        "The Sun Through Human Eyes",
+        "The Life Story of the Sun",
+        "Solar Influence on Earth"
+      ],
+      "summary": "The Sun is not just a distant object in our sky—it is the foundation of our existence. This chapter traces the Sun's structure, from its core to its outer corona, and explores how solar energy drives weather, climate, and the very chemistry of life on Earth. Learn about stellar magnetism, solar cycles, and the remarkable journey light takes from the Sun to our world.",
+      "keyTopics": [
+        "Solar structure",
+        "Nuclear fusion",
+        "Solar cycles",
+        "Light spectrum",
+        "Solar wind"
+      ],
+      "videoSuggestions": [
+        { "title": "What is the Sun?", "source": "NASA" },
+        { "title": "Inside the Sun", "source": "ESA" },
+        { "title": "Solar Activity", "source": "NASA ScienceNews" }
+      ],
+      "resources": [
+        {
+          "title": "NASA Sun Portal",
+          "url": "https://science.nasa.gov/sun/",
+          "description": "Comprehensive information about solar science and missions"
+        },
+        {
+          "title": "ESA Solar Orbiter",
+          "url": "https://www.esa.int/",
+          "description": "Latest observations from ESA's solar missions"
+        },
+        {
+          "title": "NOAA Space Weather Prediction Center",
+          "url": "https://www.swpc.noaa.gov/",
+          "description": "Real-time solar activity data"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "number": 2,
+      "title": "Human Satellites and Exploration",
+      "description": "Discover how humanity has placed thousands of artificial eyes above Earth.",
+      "sections": [
+        "Eyes Above the Earth",
+        "The First Signal",
+        "A Network of Thought",
+        "How GPS Works",
+        "Living and Working in Orbit",
+        "Preparing for Life on Mars",
+        "The Fragility of Our Creations"
+      ],
+      "summary": "Satellites have become an invisible infrastructure that connects our global civilization. From GPS to weather forecasting, from communications to Earth observation, this chapter reveals how thousands of spacecraft work in concert above our heads. Explore the challenges of orbital mechanics, the technology that enables modern life, and humanity's growing presence in space.",
+      "keyTopics": [
+        "Orbital mechanics",
+        "GPS technology",
+        "Space stations",
+        "Remote sensing",
+        "Space debris"
+      ],
+      "videoSuggestions": [
+        { "title": "How GPS Works", "source": "Khan Academy" },
+        { "title": "International Space Station Tour", "source": "NASA" },
+        { "title": "Earth from Space", "source": "ESA" }
+      ],
+      "resources": [
+        {
+          "title": "NASA ISS Portal",
+          "url": "https://www.nasa.gov/iss/",
+          "description": "International Space Station information and live stream"
+        },
+        {
+          "title": "Satellite Tracking - N2YO",
+          "url": "https://www.n2yo.com/",
+          "description": "Track satellites in real-time"
+        },
+        {
+          "title": "ESA Earth Observation",
+          "url": "https://www.esa.int/Applications/Observing_the_Earth",
+          "description": "Satellite observations of Earth"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "number": 3,
+      "title": "The Moon",
+      "description": "Our ancient companion in the sky, sculpted by billions of years of cosmic interaction.",
+      "sections": [
+        "The First Clock of the Night",
+        "Birth from Catastrophe",
+        "The Silent Architect of Life",
+        "A Mirror of Stone",
+        "Reaching the Moon",
+        "Landscapes of Memory",
+        "The Moon and Humanity"
+      ],
+      "summary": "The Moon is far more than a romantic sight in the night sky. It is a record of the early solar system, a stabilizing force for Earth's climate, and a destination that has captured human imagination for millennia. This chapter explores the Moon's dramatic origin in a planetary collision, its profound influence on life, and humanity's remarkable achievements in lunar exploration.",
+      "keyTopics": [
+        "Lunar geology",
+        "Tidal forces",
+        "Apollo missions",
+        "Crater formation",
+        "Lunar phases"
+      ],
+      "videoSuggestions": [
+        { "title": "Apollo 11: The First Moon Landing", "source": "NASA" },
+        { "title": "How the Moon Formed", "source": "Crash Course" },
+        { "title": "Lunar Eclipse Explained", "source": "NASA" }
+      ],
+      "resources": [
+        {
+          "title": "NASA Moon Portal",
+          "url": "https://science.nasa.gov/moon/",
+          "description": "Comprehensive lunar science and exploration"
+        },
+        {
+          "title": "Lunar and Planetary Institute",
+          "url": "https://www.lpi.usra.edu/",
+          "description": "Moon research and education resources"
+        },
+        {
+          "title": "Apollo Archive",
+          "url": "https://www.apolloarchive.com/",
+          "description": "Historic Apollo mission photographs"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "number": 4,
+      "title": "The Inner Planets",
+      "description": "Mercury, Venus, Earth, and Mars—four worlds, four stories.",
+      "sections": [
+        "The Sun's Closest Children",
+        "Mercury – The Burned World",
+        "Venus – Earth's Mirror in Ruin",
+        "Earth – The Living Exception",
+        "Mars – The Red Memory",
+        "The Shared Story of the Inner Worlds"
+      ],
+      "summary": "The inner solar system contains a diversity of worlds that tells the story of planetary formation, evolution, and habitability. Mercury bears the scars of solar bombardment; Venus reveals the catastrophic potential of a runaway greenhouse effect; Earth stands unique as a living world; and Mars preserves clues about the solar system's violent past. This chapter compares these four terrestrial planets and explores what made Earth special.",
+      "keyTopics": [
+        "Planetary atmospheres",
+        "Surface geology",
+        "Habitability",
+        "Planetary evolution",
+        "Comparative planetology"
+      ],
+      "videoSuggestions": [
+        { "title": "Mars Rover Perseverance", "source": "NASA" },
+        { "title": "Venus: The Hellish Planet", "source": "Crash Course" },
+        { "title": "Mercury Close-Up", "source": "ESA" }
+      ],
+      "resources": [
+        {
+          "title": "NASA Planetary Science",
+          "url": "https://science.nasa.gov/planets/",
+          "description": "Mission data and discoveries from all planets"
+        },
+        {
+          "title": "Mars Perseverance Rover Updates",
+          "url": "https://science.nasa.gov/mars/",
+          "description": "Latest Mars exploration news"
+        },
+        {
+          "title": "Venus Express Archive",
+          "url": "https://www.esa.int/",
+          "description": "Venus mission data and analysis"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "number": 5,
+      "title": "The Asteroid Belt",
+      "description": "The realm of small worlds orbiting between Mars and Jupiter.",
+      "sections": [
+        "Between Mars and Jupiter",
+        "A Planet That Never Was",
+        "Ceres and Vesta – Fossils of the Early Solar System",
+        "The Belt as a Bridge",
+        "Messengers and Threats",
+        "The Wider Family",
+        "Asteroids and Comets — What Is the Difference?",
+        "The Beauty of the Unfinished"
+      ],
+      "summary": "The asteroid belt is home to millions of rocky remnants from the solar system's formation. Rather than chaotic debris, it reveals the underlying processes of planetary formation and migration. Some asteroids are metallic treasures; others are icy bodies halfway to comets. This chapter explores the belt's role as a scientific archive and its potential both as a resource and as a source of threats to Earth.",
+      "keyTopics": [
+        "Asteroid types",
+        "Ceres",
+        "Orbital dynamics",
+        "Impact hazards",
+        "Space resources"
+      ],
+      "videoSuggestions": [
+        { "title": "The Asteroid Belt Explained", "source": "NASA" },
+        { "title": "Ceres: Dwarf Planet", "source": "NASA Dawn Mission" },
+        { "title": "Near-Earth Asteroids", "source": "ESA" }
+      ],
+      "resources": [
+        {
+          "title": "NASA Asteroid Watch",
+          "url": "https://www.nasa.gov/planetary-defense/",
+          "description": "Tracking and information about near-Earth asteroids"
+        },
+        {
+          "title": "Minor Planet Center",
+          "url": "https://www.minorplanetcenter.net/",
+          "description": "Official repository of asteroid data"
+        },
+        {
+          "title": "Dawn Mission Archive",
+          "url": "https://science.nasa.gov/mission/dawn/",
+          "description": "Ceres and asteroid exploration"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "number": 6,
+      "title": "Meteoroids, Meteors, and Meteorites",
+      "description": "Fragments of space that reach Earth's atmosphere and surface.",
+      "sections": [
+        "Meteoroids in the Solar System",
+        "Meteors – Light from Motion",
+        "Meteorites – Surviving Fragments",
+        "Meteor Showers",
+        "Impacts and Planetary History",
+        "Scientific Importance"
+      ],
+      "summary": "Meteors light up the night sky as fragments from space burn in our atmosphere, while meteorites that survive the journey carry priceless samples from the asteroid belt and early solar system. This chapter explores how meteorites have shaped planetary history, enabled life, and continue to provide crucial insights into the universe's chemical composition and age.",
+      "keyTopics": [
+        "Meteor showers",
+        "Meteorite classification",
+        "Impact craters",
+        "Panspermia",
+        "Meteorite analysis"
+      ],
+      "videoSuggestions": [
+        { "title": "Meteor Shower Guide", "source": "NASA" },
+        { "title": "The Chicxulub Impact", "source": "NASA" },
+        { "title": "Meteorite Collection", "source": "Smithsonian" }
+      ],
+      "resources": [
+        {
+          "title": "Meteor Watch NASA",
+          "url": "https://science.nasa.gov/solar-system/small-bodies/meteors-meteorites/",
+          "description": "Meteor and meteorite information"
+        },
+        {
+          "title": "Smithsonian Meteorite Collection",
+          "url": "https://www.si.edu/",
+          "description": "World's largest meteorite collection"
+        },
+        {
+          "title": "American Meteor Society",
+          "url": "https://www.amsmeteors.org/",
+          "description": "Citizen science and meteor tracking"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "number": 7,
+      "title": "The Outer Planets and the Migrating Worlds",
+      "description": "Jupiter, Saturn, Uranus, and Neptune—gas giants and ice giants.",
+      "sections": [
+        "Jupiter – The Planetary Anchor",
+        "Saturn – The Planet with Rings",
+        "Uranus and Neptune – The Ice Giants",
+        "Planetary Migration and the Nice Model",
+        "Lessons from Exoplanets"
+      ],
+      "summary": "The outer solar system contains planetary giants that shape the entire structure of our cosmic neighborhood. Jupiter's enormous gravity has protected Earth from countless impacts, while Saturn's rings display the intricate dynamics of gravity and orbital resonance. This chapter explores these magnificent worlds and the theory that they have wandered far from their birth locations.",
+      "keyTopics": [
+        "Gas giants",
+        "Planetary rings",
+        "Great Red Spot",
+        "Planetary migration",
+        "Ice giants"
+      ],
+      "videoSuggestions": [
+        { "title": "Jupiter Mission: JUNO", "source": "NASA" },
+        { "title": "Saturn's Rings Explained", "source": "Crash Course" },
+        { "title": "Uranus and Neptune", "source": "NASA" }
+      ],
+      "resources": [
+        {
+          "title": "NASA JUNO Mission",
+          "url": "https://science.nasa.gov/mission/juno/",
+          "description": "Latest Jupiter observations"
+        },
+        {
+          "title": "Saturn Cassini Archive",
+          "url": "https://science.nasa.gov/mission/cassini/",
+          "description": "Historic Saturn mission data"
+        },
+        {
+          "title": "Ice Giants Portal",
+          "url": "https://science.nasa.gov/planets/ice-giants/",
+          "description": "Uranus and Neptune information"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "number": 8,
+      "title": "Comets, Kuiper Belt, and the Oort Cloud",
+      "description": "The icy reservoir at the edge of our solar system.",
+      "sections": [
+        "The Kuiper Belt",
+        "Dwarf Planets and Notable Objects",
+        "Formation and Evolution",
+        "Comets",
+        "The Oort Cloud",
+        "Scientific Significance"
+      ],
+      "summary": "Beyond Neptune lies a realm of icy bodies left over from the solar system's formation. The Kuiper Belt and Oort Cloud represent the frontier of our cosmic neighborhood, home to comets that periodically venture inward and dwarf planets that reveal planetary processes operating under extreme conditions. This chapter explores the outer limits of our solar system.",
+      "keyTopics": [
+        "Kuiper Belt",
+        "Pluto",
+        "Comets",
+        "Oort Cloud",
+        "Dwarf planets"
+      ],
+      "videoSuggestions": [
+        { "title": "Pluto Flyby - New Horizons", "source": "NASA" },
+        { "title": "What Are Comets?", "source": "Crash Course" },
+        { "title": "Oort Cloud Explained", "source": "NASA" }
+      ],
+      "resources": [
+        {
+          "title": "NASA New Horizons Mission",
+          "url": "https://science.nasa.gov/mission/new-horizons/",
+          "description": "Pluto and Kuiper Belt exploration"
+        },
+        {
+          "title": "NASA Comet Watch",
+          "url": "https://science.nasa.gov/solar-system/small-bodies/comets/",
+          "description": "Current and upcoming comet observations"
+        },
+        {
+          "title": "IAU Minor Planet Center",
+          "url": "https://www.minorplanetcenter.net/",
+          "description": "Database of minor planets and comets"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "number": 9,
+      "title": "Leaving the Solar System",
+      "description": "The heliopause and the edge of the Sun's domain.",
+      "sections": [
+        "The Heliosphere and the Heliopause",
+        "The Solar Wind",
+        "The Edge of the Solar System",
+        "Voyager — Humanity's Emissaries to the Stars",
+        "A Living Boundary",
+        "Typical Particle Densities in the Solar and Interstellar Environment",
+        "What Lies Beyond the Heliopause",
+        "The Origins of the Elements"
+      ],
+      "summary": "The solar system doesn't end at Pluto—it extends to the heliopause, where the Sun's wind meets the interstellar medium. This dynamic boundary marks the transition from the Sun's domain to the galaxy beyond. The Voyager probes, humanity's most distant emissaries, are now crossing this frontier, sending back data about the composition and structure of the early universe.",
+      "keyTopics": [
+        "Solar wind",
+        "Heliopause",
+        "Interstellar medium",
+        "Voyager missions",
+        "Cosmic rays"
+      ],
+      "videoSuggestions": [
+        { "title": "Voyager Golden Record", "source": "NASA" },
+        { "title": "Solar Wind Explained", "source": "NASA" },
+        { "title": "Edge of the Solar System", "source": "Crash Course" }
+      ],
+      "resources": [
+        {
+          "title": "NASA Voyager Mission",
+          "url": "https://science.nasa.gov/mission/voyager/",
+          "description": "Real-time data from Voyager probes"
+        },
+        {
+          "title": "IBEX Mission - Interstellar Boundary",
+          "url": "https://science.nasa.gov/mission/ibex/",
+          "description": "Mapping the boundary of our solar system"
+        },
+        {
+          "title": "Interstellar Medium Info",
+          "url": "https://science.nasa.gov/",
+          "description": "Understanding the space between stars"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "number": 10,
+      "title": "Beyond the Solar System: Worlds Around Other Stars",
+      "description": "The discovery of exoplanets and the search for habitable worlds.",
+      "sections": [
+        "A Universe of Hidden Worlds",
+        "Hot Jupiters and Super-Earths",
+        "The Habitable Zone: A Narrow Band of Opportunity",
+        "Why Not Red Dwarfs?",
+        "Why Blue Giants Don't Help Either",
+        "The Sun: A Rare Middle Ground",
+        "Are We Alone?"
+      ],
+      "summary": "For centuries, the existence of other planetary systems was pure speculation. Today, we have discovered thousands of exoplanets orbiting distant stars, revealing a universe of worlds far more diverse than our own solar system. This chapter explores what makes a planet habitable and examines our place in a cosmos full of hidden worlds.",
+      "keyTopics": [
+        "Exoplanet detection",
+        "Habitable zone",
+        "Transit method",
+        "Planetary diversity",
+        "Biosignatures"
+      ],
+      "videoSuggestions": [
+        {
+          "title": "Discovery of Exoplanets",
+          "source": "NASA Exoplanet Program"
+        },
+        { "title": "Habitable Zone Explained", "source": "Crash Course" },
+        { "title": "JWST Exoplanet Hunt", "source": "NASA" }
+      ],
+      "resources": [
+        {
+          "title": "NASA Exoplanet Archive",
+          "url": "https://exoplanetarchive.ipac.caltech.edu/",
+          "description": "Database of confirmed exoplanets"
+        },
+        {
+          "title": "Exoplanet Exploration",
+          "url": "https://exoplanetexploration.nasa.gov/",
+          "description": "NASA's exoplanet research"
+        },
+        {
+          "title": "JWST Exoplanet Discoveries",
+          "url": "https://science.nasa.gov/jwst/",
+          "description": "Latest James Webb discoveries"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "number": 11,
+      "title": "The Local Interstellar Cloud and the Local Bubble",
+      "description": "The galactic neighborhood in which the Sun resides.",
+      "sections": [
+        "What the Local Bubble Is and How It Formed",
+        "A Galactic Neighborhood Shaped by Explosions",
+        "Density and Temperature of Interstellar Gas",
+        "The Sun's Movement Through the Local Clouds",
+        "Mapping the Local Bubble"
+      ],
+      "summary": "The Sun does not exist in isolation—it travels through a region of the galaxy marked by expanding shells of gas created by ancient stellar explosions. The Local Bubble is a cavity in the interstellar medium, surrounded by the Local Interstellar Cloud. Understanding this galactic environment reveals how the Sun and its family of worlds exist within a constantly changing cosmic neighborhood.",
+      "keyTopics": [
+        "Interstellar clouds",
+        "Supernova remnants",
+        "Local bubble",
+        "ISM structure",
+        "Stellar kinematics"
+      ],
+      "videoSuggestions": [
+        { "title": "Interstellar Medium Tour", "source": "NASA" },
+        { "title": "Our Place in the Galaxy", "source": "Crash Course" },
+        { "title": "Local Interstellar Cloud", "source": "NASA Goddard" }
+      ],
+      "resources": [
+        {
+          "title": "Local Bubble Research",
+          "url": "https://science.nasa.gov/",
+          "description": "Studies of the local interstellar medium"
+        },
+        {
+          "title": "Hipparcos Star Catalog",
+          "url": "https://www.cosmos.esa.int/web/hipparcos",
+          "description": "Mapping the local solar neighborhood"
+        },
+        {
+          "title": "Gaia Mission Results",
+          "url": "https://www.esa.int/gaia",
+          "description": "Ultra-precise stellar positions and motions"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "number": 12,
+      "title": "Our Nearest Stars",
+      "description": "The Alpha Centauri System and our closest stellar neighbors.",
+      "sections": [
+        "The Alpha Centauri System (A, B, and Proxima)",
+        "Stellar Distances and the Meaning of a Light-Year",
+        "The Future of Our Stellar Neighborhood"
+      ],
+      "summary": "Alpha Centauri, at just 4.37 light-years away, is our nearest stellar neighbor. This system of three stars offers a window into diverse stellar types and potentially habitable worlds. This chapter explores the scale of distances in space, the characteristics of nearby stars, and the technological and theoretical challenges of reaching our closest cosmic neighbors.",
+      "keyTopics": [
+        "Alpha Centauri",
+        "Light-year",
+        "Proxima Centauri",
+        "Stellar classification",
+        "Proper motion"
+      ],
+      "videoSuggestions": [
+        { "title": "Alpha Centauri Explained", "source": "Crash Course" },
+        { "title": "Proxima Centauri Discovery", "source": "NASA" },
+        { "title": "The Scale of Space", "source": "YouTube Edu" }
+      ],
+      "resources": [
+        {
+          "title": "ESO Alpha Centauri Page",
+          "url": "https://www.eso.org/",
+          "description": "Professional observations of Alpha Centauri"
+        },
+        {
+          "title": "Breakthrough Starshot",
+          "url": "https://breakthroughinitiatives.org/",
+          "description": "Interstellar travel initiative"
+        },
+        {
+          "title": "Stellar Database - Simbad",
+          "url": "https://simbad.u-strasbg.fr/",
+          "description": "Professional astronomical database"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "number": 13,
+      "title": "The Solar Neighborhood",
+      "description": "Red dwarfs and the invisible majority of nearby stars.",
+      "sections": [
+        "The Solar Neighborhood",
+        "Red Dwarfs Dominate",
+        "Mapping the Invisible Majority",
+        "Known Exoplanets in the Solar Neighborhood",
+        "The Significance of Our Cosmic Neighborhood"
+      ],
+      "summary": "The immediate solar neighborhood extends to about 32 light-years from Earth and contains many more red dwarf stars than bright Sun-like stars. This chapter explores the demographics of nearby space, the recent discoveries of potentially habitable exoplanets in our cosmic backyard, and what the nearby universe reveals about the frequency of worlds like Earth.",
+      "keyTopics": [
+        "Red dwarfs",
+        "Stellar demographics",
+        "Nearby exoplanets",
+        "TRAPPIST-1 system",
+        "Space density"
+      ],
+      "videoSuggestions": [
+        { "title": "Red Dwarfs Explained", "source": "Crash Course" },
+        { "title": "TRAPPIST-1 System", "source": "NASA" },
+        { "title": "Nearby Stars", "source": "Crash Course Astronomy" }
+      ],
+      "resources": [
+        {
+          "title": "TRAPPIST-1 Information",
+          "url": "https://science.nasa.gov/",
+          "description": "Discoveries in the TRAPPIST-1 system"
+        },
+        {
+          "title": "Gaia Star Catalog",
+          "url": "https://www.cosmos.esa.int/gaia",
+          "description": "Nearby star positions and parallaxes"
+        },
+        {
+          "title": "Red Dwarf Research",
+          "url": "https://www.nasa.gov/",
+          "description": "Studies of low-mass stars"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "number": 14,
+      "title": "Local Stellar Associations and Moving Groups",
+      "description": "Families of stars born together and moving through space.",
+      "sections": [
+        "What Are Stellar Associations?",
+        "The Scorpius–Centaurus OB Association",
+        "The Hyades and Pleiades Moving Groups",
+        "The Sun and the Ursa Major Moving Group",
+        "The Role of Associations in Galactic Evolution"
+      ],
+      "summary": "Stars are not randomly distributed but often form in groups that remain bound by gravity or kinematic association. This chapter explores stellar nurseries, moving groups that drift through the galaxy together, and the evidence that the Sun itself may have born in a dense cluster before being dispersed. Understanding these associations illuminates the cosmic choreography of stellar evolution.",
+      "keyTopics": [
+        "Star clusters",
+        "OB associations",
+        "Hyades",
+        "Pleiades",
+        "Proper motion"
+      ],
+      "videoSuggestions": [
+        { "title": "Star Clusters Explained", "source": "Crash Course" },
+        { "title": "Pleiades Star Cluster", "source": "NASA" },
+        { "title": "Open Clusters", "source": "Crash Course Astronomy" }
+      ],
+      "resources": [
+        {
+          "title": "Pleiades Observations",
+          "url": "https://science.nasa.gov/",
+          "description": "Studies of the Pleiades cluster"
+        },
+        {
+          "title": "OB Association Research",
+          "url": "https://www.nasa.gov/",
+          "description": "Stellar association discoveries"
+        },
+        {
+          "title": "Hipparcos Archive",
+          "url": "https://www.cosmos.esa.int/hipparcos",
+          "description": "Accurate star cluster distances"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "number": 15,
+      "title": "The Interstellar Medium and Molecular Clouds",
+      "description": "The cosmic material from which new stars are born.",
+      "sections": [
+        "What Are Molecular Clouds?",
+        "How Stars Form from Molecular Clouds",
+        "Famous Nearby Molecular Clouds",
+        "The Life Cycle of Clouds"
+      ],
+      "summary": "Between the stars lies a rich and dynamic medium—a mixture of gas, dust, and complex molecules that is the birthplace of new stars. This chapter explores the life cycle of molecular clouds, the processes that trigger star formation, and some of the most famous stellar nurseries visible from Earth, including the Orion Nebula.",
+      "keyTopics": [
+        "Molecular clouds",
+        "Dust grains",
+        "Star formation",
+        "Nebulae",
+        "Stellar nurseries"
+      ],
+      "videoSuggestions": [
+        { "title": "Star Formation Explained", "source": "Crash Course" },
+        { "title": "Orion Nebula Tour", "source": "NASA" },
+        { "title": "Inside a Molecular Cloud", "source": "NASA Goddard" }
+      ],
+      "resources": [
+        {
+          "title": "Orion Nebula",
+          "url": "https://science.nasa.gov/",
+          "description": "Observations of the Orion region"
+        },
+        {
+          "title": "ALMA Observatory",
+          "url": "https://www.almaobservatory.org/",
+          "description": "Molecular cloud observations"
+        },
+        {
+          "title": "Carina Nebula Images",
+          "url": "https://www.nasa.gov/",
+          "description": "JWST observations of star formation"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "number": 16,
+      "title": "The Local Arm and Beyond",
+      "description": "Our place within the grand architecture of the Milky Way.",
+      "sections": [
+        "Our Place in the Galaxy",
+        "The Structure of the Orion Arm",
+        "Mapping the Galaxy",
+        "Beyond the Local Arm",
+        "The Galactic Disk, Halo, and the Greater Cosmos"
+      ],
+      "summary": "The Sun resides in a spiral arm of the Milky Way called the Orion Arm, a structure so vast that even at galactic scales, we occupy a peripheral location. This chapter traces our position in the galactic structure, the methods astronomers use to map the galaxy, and what the spiral architecture reveals about galactic dynamics and the universe's grand design.",
+      "keyTopics": [
+        "Spiral arms",
+        "Orion Arm",
+        "Galactic structure",
+        "Galactic center",
+        "Dark matter halo"
+      ],
+      "videoSuggestions": [
+        { "title": "Milky Way Structure", "source": "Crash Course" },
+        { "title": "Mapping the Galaxy", "source": "NASA" },
+        { "title": "Galactic Center Tour", "source": "NASA Goddard" }
+      ],
+      "resources": [
+        {
+          "title": "NASA Galactic Center",
+          "url": "https://science.nasa.gov/",
+          "description": "Latest observations of Sagittarius A*"
+        },
+        {
+          "title": "Gaia Galaxy Map",
+          "url": "https://www.esa.int/gaia",
+          "description": "3D map of nearby stars"
+        },
+        {
+          "title": "Milky Way Structure",
+          "url": "https://www.nasa.gov/",
+          "description": "Updated models of galactic architecture"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "number": 17,
+      "title": "The Stellar Life Cycle in Orion",
+      "description": "Birth, life, and death of stars illustrated in the Orion region.",
+      "sections": [
+        "The Molecular Cloud – A Cradle of Creation",
+        "The Giants of Orion – Life on the Main Sequence",
+        "The Aging Titans – Betelgeuse and Rigel",
+        "Echoes of Death – Supernova Remnants in Orion",
+        "A Cosmic Continuum"
+      ],
+      "summary": "The Orion region offers a textbook illustration of stellar evolution across multiple timescales. Young protostars emerge from the Orion Nebula, while massive stars like Betelgeuse near the end of their lives, and supernova remnants mark where ancient stars have already died. This chapter uses Orion as a case study to understand how stars are born, live, and ultimately return their material to the interstellar medium.",
+      "keyTopics": [
+        "Stellar evolution",
+        "Massive stars",
+        "Betelgeuse",
+        "Supernova remnants",
+        "Star formation timescales"
+      ],
+      "videoSuggestions": [
+        { "title": "Orion Nebula JWST", "source": "NASA" },
+        { "title": "Life Cycle of Stars", "source": "Crash Course" },
+        { "title": "Betelgeuse Supergiant", "source": "NASA" }
+      ],
+      "resources": [
+        {
+          "title": "Orion JWST Images",
+          "url": "https://www.nasa.gov/jwst",
+          "description": "Latest observations of star formation"
+        },
+        {
+          "title": "Betelgeuse Research",
+          "url": "https://science.nasa.gov/",
+          "description": "Studies of the red supergiant"
+        },
+        {
+          "title": "Orion Trapezium Cluster",
+          "url": "https://www.nasa.gov/",
+          "description": "Young massive star cluster"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "number": 18,
+      "title": "The Future of the Solar System's Journey",
+      "description": "Tracing the Sun's path through the galaxy and its long-term fate.",
+      "sections": [
+        "The Sun's Galactic Voyage",
+        "Future Encounters with Nearby Stars",
+        "The Long-Term Fate of the Solar System",
+        "Merging Galaxies and the Far Future"
+      ],
+      "summary": "The Sun is not stationary—it travels through the galaxy at speeds of about 250 kilometers per second, taking 230 million years to complete one orbit. Over cosmic timescales, the solar system will encounter other stars, experience dynamical instability, and ultimately face merger with the Andromeda Galaxy. This chapter projects the solar system's future across billions of years.",
+      "keyTopics": [
+        "Solar orbit",
+        "Stellar encounters",
+        "Orbital decay",
+        "Planetary stability",
+        "Galaxy merger"
+      ],
+      "videoSuggestions": [
+        { "title": "Sun's Galactic Orbit", "source": "NASA" },
+        { "title": "Andromeda Collision", "source": "Crash Course" },
+        { "title": "Future of the Solar System", "source": "PBS Space Time" }
+      ],
+      "resources": [
+        {
+          "title": "Galactic Year",
+          "url": "https://science.nasa.gov/",
+          "description": "The Sun's orbital period"
+        },
+        {
+          "title": "Andromeda Merger Simulation",
+          "url": "https://www.nasa.gov/",
+          "description": "Computer models of galaxy collision"
+        },
+        {
+          "title": "Solar System Evolution",
+          "url": "https://www.nasa.gov/",
+          "description": "Long-term dynamical studies"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "number": 19,
+      "title": "Beyond the Milky Way: The Cosmic Web",
+      "description": "Galaxies, galaxy clusters, and the large-scale structure of the universe.",
+      "sections": [
+        "The Outskirts of Our Galaxy",
+        "The Realm of Neighboring Galaxies",
+        "The Local Group",
+        "A Local Supervoid — The Mystery of the Local Hole",
+        "The Virgo Cluster and Beyond",
+        "The Cosmic Web",
+        "Cosmic Giants — Structures That Challenge Our Understanding",
+        "Laniakea — Our Home Supercluster",
+        "Giant Arcs and Quasar Megastructures",
+        "The Hercules–Corona Borealis Great Wall",
+        "Looking Outward, Looking Back"
+      ],
+      "summary": "Beyond the Milky Way lies a universe of galaxies arranged in a vast cosmic web of clusters and filaments. This chapter charts humanity's expanding view of the cosmos, from nearby galaxies to superclusters billions of light-years away. It reveals how we are all connected through gravitational threads and matter flows, and how the large-scale structure of the universe illuminates its origin and fate.",
+      "keyTopics": [
+        "Galaxy clusters",
+        "Local Group",
+        "Superclusters",
+        "Cosmic web",
+        "Dark matter distribution"
+      ],
+      "videoSuggestions": [
+        { "title": "Cosmic Web Tour", "source": "NASA" },
+        { "title": "Andromeda Galaxy", "source": "Crash Course" },
+        {
+          "title": "Universe's Large Scale Structure",
+          "source": "NASA Goddard"
+        }
+      ],
+      "resources": [
+        {
+          "title": "NASA Extragalactic Database",
+          "url": "https://ned.ipac.caltech.edu/",
+          "description": "Catalog of galaxies and clusters"
+        },
+        {
+          "title": "Hubble Deep Field",
+          "url": "https://www.nasa.gov/",
+          "description": "Historic deep universe observations"
+        },
+        {
+          "title": "Local Group Galaxies",
+          "url": "https://science.nasa.gov/",
+          "description": "Detailed information about nearby galaxies"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "number": 20,
+      "title": "Cosmic Origins: A Journey Through Time and Space",
+      "description": "The Big Bang, the early universe, and cosmic history.",
+      "sections": [
+        "The Mirror of the Universe",
+        "The Story of Matter and Life",
+        "The Expanding Mystery",
+        "The JWST Early Galaxy Problem — Too Big, Too Soon",
+        "The Light of Understanding",
+        "The Long Arc of Time"
+      ],
+      "summary": "Looking at distant galaxies is looking back in time. By studying the most distant objects in the universe, we can reconstruct the history of cosmic expansion and the formation of the first stars and galaxies. This chapter explores the universe's earliest moments, the mystery of cosmic inflation, and how recent discoveries from the James Webb Space Telescope are reshaping our understanding of the cosmos.",
+      "keyTopics": [
+        "Big Bang",
+        "Cosmic inflation",
+        "Redshift",
+        "Cosmic microwave background",
+        "First galaxies"
+      ],
+      "videoSuggestions": [
+        { "title": "Big Bang Explained", "source": "Crash Course" },
+        { "title": "JWST Early Galaxies", "source": "NASA" },
+        { "title": "History of the Universe", "source": "PBS Space Time" }
+      ],
+      "resources": [
+        {
+          "title": "Cosmic Microwave Background",
+          "url": "https://science.nasa.gov/",
+          "description": "Background radiation from the early universe"
+        },
+        {
+          "title": "JWST Mission Results",
+          "url": "https://www.nasa.gov/jwst",
+          "description": "Latest observations of early galaxies"
+        },
+        {
+          "title": "Planck Mission Cosmology",
+          "url": "https://www.esa.int/planck",
+          "description": "Precision measurements of cosmic parameters"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "number": 21,
+      "title": "A Universe at Two Speeds",
+      "description": "The Hubble Tension and mysteries of cosmic expansion.",
+      "sections": [
+        "A Universe at Two Speeds — The Hubble Tension",
+        "67 km/s/Mpc — The Early Universe's Answer",
+        "73 km/s/Mpc — The Local Universe's Answer",
+        "A Crisis or a Clue?",
+        "A Signpost Toward New Physics"
+      ],
+      "summary": "The universe is expanding, but astronomers have found a discrepancy in how fast. Different methods of measuring cosmic expansion yield different results—a puzzle known as the Hubble Tension. This chapter explores one of modern cosmology's most intriguing mysteries, what it might reveal about the nature of space and time, and how its resolution could point toward new physics beyond our current understanding.",
+      "keyTopics": [
+        "Hubble constant",
+        "Cosmic expansion",
+        "Distance ladder",
+        "Type Ia supernovae",
+        "New physics"
+      ],
+      "videoSuggestions": [
+        { "title": "Hubble Tension Explained", "source": "PBS Space Time" },
+        { "title": "Cosmic Expansion", "source": "Crash Course" },
+        { "title": "Measuring Distances to Galaxies", "source": "NASA" }
+      ],
+      "resources": [
+        {
+          "title": "Hubble Tension Research",
+          "url": "https://science.nasa.gov/",
+          "description": "Latest studies of the expansion rate discrepancy"
+        },
+        {
+          "title": "Supernova Cosmology",
+          "url": "https://www.nasa.gov/",
+          "description": "Type Ia supernovae as distance markers"
+        },
+        {
+          "title": "Cosmic Distance Ladder",
+          "url": "https://www.nasa.gov/",
+          "description": "Methods for measuring cosmic distances"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "number": 22,
+      "title": "The Fate of Light and Time",
+      "description": "The ultimate destiny of the universe and the end of all things.",
+      "sections": [
+        "The Dimming of the Stars",
+        "The Age of Darkness",
+        "The Black Hole Era",
+        "The Fading of Light and the Death of Time",
+        "The Meaning of an Ending"
+      ],
+      "summary": "In the unimaginably distant future, stars will burn out, galaxies will grow cold and dark, and even black holes will evaporate through Hawking radiation. This final chapter traces the universe's journey from the Big Bang to its ultimate end, exploring the deep physics of entropy, time's arrow, and the profound meaning of a cosmos that began in light and will end in darkness.",
+      "keyTopics": [
+        "Heat death",
+        "Black hole evaporation",
+        "Entropy",
+        "Time's arrow",
+        "Ultimate fate of universe"
+      ],
+      "videoSuggestions": [
+        { "title": "End of the Universe", "source": "Crash Course" },
+        { "title": "Heat Death Explained", "source": "PBS Space Time" },
+        { "title": "The Very Far Future", "source": "NASA" }
+      ],
+      "resources": [
+        {
+          "title": "Black Hole Thermodynamics",
+          "url": "https://science.nasa.gov/",
+          "description": "Hawking radiation and entropy"
+        },
+        {
+          "title": "Ultimate Fate of the Universe",
+          "url": "https://www.nasa.gov/",
+          "description": "Cosmological models of the far future"
+        },
+        {
+          "title": "Time and Thermodynamics",
+          "url": "https://www.nasa.gov/",
+          "description": "Physics of entropy and causality"
+        }
+      ]
+    }
+  ]
+}
