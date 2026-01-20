@@ -24,19 +24,29 @@
         "Solar wind"
       ],
       "videoSuggestions": [
-        { "title": "What is the Sun?", "source": "NASA" },
-        { "title": "Inside the Sun", "source": "ESA" },
-        { "title": "Solar Activity", "source": "NASA ScienceNews" }
+        {
+          "title": "White Dwarfs & Planetary Nebulae",
+          "source": "Crash Course Astronomy",
+          "type": "youtube",
+          "url": "https://youtu.be/Mj06h8BeeOA?si=f44okqV1rWDQ3bPn"
+        },
+
+        {
+          "title": "Stars: Stellar Classification explained and our why the Sun lookes white and not yellow or green ",
+          "source": "Crash Course Astronomy",
+          "type": "youtube",
+          "url": "https://youtu.be/ld75W1dz-h0?si=lVOcgwTHpuwDRuuf"
+        }
       ],
       "resources": [
         {
-          "title": "NASA Sun Portal",
-          "url": "https://science.nasa.gov/sun/",
-          "description": "Comprehensive information about solar science and missions"
+          "title": "Space Weather Live",
+          "url": "https://www.spaceweatherlive.com/",
+          "description": "SpaceWeatherLive is a website that provides near real-time information about space weather and solar activity. It tracks events such as solar flares, sunspots, solar wind conditions, and geomagnetic storms. The site also offers aurora forecasts, including Kp-index data, helping users estimate the chances of seeing the Northern or Southern Lights. SpaceWeatherLive is widely used by space weather enthusiasts, researchers, and aurora watchers who want up-to-date and reliable data about activity on the Sun and its effects on Earth."
         },
         {
           "title": "ESA Solar Orbiter",
-          "url": "https://www.esa.int/",
+          "url": "https://www.esa.int/Science_Exploration/Space_Science/Solar_Orbiter",
           "description": "Latest observations from ESA's solar missions"
         },
         {
@@ -69,9 +79,24 @@
         "Space debris"
       ],
       "videoSuggestions": [
-        { "title": "How GPS Works", "source": "Khan Academy" },
-        { "title": "International Space Station Tour", "source": "NASA" },
-        { "title": "Earth from Space", "source": "ESA" }
+        {
+          "title": "How GPS Works Today",
+          "source": "BRIGHT SIDEy",
+          "type": "youtube",
+          "url": "https://youtu.be/wCcARVbL_Dk?si=x5jwR3m0Kdtl0NJo"
+        },
+        {
+          "title": "Step Inside the International Space Station (POV Tour)",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://youtu.be/nmBbcNTUkOg?si=-z3ZCCzqNEX3rVNP"
+        },
+        {
+          "title": "Live 4K video of Earth and space: 24/7 Livestream of Earth by Sen’s 4K video cameras on the ISS",
+          "source": "Sen",
+          "type": "youtube",
+          "url": "https://www.youtube.com/watch?v=fO9e9jnhYK8"
+        }
       ],
       "resources": [
         {
@@ -80,14 +105,14 @@
           "description": "International Space Station information and live stream"
         },
         {
-          "title": "Satellite Tracking - N2YO",
-          "url": "https://www.n2yo.com/",
-          "description": "Track satellites in real-time"
+          "title": "Satellite Tracker 3D",
+          "url": "https://satellitetracker3d.com/",
+          "description": "Search, filter, analyze, and discover satellites with AI-powered insights and interactive controls. Start tracking now — right in your browser."
         },
         {
           "title": "ESA Earth Observation",
           "url": "https://www.esa.int/Applications/Observing_the_Earth",
-          "description": "Satellite observations of Earth"
+          "description": "ESA’s Observing the Earth program uses satellites to monitor Earth’s atmosphere, land, oceans, and climate in order to support science, environmental protection, and informed decision-making."
         }
       ]
     },
@@ -114,11 +139,31 @@
         "Lunar phases"
       ],
       "videoSuggestions": [
-        { "title": "Apollo 11: The First Moon Landing", "source": "NASA" },
-        { "title": "How the Moon Formed", "source": "Crash Course" },
-        { "title": "Lunar Eclipse Explained", "source": "NASA" }
+        {
+          "title": "Apollo 11: Landing on the Moon",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://youtu.be/nOcDftgR5UQ?si=nyYKLqZTnV8etTo2"
+        },
+        {
+          "title": "New Supercomputer Simulation Sheds Light on Moon’s Origin",
+          "source": "NASA's Ames Research Center",
+          "type": "youtube",
+          "url": "https://youtu.be/kRlhlCWplqk?si=YpALUjxSU4tFqJBO"
+        },
+        {
+          "title": "The Moon: Crash Course Astronomy",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://youtu.be/mCzchPx3yF8?si=kwKUGBw9QC4E7AXU"
+        }
       ],
       "resources": [
+        {
+          "title": "Artemis Program",
+          "url": "https://www.nasa.gov/humans-in-space/artemis/",
+          "description": "With NASA’s Artemis campaign, we are exploring the Moon for scientific discovery, technology advancement, and to learn how to live and work on another world as we prepare for human missions to Mars. We will collaborate with commercial and international partners and establish the first long-term presence on the Moon."
+        },
         {
           "title": "NASA Moon Portal",
           "url": "https://science.nasa.gov/moon/",
@@ -128,11 +173,6 @@
           "title": "Lunar and Planetary Institute",
           "url": "https://www.lpi.usra.edu/",
           "description": "Moon research and education resources"
-        },
-        {
-          "title": "Apollo Archive",
-          "url": "https://www.apolloarchive.com/",
-          "description": "Historic Apollo mission photographs"
         }
       ]
     },
@@ -158,25 +198,41 @@
         "Comparative planetology"
       ],
       "videoSuggestions": [
-        { "title": "Mars Rover Perseverance", "source": "NASA" },
-        { "title": "Venus: The Hellish Planet", "source": "Crash Course" },
-        { "title": "Mercury Close-Up", "source": "ESA" }
+        {
+          "title": "Mercury: Crash Course Astronomy",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://youtu.be/P3GkZe3nRQ0"
+        },
+        {
+          "title": "Venus: Crash Course Astronomy",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://youtu.be/ZFUgy3crCYY?si=NNEGtpiMWgoCC0-o"
+        },
+        {
+          "title": "Mars: Crash Course Astronomy",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://youtu.be/I-88YWx71gE"
+        }
       ],
+
       "resources": [
         {
-          "title": "NASA Planetary Science",
-          "url": "https://science.nasa.gov/planets/",
-          "description": "Mission data and discoveries from all planets"
+          "title": "NASA Mercury",
+          "url": "https://science.nasa.gov/mercury/",
+          "description": "Mercury is the closest planet to the Sun, and the smallest planet in our solar system. It's only slightly larger than Earth's Moon."
         },
         {
-          "title": "Mars Perseverance Rover Updates",
+          "title": "NASA Venus",
+          "url": "https://science.nasa.gov/venus/",
+          "description": "Venus is the second planet from the Sun, and the sixth largest planet. It’s the hottest planet in our solar system."
+        },
+        {
+          "title": "NASA Mars",
           "url": "https://science.nasa.gov/mars/",
-          "description": "Latest Mars exploration news"
-        },
-        {
-          "title": "Venus Express Archive",
-          "url": "https://www.esa.int/",
-          "description": "Venus mission data and analysis"
+          "description": "Mars is the fourth planet from the Sun and is often called the Red Planet because of its reddish appearance. It has the largest volcano and canyon in the solar system."
         }
       ]
     },
@@ -204,25 +260,40 @@
         "Space resources"
       ],
       "videoSuggestions": [
-        { "title": "The Asteroid Belt Explained", "source": "NASA" },
-        { "title": "Ceres: Dwarf Planet", "source": "NASA Dawn Mission" },
-        { "title": "Near-Earth Asteroids", "source": "ESA" }
+        {
+          "title": "Asteroids: Crash Course",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://youtu.be/auxpcdQimCs?si=y-GfPTwLdOUtuQRM"
+        },
+        {
+          "title": "What NASA's Dawn Saw on Ceres and Vesta Stunned Me",
+          "source": "Astrum",
+          "type": "youtube",
+          "url": "https://youtu.be/0w6KRajHMlo?si=ADpjNaEXxsoIQj_K"
+        },
+        {
+          "title": "These are the asteroids to worry about",
+          "source": "Veritasium",
+          "type": "youtube",
+          "url": "https://youtu.be/4Wrc4fHSCpw?si=cgwMJUrCnLIH_8CP"
+        }
       ],
       "resources": [
         {
-          "title": "NASA Asteroid Watch",
-          "url": "https://www.nasa.gov/planetary-defense/",
+          "title": "NASA Eyes on Asteroids",
+          "url": "https://eyes.nasa.gov/apps/asteroids/#/home",
           "description": "Tracking and information about near-Earth asteroids"
         },
         {
-          "title": "Minor Planet Center",
-          "url": "https://www.minorplanetcenter.net/",
-          "description": "Official repository of asteroid data"
+          "title": "NASA Asteroids",
+          "url": "https://science.nasa.gov/solar-system/asteroids/",
+          "description": "Asteroids, sometimes called minor planets, are rocky, airless remnants of the early solar system."
         },
         {
-          "title": "Dawn Mission Archive",
-          "url": "https://science.nasa.gov/mission/dawn/",
-          "description": "Ceres and asteroid exploration"
+          "title": "Asteroids, Comets & Meteors",
+          "url": "https://science.nasa.gov/asteroids-comets-meteors/",
+          "description": "Our solar system's small bodies pack outsized intrigue"
         }
       ]
     },
@@ -248,25 +319,35 @@
         "Meteorite analysis"
       ],
       "videoSuggestions": [
-        { "title": "Meteor Shower Guide", "source": "NASA" },
-        { "title": "The Chicxulub Impact", "source": "NASA" },
-        { "title": "Meteorite Collection", "source": "Smithsonian" }
+        {
+          "title": "Meteor Showers 101",
+          "source": "National Geographic",
+          "type": "youtube",
+          "url": "https://youtu.be/zkglsg0K1IY?si=5tKfDaATZZisUGwA"
+        },
+        {
+          "title": "Meteors",
+          "source": "Crash Course Astronomy",
+          "type": "youtube",
+          "url": "https://youtu.be/TuDfZ2Md5x8?si=f3R91jPRwQuqBHa5"
+        },
+        {
+          "title": "The Impact Crater in Mexico which Wiped out the Dinosaurs; Chicxulub Crater",
+          "source": "GeologyHub",
+          "type": "youtube",
+          "url": "https://youtu.be/dsQuEOVGYFE?si=6tFDQGP7P2TMgVVb"
+        }
       ],
       "resources": [
         {
-          "title": "Meteor Watch NASA",
-          "url": "https://science.nasa.gov/solar-system/small-bodies/meteors-meteorites/",
+          "title": "Meteors and Meteorites",
+          "url": "https://science.nasa.gov/solar-system/meteors-meteorites/",
           "description": "Meteor and meteorite information"
         },
         {
-          "title": "Smithsonian Meteorite Collection",
-          "url": "https://www.si.edu/",
-          "description": "World's largest meteorite collection"
-        },
-        {
-          "title": "American Meteor Society",
-          "url": "https://www.amsmeteors.org/",
-          "description": "Citizen science and meteor tracking"
+          "title": "Smithsonian: Meteorites - Messengers From Outer Space",
+          "url": "https://naturalhistory.si.edu/education/teaching-resources/earth-science/meteorites-messengers-outer-space",
+          "description": "Smithsonian educational resources on meteorites"
         }
       ]
     },
@@ -291,10 +372,32 @@
         "Ice giants"
       ],
       "videoSuggestions": [
-        { "title": "Jupiter Mission: JUNO", "source": "NASA" },
-        { "title": "Saturn's Rings Explained", "source": "Crash Course" },
-        { "title": "Uranus and Neptune", "source": "NASA" }
+        {
+          "title": "Jupiter: Crash Course Astronomy",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://youtu.be/Xwn8fQSW7-8?si=yAqmJMcdOJYAwF7K"
+        },
+        {
+          "title": "Saturn: Crash Course Astronomy",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://youtu.be/E8GNde5nCSg?si=3J1XtI6PAtQkeQxi"
+        },
+        {
+          "title": "Uranus and Neptune: Crash Course Astronomy",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://youtu.be/1hIwD17Crko?si=-sk_LErINk9dHLSS"
+        },
+        {
+          "title": "Planetary Migration: When Jupiter Devastated The Solar System!",
+          "source": "Insane Curiosity",
+          "type": "youtube",
+          "url": "https://youtu.be/SurF6UtYMMY?si=SHyY-Cn0CGo9adOI"
+        }
       ],
+
       "resources": [
         {
           "title": "NASA JUNO Mission",
@@ -305,11 +408,6 @@
           "title": "Saturn Cassini Archive",
           "url": "https://science.nasa.gov/mission/cassini/",
           "description": "Historic Saturn mission data"
-        },
-        {
-          "title": "Ice Giants Portal",
-          "url": "https://science.nasa.gov/planets/ice-giants/",
-          "description": "Uranus and Neptune information"
         }
       ]
     },
@@ -335,25 +433,41 @@
         "Dwarf planets"
       ],
       "videoSuggestions": [
-        { "title": "Pluto Flyby - New Horizons", "source": "NASA" },
-        { "title": "What Are Comets?", "source": "Crash Course" },
-        { "title": "Oort Cloud Explained", "source": "NASA" }
+        {
+          "title": "Comets: Crash Course Astronomy",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://youtu.be/yB9HHyPpKds?si=O3isaoe3nyPnhIyR"
+        },
+        {
+          "title": "The Oort Cloud: Crash Course Astronomy",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://youtu.be/ZJscxTyI__s?si=RoxCUD7XHlTzbu4O"
+        },
+        {
+          "title": "The Surprising Origin of All the Elements in the Universe?",
+          "source": "Arvin Ash",
+          "type": "youtube",
+          "url": "https://youtu.be/wgUIB4tD0cM?si=WjaCMM1q0Pugz8q8"
+        },
+        {
+          "title": "Astro Alchemy: Where Rare Elements Come From",
+          "source": "But Why?",
+          "type": "youtube",
+          "url": "https://youtu.be/3pzjYXBFWz0?si=wQelVei1bA477dca"
+        }
       ],
       "resources": [
         {
-          "title": "NASA New Horizons Mission",
-          "url": "https://science.nasa.gov/mission/new-horizons/",
-          "description": "Pluto and Kuiper Belt exploration"
+          "title": "NASA The Kuiper Belt",
+          "url": "https://science.nasa.gov/solar-system/kuiper-belt/",
+          "description": "The Kuiper Belt is a doughnut-shaped region of icy objects beyond the orbit of Neptune."
         },
         {
-          "title": "NASA Comet Watch",
-          "url": "https://science.nasa.gov/solar-system/small-bodies/comets/",
-          "description": "Current and upcoming comet observations"
-        },
-        {
-          "title": "IAU Minor Planet Center",
-          "url": "https://www.minorplanetcenter.net/",
-          "description": "Database of minor planets and comets"
+          "title": "NASA Oort Cloud",
+          "url": "https://science.nasa.gov/solar-system/oort-cloud/",
+          "description": "Scientists think the Oort Cloud is a giant spherical shell surrounding our solar system."
         }
       ]
     },
@@ -381,25 +495,46 @@
         "Cosmic rays"
       ],
       "videoSuggestions": [
-        { "title": "Voyager Golden Record", "source": "NASA" },
-        { "title": "Solar Wind Explained", "source": "NASA" },
-        { "title": "Edge of the Solar System", "source": "Crash Course" }
+        {
+          "title": "NASA The Heliosphere",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://youtu.be/9IE2VUZ6wZM?si=tDUI6DJ4VLYHZ-TP"
+        },
+        {
+          "title": "Shocking! Voyager Found a 50,000K Wall at the Solar System’s Edge",
+          "source": "NASA Space News",
+          "type": "youtube",
+          "url": "https://youtu.be/ZvMaSn3HMhI?si=GoDKkbbcJvk5rXxR"
+        },
+        {
+          "title": "NASA ScienceCasts: Effects of the Solar Wind",
+          "source": "NASA Science",
+          "type": "youtube",
+          "url": "https://youtu.be/twB62NYsaIg?si=ThKDLaVowXIofr_K"
+        },
+        {
+          "title": "ScienceCasts: The Mystery of High-Energy Cosmic Rays",
+          "source": "NASA Science",
+          "type": "youtube",
+          "url": "https://youtu.be/twB62NYsaIg?si=ThKDLaVowXIofr_K"
+        }
       ],
       "resources": [
         {
           "title": "NASA Voyager Mission",
           "url": "https://science.nasa.gov/mission/voyager/",
-          "description": "Real-time data from Voyager probes"
+          "description": "Interstellar Messengers"
         },
         {
-          "title": "IBEX Mission - Interstellar Boundary",
+          "title": "IBEX Mission - Interstellar Boundary Explorer",
           "url": "https://science.nasa.gov/mission/ibex/",
           "description": "Mapping the boundary of our solar system"
         },
         {
-          "title": "Interstellar Medium Info",
+          "title": "What Is the Solar Wind?",
           "url": "https://science.nasa.gov/",
-          "description": "Understanding the space between stars"
+          "description": "From the center of the solar system, rages a powerful wind"
         }
       ]
     },
@@ -427,27 +562,27 @@
       ],
       "videoSuggestions": [
         {
-          "title": "Discovery of Exoplanets",
-          "source": "NASA Exoplanet Program"
-        },
-        { "title": "Habitable Zone Explained", "source": "Crash Course" },
-        { "title": "JWST Exoplanet Hunt", "source": "NASA" }
+          "title": "Exoplanets: Crash Course Astronomy",
+          "source": "Crash Course Astronomy",
+          "type": "youtube",
+          "url": "https://youtu.be/7ATtD8x7vV0?si=81PyQMeLUd4hcn7S"
+        }
       ],
       "resources": [
         {
-          "title": "NASA Exoplanet Archive",
-          "url": "https://exoplanetarchive.ipac.caltech.edu/",
-          "description": "Database of confirmed exoplanets"
+          "title": "NASA Interactive 3D visualization of Exoplanets",
+          "url": "https://eyes.nasa.gov/apps/exo/",
+          "description": "Interactive 3D visualization of known exoplanets"
         },
         {
-          "title": "Exoplanet Exploration",
-          "url": "https://exoplanetexploration.nasa.gov/",
-          "description": "NASA's exoplanet research"
+          "title": "NASA Exoplanets",
+          "url": "https://science.nasa.gov/exoplanets/",
+          "description": "Comprehensive exoplanet data and discoveries"
         },
         {
-          "title": "JWST Exoplanet Discoveries",
-          "url": "https://science.nasa.gov/jwst/",
-          "description": "Latest James Webb discoveries"
+          "title": "NASA The Habitable Zone",
+          "url": "https://science.nasa.gov/exoplanets/habitable-zone/",
+          "description": "information about The Habitable Zone"
         }
       ]
     },
@@ -472,25 +607,29 @@
         "Stellar kinematics"
       ],
       "videoSuggestions": [
-        { "title": "Interstellar Medium Tour", "source": "NASA" },
-        { "title": "Our Place in the Galaxy", "source": "Crash Course" },
-        { "title": "Local Interstellar Cloud", "source": "NASA Goddard" }
+        {
+          "title": "Formation of Local Bubble (Animation)",
+          "source": "Catherine Zucker, Alyssa A. Goodman, Michael Foley, Douglas Finkbeiner (Harvard–Smithsonian Center for Astrophysics), CC0, via Wikimedia Commons",
+          "type": "gif",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Localbubble_formation.gif"
+        },
+        {
+          "title": "What Lies Beyond the Solar System? Long Episode",
+          "source": "Kosmo",
+          "type": "youtube",
+          "url": "https://youtu.be/qOpYYPzVOG4?si=OTW0v8fNj5uTFLk0"
+        }
       ],
       "resources": [
         {
-          "title": "Local Bubble Research",
-          "url": "https://science.nasa.gov/",
-          "description": "Studies of the local interstellar medium"
+          "title": "1,000-Light-Year Wide Bubble Surrounding Earth is Source of All Nearby, Young Star",
+          "url": "https://www.cfa.harvard.edu/news/1000-light-year-wide-bubble-surrounding-earth-source-all-nearby-young-stars",
+          "description": "For the first time, astronomers have retraced the history of our galactic neighborhood, showing exactly how the young stars nearest to our solar system formed."
         },
         {
-          "title": "Hipparcos Star Catalog",
-          "url": "https://www.cosmos.esa.int/web/hipparcos",
-          "description": "Mapping the local solar neighborhood"
-        },
-        {
-          "title": "Gaia Mission Results",
-          "url": "https://www.esa.int/gaia",
-          "description": "Ultra-precise stellar positions and motions"
+          "title": "The Galactic Environment of the Sun",
+          "url": "https://www.americanscientist.org/article/the-galactic-environment-of-the-sun",
+          "description": "The heliosphere appears to protect the inner solar system from the vagaries of the interstellar medium."
         }
       ]
     },
@@ -513,25 +652,24 @@
         "Proper motion"
       ],
       "videoSuggestions": [
-        { "title": "Alpha Centauri Explained", "source": "Crash Course" },
-        { "title": "Proxima Centauri Discovery", "source": "NASA" },
-        { "title": "The Scale of Space", "source": "YouTube Edu" }
+        {
+          "title": "Our Closest Stars. What Lies beyond the Solar System?",
+          "source": "Kosmo",
+          "type": "youtube",
+          "url": "https://youtu.be/T6GUHyRBgOQ?si=5jUvRMqvTV9i2_iT"
+        },
+        {
+          "title": "Light seconds, light years, light centuries: How to measure extreme distances - Yuan-Sen Ting",
+          "source": "TED-Ed",
+          "type": "youtube",
+          "url": "https://youtu.be/Op3AYaJc0Xw?si=F60gpPrZF0uItd1G"
+        }
       ],
       "resources": [
         {
-          "title": "ESO Alpha Centauri Page",
-          "url": "https://www.eso.org/",
-          "description": "Professional observations of Alpha Centauri"
-        },
-        {
-          "title": "Breakthrough Starshot",
-          "url": "https://breakthroughinitiatives.org/",
-          "description": "Interstellar travel initiative"
-        },
-        {
-          "title": "Stellar Database - Simbad",
-          "url": "https://simbad.u-strasbg.fr/",
-          "description": "Professional astronomical database"
+          "title": "Stellar Catalog",
+          "url": "https://www.stellarcatalog.com/stars.php?showStars=15",
+          "description": "Our Milky Way galaxy contains billions of stars. Stellar Catalog focuses on those that are close to the Solar system. Explore the Stellar Catalog: a complete list of the nearby stars within 97.4 light-years, including Alpha Centauri, Wolf 359, Sirius and thousands of stars and exoplanets."
         }
       ]
     },
@@ -556,25 +694,30 @@
         "Space density"
       ],
       "videoSuggestions": [
-        { "title": "Red Dwarfs Explained", "source": "Crash Course" },
-        { "title": "TRAPPIST-1 System", "source": "NASA" },
-        { "title": "Nearby Stars", "source": "Crash Course Astronomy" }
+        {
+          "title": "Low Mass Stars: Crash Course Astronomy",
+          "source": "Crash Course Astronomy",
+          "type": "youtube",
+          "url": "https://youtu.be/jfvMtCHv1q4?si=fSAsGcX6Ecu8fhGL"
+        },
+        {
+          "title": "Brown Dwarfs: Crash Course Astronomy",
+          "source": "Crash Course Astronomy",
+          "type": "youtube",
+          "url": "https://youtu.be/4zKVx29_A1w?si=EbIs0PecM6Op8qZE"
+        },
+        {
+          "title": "Classification of Stars: Spectral Analysis and the H-R Diagram",
+          "source": "Professor Dave Explains",
+          "type": "youtube",
+          "url": "https://youtu.be/Y5VU3Mp6abI?si=ZVk8cHVqo7v6vc3s"
+        }
       ],
       "resources": [
         {
-          "title": "TRAPPIST-1 Information",
-          "url": "https://science.nasa.gov/",
-          "description": "Discoveries in the TRAPPIST-1 system"
-        },
-        {
-          "title": "Gaia Star Catalog",
-          "url": "https://www.cosmos.esa.int/gaia",
-          "description": "Nearby star positions and parallaxes"
-        },
-        {
-          "title": "Red Dwarf Research",
-          "url": "https://www.nasa.gov/",
-          "description": "Studies of low-mass stars"
+          "title": "Stellar Parallax",
+          "url": "https://science.nasa.gov/asset/hubble/stellar-parallax/",
+          "description": "Stellar Parallax"
         }
       ]
     },
@@ -599,9 +742,24 @@
         "Proper motion"
       ],
       "videoSuggestions": [
-        { "title": "Star Clusters Explained", "source": "Crash Course" },
-        { "title": "Pleiades Star Cluster", "source": "NASA" },
-        { "title": "Open Clusters", "source": "Crash Course Astronomy" }
+        {
+          "title": "Star Clusters Explained",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Star%20Clusters%20Explained%20Crash%20Course"
+        },
+        {
+          "title": "Pleiades Star Cluster",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Pleiades%20Star%20Cluster%20NASA"
+        },
+        {
+          "title": "Open Clusters",
+          "source": "Crash Course Astronomy",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Open%20Clusters%20Crash%20Course%20Astronomy"
+        }
       ],
       "resources": [
         {
@@ -641,9 +799,24 @@
         "Stellar nurseries"
       ],
       "videoSuggestions": [
-        { "title": "Star Formation Explained", "source": "Crash Course" },
-        { "title": "Orion Nebula Tour", "source": "NASA" },
-        { "title": "Inside a Molecular Cloud", "source": "NASA Goddard" }
+        {
+          "title": "Star Formation Explained",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Star%20Formation%20Explained%20Crash%20Course"
+        },
+        {
+          "title": "Orion Nebula Tour",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Orion%20Nebula%20Tour%20NASA"
+        },
+        {
+          "title": "Inside a Molecular Cloud",
+          "source": "NASA Goddard",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Inside%20a%20Molecular%20Cloud%20NASA%20Goddard"
+        }
       ],
       "resources": [
         {
@@ -684,9 +857,24 @@
         "Dark matter halo"
       ],
       "videoSuggestions": [
-        { "title": "Milky Way Structure", "source": "Crash Course" },
-        { "title": "Mapping the Galaxy", "source": "NASA" },
-        { "title": "Galactic Center Tour", "source": "NASA Goddard" }
+        {
+          "title": "Milky Way Structure",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Milky%20Way%20Structure%20Crash%20Course"
+        },
+        {
+          "title": "Mapping the Galaxy",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Mapping%20the%20Galaxy%20NASA"
+        },
+        {
+          "title": "Galactic Center Tour",
+          "source": "NASA Goddard",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Galactic%20Center%20Tour%20NASA%20Goddard"
+        }
       ],
       "resources": [
         {
@@ -727,9 +915,24 @@
         "Star formation timescales"
       ],
       "videoSuggestions": [
-        { "title": "Orion Nebula JWST", "source": "NASA" },
-        { "title": "Life Cycle of Stars", "source": "Crash Course" },
-        { "title": "Betelgeuse Supergiant", "source": "NASA" }
+        {
+          "title": "Orion Nebula JWST",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Orion%20Nebula%20JWST%20NASA"
+        },
+        {
+          "title": "Life Cycle of Stars",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Life%20Cycle%20of%20Stars%20Crash%20Course"
+        },
+        {
+          "title": "Betelgeuse Supergiant",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Betelgeuse%20Supergiant%20NASA"
+        }
       ],
       "resources": [
         {
@@ -769,9 +972,24 @@
         "Galaxy merger"
       ],
       "videoSuggestions": [
-        { "title": "Sun's Galactic Orbit", "source": "NASA" },
-        { "title": "Andromeda Collision", "source": "Crash Course" },
-        { "title": "Future of the Solar System", "source": "PBS Space Time" }
+        {
+          "title": "Sun's Galactic Orbit",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Sun%27s%20Galactic%20Orbit%20NASA"
+        },
+        {
+          "title": "Andromeda Collision",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Andromeda%20Collision%20Crash%20Course"
+        },
+        {
+          "title": "Future of the Solar System",
+          "source": "PBS Space Time",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Future%20of%20the%20Solar%20System%20PBS%20Space%20Time"
+        }
       ],
       "resources": [
         {
@@ -818,11 +1036,23 @@
         "Dark matter distribution"
       ],
       "videoSuggestions": [
-        { "title": "Cosmic Web Tour", "source": "NASA" },
-        { "title": "Andromeda Galaxy", "source": "Crash Course" },
+        {
+          "title": "Cosmic Web Tour",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Cosmic%20Web%20Tour%20NASA"
+        },
+        {
+          "title": "Andromeda Galaxy",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Andromeda%20Galaxy%20Crash%20Course"
+        },
         {
           "title": "Universe's Large Scale Structure",
-          "source": "NASA Goddard"
+          "source": "NASA Goddard",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Universe%27s%20Large%20Scale%20Structure%20NASA%20Goddard"
         }
       ],
       "resources": [
@@ -865,9 +1095,24 @@
         "First galaxies"
       ],
       "videoSuggestions": [
-        { "title": "Big Bang Explained", "source": "Crash Course" },
-        { "title": "JWST Early Galaxies", "source": "NASA" },
-        { "title": "History of the Universe", "source": "PBS Space Time" }
+        {
+          "title": "Big Bang Explained",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Big%20Bang%20Explained%20Crash%20Course"
+        },
+        {
+          "title": "JWST Early Galaxies",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=JWST%20Early%20Galaxies%20NASA"
+        },
+        {
+          "title": "History of the Universe",
+          "source": "PBS Space Time",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=History%20of%20the%20Universe%20PBS%20Space%20Time"
+        }
       ],
       "resources": [
         {
@@ -908,9 +1153,24 @@
         "New physics"
       ],
       "videoSuggestions": [
-        { "title": "Hubble Tension Explained", "source": "PBS Space Time" },
-        { "title": "Cosmic Expansion", "source": "Crash Course" },
-        { "title": "Measuring Distances to Galaxies", "source": "NASA" }
+        {
+          "title": "Hubble Tension Explained",
+          "source": "PBS Space Time",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Hubble%20Tension%20Explained%20PBS%20Space%20Time"
+        },
+        {
+          "title": "Cosmic Expansion",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Cosmic%20Expansion%20Crash%20Course"
+        },
+        {
+          "title": "Measuring Distances to Galaxies",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Measuring%20Distances%20to%20Galaxies%20NASA"
+        }
       ],
       "resources": [
         {
@@ -951,9 +1211,24 @@
         "Ultimate fate of universe"
       ],
       "videoSuggestions": [
-        { "title": "End of the Universe", "source": "Crash Course" },
-        { "title": "Heat Death Explained", "source": "PBS Space Time" },
-        { "title": "The Very Far Future", "source": "NASA" }
+        {
+          "title": "End of the Universe",
+          "source": "Crash Course",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=End%20of%20the%20Universe%20Crash%20Course"
+        },
+        {
+          "title": "Heat Death Explained",
+          "source": "PBS Space Time",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=Heat%20Death%20Explained%20PBS%20Space%20Time"
+        },
+        {
+          "title": "The Very Far Future",
+          "source": "NASA",
+          "type": "youtube",
+          "url": "https://www.youtube.com/results?search_query=The%20Very%20Far%20Future%20NASA"
+        }
       ],
       "resources": [
         {

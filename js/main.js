@@ -42,7 +42,7 @@ function setupMenuToggle() {
     if (
       sideMenu.classList.contains("active") &&
       !sideMenu.contains(e.target) &&
-      !menuToggle.contains(e.target)
+      !(menuToggle && menuToggle.contains(e.target))
     ) {
       closeMenu();
     }
@@ -173,14 +173,70 @@ function renderChapterPage(chapterNumber) {
   if (videosContainer) {
     let html = '<h3>Videos</h3><div class="video-grid">';
     chapter.videoSuggestions.forEach((video) => {
-      html += `
+      const title = video.title || "Video";
+      const source = video.source || "";
+      const type = video.type || "link";
+
+      if (type === "gif" && video.url) {
+        html += `
                 <div class="video-card">
-                    <div style="font-size: 2rem;">🎬</div>
-                    <h4>${video.title}</h4>
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">${video.source}</p>
-                    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(video.title + " " + video.source)}" target="_blank">Watch on YouTube</a>
+                    <h4>${title}</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">${source}</p>
+                    <img class="video-embed gif-embed" src="${video.url}" alt="${title}" />
                 </div>
             `;
+      } else if (type === "youtube") {
+        let embedSrc = null;
+        if (video.youtubeId) {
+          embedSrc = `https://www.youtube.com/embed/${video.youtubeId}`;
+        } else if (video.embedUrl) {
+          embedSrc = video.embedUrl;
+        } else if (video.url) {
+          try {
+            const url = new URL(video.url);
+            const host = url.hostname.replace("www.", "");
+            if (host === "youtube.com" && url.pathname === "/watch") {
+              const id = url.searchParams.get("v");
+              if (id) embedSrc = `https://www.youtube.com/embed/${id}`;
+            } else if (host === "youtu.be") {
+              const id = url.pathname.split("/").filter(Boolean)[0];
+              if (id) embedSrc = `https://www.youtube.com/embed/${id}`;
+            }
+          } catch (e) {
+            // ignore parsing errors
+          }
+        }
+
+        if (embedSrc) {
+          html += `
+                <div class="video-card">
+                    <h4>${title}</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">${source}</p>
+                    <iframe class="video-embed" src="${embedSrc}" title="${title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+            `;
+        } else {
+          const linkUrl =
+            video.url ||
+            `https://www.youtube.com/results?search_query=${encodeURIComponent(title + " " + source)}`;
+          html += `
+                <div class="video-card">
+                    <h4>${title}</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">${source}</p>
+                    <a href="${linkUrl}" target="_blank">Open on YouTube</a>
+                </div>
+            `;
+        }
+      } else {
+        html += `
+                <div class="video-card">
+                    <div style="font-size: 2rem;">🎬</div>
+                    <h4>${title}</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">${source}</p>
+                    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(title + " " + source)}" target="_blank">Watch on YouTube</a>
+                </div>
+            `;
+      }
     });
     html += "</div>";
     videosContainer.innerHTML = html;
