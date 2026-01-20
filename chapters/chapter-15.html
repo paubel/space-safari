@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chapter - Space Safari</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body class="chapter-page">
     <!-- Navigation Menu -->
     <nav class="navbar">
@@ -28,7 +30,7 @@
         <div class="chapter-header"></div>
 
         <section id="chapter-summary"></section>
-        
+
         <section id="chapter-sections"></section>
 
         <section id="chapter-videos"></section>
@@ -39,22 +41,24 @@
 
         <footer>
             <p><a href="../index.html">← Back to All Chapters</a></p>
-            <p style="margin-top: 1rem;">Resources: <a href="https://www.nasa.gov/" target="_blank">NASA</a> • <a href="https://www.esa.int/" target="_blank">ESA</a></p>
+            <p style="margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-muted);">© Paul Belfrage. All rights
+                reserved except when clearly stated.</p>
         </footer>
     </div>
 
     <script src="../js/main.js"></script>
     <script>
-        const match = window.location.pathname.match(/chapter-(\d+)\.html/);
+        const match = window.location.pathname.match(/chapter-(\d+)\.html/)
         if (match) {
-            const chapterNumber = parseInt(match[1]);
+            const chapterNumber = parseInt(match[1])
             const interval = setInterval(() => {
                 if (window.spacesafari && window.spacesafari.getChapter(chapterNumber)) {
-                    clearInterval(interval);
-                    window.spacesafari.renderChapterPage(chapterNumber);
+                    clearInterval(interval)
+                    window.spacesafari.renderChapterPage(chapterNumber)
                 }
-            }, 100);
+            }, 100)
         }
     </script>
 </body>
+
 </html>
