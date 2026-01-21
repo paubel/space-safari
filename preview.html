@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Safari - Book Preview</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Georgia', serif;
+        }
+
+        .preview-header {
+            background: rgba(10, 14, 39, 0.95);
+            padding: 1.5rem;
+            border-bottom: 2px solid #ff6b35;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .preview-header h1 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.5rem;
+        }
+
+        .preview-header p {
+            margin: 0;
+            color: #ccc;
+            font-size: 0.95rem;
+            flex: 1;
+        }
+
+        .preview-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .preview-btn {
+            background: #ff6b35;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.3s ease;
+        }
+
+        .preview-btn:hover {
+            background: #ff5520;
+        }
+
+        .preview-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            color: #fff;
+            font-size: 0.9rem;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .preview-back {
+            background: #444;
+        }
+
+        .preview-back:hover {
+            background: #555;
+        }
+
+        .pdf-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem 1rem;
+            overflow: auto;
+        }
+
+        #pdf-canvas {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #333;
+        }
+
+        .loading {
+            color: #fff;
+            font-size: 1.2rem;
+        }
+
+        .error {
+            color: #ff6b35;
+            font-size: 1rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .preview-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .preview-header h1 {
+                font-size: 1.2rem;
+            }
+
+            .preview-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .preview-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .page-info {
+                min-width: 80px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="preview-header">
+        <div>
+            <h1>📖 Space Safari - Book Preview</h1>
+            <p>Read the first chapters free</p>
+        </div>
+        <div class="preview-controls">
+            <button class="preview-btn preview-back" onclick="window.location.href='index.html'">← Back to Home</button>
+            <button class="preview-btn" id="prev-btn" onclick="prevPage()" title="Previous page">← Prev</button>
+            <div class="page-info">
+                <span id="page-num">1</span> / <span id="page-count">1</span>
+            </div>
+            <button class="preview-btn" id="next-btn" onclick="nextPage()" title="Next page">Next →</button>
+            <button class="preview-btn" id="zoom-in-btn" onclick="zoomIn()" title="Zoom in">🔍+</button>
+            <button class="preview-btn" id="zoom-out-btn" onclick="zoomOut()" title="Zoom out">🔍−</button>
+        </div>
+    </div>
+
+    <div class="pdf-container">
+        <div id="loading" class="loading">Loading PDF...</div>
+        <canvas id="pdf-canvas"></canvas>
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+
+    <!-- PDF.js Library from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Setup PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+
+        const canvas = document.getElementById('pdf-canvas')
+        const ctx = canvas.getContext('2d')
+        const loadingDiv = document.getElementById('loading')
+        const errorDiv = document.getElementById('error')
+        const pageNumElement = document.getElementById('page-num')
+        const pageCountElement = document.getElementById('page-count')
+        const prevBtn = document.getElementById('prev-btn')
+        const nextBtn = document.getElementById('next-btn')
+
+        let pdfDoc = null
+        let pageNum = 1
+        let pageRendering = false
+        let pageNumPending = null
+        let scale = 1.5
+
+        function renderPage(num) {
+            pageRendering = true
+            pdfDoc.getPage(num).then((page) => {
+                const viewport = page.getViewport({ scale: scale })
+                canvas.height = viewport.height
+                canvas.width = viewport.width
+
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                }
+                page.render(renderContext).promise.then(() => {
+                    pageRendering = false
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending)
+                        pageNumPending = null
+                    }
+                })
+            })
+
+            pageNumElement.textContent = num
+            updateButtons()
+        }
+
+        function updateButtons() {
+            prevBtn.disabled = pageNum <= 1
+            nextBtn.disabled = pageNum >= pdfDoc.numPages
+        }
+
+        function nextPage() {
+            if (pageNum < pdfDoc.numPages) {
+                pageNum++
+                if (pageRendering) {
+                    pageNumPending = pageNum
+                } else {
+                    renderPage(pageNum)
+                }
+            }
+        }
+
+        function prevPage() {
+            if (pageNum > 1) {
+                pageNum--
+                if (pageRendering) {
+                    pageNumPending = pageNum
+                } else {
+                    renderPage(pageNum)
+                }
+            }
+        }
+
+        function zoomIn() {
+            scale += 0.25
+            renderPage(pageNum)
+        }
+
+        function zoomOut() {
+            if (scale > 0.5) {
+                scale -= 0.25
+                renderPage(pageNum)
+            }
+        }
+
+        // Load PDF
+        pdfjsLib.getDocument('./assets/pdf/preview.pdf').promise.then((pdf) => {
+            pdfDoc = pdf
+            pageCountElement.textContent = pdf.numPages
+            loadingDiv.style.display = 'none'
+            canvas.style.display = 'block'
+            renderPage(pageNum)
+        }).catch((error) => {
+            loadingDiv.style.display = 'none'
+            errorDiv.style.display = 'block'
+            errorDiv.textContent = 'Error loading PDF. Please check that the file exists at assets/pdf/preview.pdf'
+            console.error('PDF loading error:', error)
+        })
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextPage()
+            if (e.key === 'ArrowLeft') prevPage()
+        });
+    </script>
+</body>
+
+</html>

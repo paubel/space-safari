@@ -29,6 +29,52 @@ body {
   padding: 2rem 1.5rem;
 }
 
+/* Preview Section */
+.preview-section {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 158, 255, 0.1) 0%,
+    rgba(255, 107, 53, 0.1) 100%
+  );
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2rem 1.5rem;
+  margin: 2.5rem 0;
+  text-align: center;
+}
+
+.preview-section h2 {
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+  font-size: 1.8rem;
+}
+
+.preview-section p {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.preview-link {
+  display: inline-block;
+  background: linear-gradient(135deg, #4a9eff 0%, #ff6b35 100%);
+  color: white;
+  padding: 0.9rem 2.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.05rem;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: 0 6px 20px rgba(74, 158, 255, 0.3);
+}
+
+.preview-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(74, 158, 255, 0.4);
+}
+
 /* Buy Guide */
 .buy-guide {
   margin-top: 2.5rem;
@@ -503,6 +549,19 @@ footer a {
 
   h2 {
     font-size: 1.5rem;
+  }
+
+  .preview-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .preview-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .preview-link {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
   }
 
   .chapter-link {
