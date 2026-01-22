@@ -988,17 +988,17 @@
       ],
       "videoSuggestions": [
         {
-          "title": "Big Bang Explained",
-          "source": "Crash Course",
+          "title": "JWST’s 3 BIG mysteries of the early Universe",
+          "source": "Dr. Becky",
           "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Big%20Bang%20Explained%20Crash%20Course"
+          "url": "https://youtu.be/Qu15C28QW8c?si=DvZGG-UI1FZ7SlwX"
         }
       ],
       "resources": [
         {
-          "title": "Cosmic Microwave Background",
+          "title": "An Explanation For The JWST's Puzzling Early Galaxies",
           "url": "https://science.nasa.gov/",
-          "description": "Background radiation from the early universe"
+          "description": "Universe Today"
         }
       ]
     },
@@ -1024,39 +1024,17 @@
       ],
       "videoSuggestions": [
         {
-          "title": "Hubble Tension Explained",
-          "source": "PBS Space Time",
+          "title": "Expansion Rate: The Hubble Tension",
+          "source": "NASA Goddard",
           "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Hubble%20Tension%20Explained%20PBS%20Space%20Time"
-        },
-        {
-          "title": "Cosmic Expansion",
-          "source": "Crash Course",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Cosmic%20Expansion%20Crash%20Course"
-        },
-        {
-          "title": "Measuring Distances to Galaxies",
-          "source": "NASA",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Measuring%20Distances%20to%20Galaxies%20NASA"
+          "url": "https://youtu.be/Jam61H0SA3Q?si=qn7HmnPUR_c9wKb5"
         }
       ],
       "resources": [
         {
-          "title": "Hubble Tension Research",
-          "url": "https://science.nasa.gov/",
+          "title": "NASA’s Webb, Hubble Telescopes Affirm Universe’s Expansion Rate, Puzzle Persists",
+          "url": "https://science.nasa.gov/missions/hubble/nasas-webb-hubble-telescopes-affirm-universes-expansion-rate-puzzle-persists/",
           "description": "Latest studies of the expansion rate discrepancy"
-        },
-        {
-          "title": "Supernova Cosmology",
-          "url": "https://www.nasa.gov/",
-          "description": "Type Ia supernovae as distance markers"
-        },
-        {
-          "title": "Cosmic Distance Ladder",
-          "url": "https://www.nasa.gov/",
-          "description": "Methods for measuring cosmic distances"
         }
       ]
     },
@@ -1082,39 +1060,17 @@
       ],
       "videoSuggestions": [
         {
-          "title": "End of the Universe",
-          "source": "Crash Course",
+          "title": "TIMELAPSE OF THE FUTURE: A Journey to the End of Time (4K)",
+          "source": "melodysheep",
           "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=End%20of%20the%20Universe%20Crash%20Course"
-        },
-        {
-          "title": "Heat Death Explained",
-          "source": "PBS Space Time",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Heat%20Death%20Explained%20PBS%20Space%20Time"
-        },
-        {
-          "title": "The Very Far Future",
-          "source": "NASA",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=The%20Very%20Far%20Future%20NASA"
+          "url": "https://youtu.be/uD4izuDMUQA?si=3X8xlxrm51rFh4A2"
         }
       ],
       "resources": [
         {
-          "title": "Black Hole Thermodynamics",
-          "url": "https://science.nasa.gov/",
-          "description": "Hawking radiation and entropy"
-        },
-        {
-          "title": "Ultimate Fate of the Universe",
-          "url": "https://www.nasa.gov/",
-          "description": "Cosmological models of the far future"
-        },
-        {
-          "title": "Time and Thermodynamics",
-          "url": "https://www.nasa.gov/",
-          "description": "Physics of entropy and causality"
+          "title": "The Beginning to the End of the Universe: A cold, lonely death",
+          "url": "https://www.astronomy.com/science/the-beginning-to-the-end-of-the-universe-a-cold-lonely-death/",
+          "description": "Everything — from creatures to stars to black holes — will eventually decay into nothingness."
         }
       ]
     }
