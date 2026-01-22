@@ -743,39 +743,23 @@
       ],
       "videoSuggestions": [
         {
-          "title": "Star Clusters Explained",
-          "source": "Crash Course",
+          "title": "Formation of a stellar association",
+          "source": "Mike Grudić",
           "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Star%20Clusters%20Explained%20Crash%20Course"
+          "url": "https://www.youtube.com/embed/jVWpC-qEQMs"
         },
         {
-          "title": "Pleiades Star Cluster",
-          "source": "NASA",
+          "title": "Stars V9.5 Moving Groups",
+          "source": "Paul Francis",
           "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Pleiades%20Star%20Cluster%20NASA"
-        },
-        {
-          "title": "Open Clusters",
-          "source": "Crash Course Astronomy",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Open%20Clusters%20Crash%20Course%20Astronomy"
+          "url": "https://youtu.be/7ZnPmRs34Ig?si=ih_thIjR9-28954d"
         }
       ],
       "resources": [
         {
-          "title": "Pleiades Observations",
-          "url": "https://science.nasa.gov/",
-          "description": "Studies of the Pleiades cluster"
-        },
-        {
-          "title": "OB Association Research",
-          "url": "https://www.nasa.gov/",
-          "description": "Stellar association discoveries"
-        },
-        {
-          "title": "Hipparcos Archive",
-          "url": "https://www.cosmos.esa.int/hipparcos",
-          "description": "Accurate star cluster distances"
+          "title": "The Nearby Star Clusters Come from Only Three Places",
+          "url": "https://www.universetoday.com/articles/the-nearby-star-clusters-come-from-only-three-places",
+          "description": "The Nearby Star Clusters Come from Only Three Places"
         }
       ]
     },
@@ -800,39 +784,23 @@
       ],
       "videoSuggestions": [
         {
-          "title": "Star Formation Explained",
-          "source": "Crash Course",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Star%20Formation%20Explained%20Crash%20Course"
-        },
-        {
-          "title": "Orion Nebula Tour",
-          "source": "NASA",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Orion%20Nebula%20Tour%20NASA"
-        },
-        {
-          "title": "Inside a Molecular Cloud",
+          "title": "Our Interstellar Medium",
           "source": "NASA Goddard",
           "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Inside%20a%20Molecular%20Cloud%20NASA%20Goddard"
+          "url": "https://youtu.be/EM5xPm_jg2w?si=6bgfrlU3k-Cki1SD"
+        },
+        {
+          "title": "Giant Molecular Clouds of the Milky Way",
+          "source": "GO ASTRONOMY",
+          "type": "youtube",
+          "url": "https://youtu.be/2czGEIG38gY?si=TKPzo3OFcL3yAqAM"
         }
       ],
       "resources": [
         {
-          "title": "Orion Nebula",
-          "url": "https://science.nasa.gov/",
-          "description": "Observations of the Orion region"
-        },
-        {
-          "title": "ALMA Observatory",
-          "url": "https://www.almaobservatory.org/",
-          "description": "Molecular cloud observations"
-        },
-        {
-          "title": "Carina Nebula Images",
-          "url": "https://www.nasa.gov/",
-          "description": "JWST observations of star formation"
+          "title": "Interstellar Medium and Molecular Clouds",
+          "url": "https://www.cfa.harvard.edu/research/topic/interstellar-medium-and-molecular-clouds",
+          "description": "Interstellar Medium and Molecular Clouds"
         }
       ]
     },
@@ -858,39 +826,17 @@
       ],
       "videoSuggestions": [
         {
-          "title": "Milky Way Structure",
-          "source": "Crash Course",
+          "title": "The Milky Way",
+          "source": "Crash Course Astronomy",
           "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Milky%20Way%20Structure%20Crash%20Course"
-        },
-        {
-          "title": "Mapping the Galaxy",
-          "source": "NASA",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Mapping%20the%20Galaxy%20NASA"
-        },
-        {
-          "title": "Galactic Center Tour",
-          "source": "NASA Goddard",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Galactic%20Center%20Tour%20NASA%20Goddard"
+          "url": "https://youtu.be/tj_QPnO8vpQ?si=e-NWBiwIW52Kq82U"
         }
       ],
       "resources": [
         {
-          "title": "NASA Galactic Center",
-          "url": "https://science.nasa.gov/",
-          "description": "Latest observations of Sagittarius A*"
-        },
-        {
-          "title": "Gaia Galaxy Map",
-          "url": "https://www.esa.int/gaia",
-          "description": "3D map of nearby stars"
-        },
-        {
-          "title": "Milky Way Structure",
-          "url": "https://www.nasa.gov/",
-          "description": "Updated models of galactic architecture"
+          "title": "Interactive map of the sky from Gaia’s Early Data Release 3",
+          "url": "https://www.esa.int/ESA_Multimedia/Images/2020/12/Interactive_map_of_the_sky_from_Gaia_s_Early_Data_Release_3",
+          "description": "Interactive map of the sky from Gaia’s Early Data Release 3"
         }
       ]
     },
@@ -916,39 +862,17 @@
       ],
       "videoSuggestions": [
         {
-          "title": "Orion Nebula JWST",
-          "source": "NASA",
+          "title": "Unpacking Orion: Into the Molecular Cloud Complex",
+          "source": "GO ASTRONOMY",
           "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Orion%20Nebula%20JWST%20NASA"
-        },
-        {
-          "title": "Life Cycle of Stars",
-          "source": "Crash Course",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Life%20Cycle%20of%20Stars%20Crash%20Course"
-        },
-        {
-          "title": "Betelgeuse Supergiant",
-          "source": "NASA",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Betelgeuse%20Supergiant%20NASA"
+          "url": "https://youtu.be/UjFkPexT2u8?si=M8rf_W48VAYxy3el"
         }
       ],
       "resources": [
         {
-          "title": "Orion JWST Images",
-          "url": "https://www.nasa.gov/jwst",
-          "description": "Latest observations of star formation"
-        },
-        {
-          "title": "Betelgeuse Research",
-          "url": "https://science.nasa.gov/",
-          "description": "Studies of the red supergiant"
-        },
-        {
-          "title": "Orion Trapezium Cluster",
-          "url": "https://www.nasa.gov/",
-          "description": "Young massive star cluster"
+          "title": "Protostars Carve Out Homes In The Orion Molecular Cloud",
+          "url": "https://www.universetoday.com/articles/protostars-carve-out-homes-in-the-orion-molecular-cloud",
+          "description": "Universe Today"
         }
       ]
     },
@@ -973,39 +897,17 @@
       ],
       "videoSuggestions": [
         {
-          "title": "Sun's Galactic Orbit",
+          "title": "The best Milky Way animation, by Gaia",
           "source": "NASA",
           "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Sun%27s%20Galactic%20Orbit%20NASA"
-        },
-        {
-          "title": "Andromeda Collision",
-          "source": "Crash Course",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Andromeda%20Collision%20Crash%20Course"
-        },
-        {
-          "title": "Future of the Solar System",
-          "source": "PBS Space Time",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Future%20of%20the%20Solar%20System%20PBS%20Space%20Time"
+          "url": "https://youtu.be/wEZBNsU4dMU?si=1InXuQscKdkPKMU0"
         }
       ],
       "resources": [
         {
-          "title": "Galactic Year",
-          "url": "https://science.nasa.gov/",
-          "description": "The Sun's orbital period"
-        },
-        {
-          "title": "Andromeda Merger Simulation",
-          "url": "https://www.nasa.gov/",
-          "description": "Computer models of galaxy collision"
-        },
-        {
-          "title": "Solar System Evolution",
-          "url": "https://www.nasa.gov/",
-          "description": "Long-term dynamical studies"
+          "title": "Close encounters of the stellar kind",
+          "url": "https://www.esa.int/Science_Exploration/Space_Science/Gaia/Close_encounters_of_the_stellar_kind",
+          "description": "Close encounters of the stellar kind"
         }
       ]
     },
@@ -1037,39 +939,29 @@
       ],
       "videoSuggestions": [
         {
-          "title": "Cosmic Web Tour",
-          "source": "NASA",
+          "title": "This Is How Big The Local Group of Galaxies Is",
+          "source": "Anton Petrov",
           "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Cosmic%20Web%20Tour%20NASA"
+          "url": "https://youtu.be/GW2a9xwpd50?si=XJH6cFLOdPd9EBCI"
         },
         {
-          "title": "Andromeda Galaxy",
-          "source": "Crash Course",
+          "title": "Is Milky Way Inside a Huge Void? About KBC Void (also known as the Local Hole)",
+          "source": "Kosmo",
           "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Andromeda%20Galaxy%20Crash%20Course"
+          "url": "https://youtu.be/RTv7sFo4r_I?si=OfRVDnaZvNkrjpCz"
         },
         {
-          "title": "Universe's Large Scale Structure",
-          "source": "NASA Goddard",
+          "title": "What Was Discovered Beyond the Milky Way? (KBC Void and Virgo Supercluster to Laniakea)",
+          "source": "Anton Petrov",
           "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=Universe%27s%20Large%20Scale%20Structure%20NASA%20Goddard"
+          "url": "https://youtu.be/RTv7sFo4r_I?si=OfRVDnaZvNkrjpCz"
         }
       ],
       "resources": [
         {
-          "title": "NASA Extragalactic Database",
-          "url": "https://ned.ipac.caltech.edu/",
-          "description": "Catalog of galaxies and clusters"
-        },
-        {
-          "title": "Hubble Deep Field",
-          "url": "https://www.nasa.gov/",
-          "description": "Historic deep universe observations"
-        },
-        {
-          "title": "Local Group Galaxies",
-          "url": "https://science.nasa.gov/",
-          "description": "Detailed information about nearby galaxies"
+          "title": "The Tilt in our Stars: The Shape of the Milky Way's Halo of Stars is Realized",
+          "url": "https://www.cfa.harvard.edu/news/tilt-our-stars-shape-milky-ways-halo-stars-realized",
+          "description": "New data throws out the textbook picture of a spherical stellar halo and reinforces a dynamic origin story of two galaxies that collided billions of years ago."
         }
       ]
     },
@@ -1100,18 +992,6 @@
           "source": "Crash Course",
           "type": "youtube",
           "url": "https://www.youtube.com/results?search_query=Big%20Bang%20Explained%20Crash%20Course"
-        },
-        {
-          "title": "JWST Early Galaxies",
-          "source": "NASA",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=JWST%20Early%20Galaxies%20NASA"
-        },
-        {
-          "title": "History of the Universe",
-          "source": "PBS Space Time",
-          "type": "youtube",
-          "url": "https://www.youtube.com/results?search_query=History%20of%20the%20Universe%20PBS%20Space%20Time"
         }
       ],
       "resources": [
@@ -1119,16 +999,6 @@
           "title": "Cosmic Microwave Background",
           "url": "https://science.nasa.gov/",
           "description": "Background radiation from the early universe"
-        },
-        {
-          "title": "JWST Mission Results",
-          "url": "https://www.nasa.gov/jwst",
-          "description": "Latest observations of early galaxies"
-        },
-        {
-          "title": "Planck Mission Cosmology",
-          "url": "https://www.esa.int/planck",
-          "description": "Precision measurements of cosmic parameters"
         }
       ]
     },
