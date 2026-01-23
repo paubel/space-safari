@@ -16,7 +16,8 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-family: system-ui, sans-serif;
+  font-weight: normal;
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
@@ -24,7 +25,7 @@ body {
 }
 
 .container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
 }
@@ -306,11 +307,12 @@ p {
 
 a {
   color: var(--accent);
-  text-decoration: none;
+  text-decoration: underline;
 }
 
 a:hover {
   text-decoration: underline;
+  opacity: 0.8;
 }
 
 /* Header */
@@ -393,7 +395,7 @@ footer a {
 
 /* Chapter Page Styles */
 .chapter-page {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
 }
@@ -416,6 +418,13 @@ footer a {
   font-size: 0.9rem;
 }
 
+#chapter-summary,
+#chapter-sections,
+#chapter-videos,
+#chapter-resources {
+  min-height: 200px; /* reserve space while content loads to reduce layout shift */
+}
+
 .content-section {
   background: var(--surface);
   padding: 1.5rem;
@@ -424,7 +433,7 @@ footer a {
   margin: 2rem 0;
 }
 
-.content-section h3 {
+.content-section h2 {
   margin-top: 0;
   color: var(--accent);
 }
@@ -461,7 +470,7 @@ footer a {
   text-align: center;
 }
 
-.video-card h4 {
+.video-card h3 {
   margin: 1rem 0 0.5rem;
   font-size: 1rem;
 }
@@ -493,7 +502,7 @@ footer a {
   border-radius: 6px;
 }
 
-.resource-item h4 {
+.resource-item h3 {
   margin-bottom: 0.5rem;
   color: var(--accent);
 }
@@ -600,5 +609,11 @@ footer a {
 
   .intro-figure img {
     max-width: 200px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1200px;
   }
 }

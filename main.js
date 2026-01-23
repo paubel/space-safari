@@ -148,7 +148,7 @@ function renderChapterPage(chapterNumber) {
   if (summary) {
     summary.innerHTML = `
             <div class="content-section">
-                <h3>Overview</h3>
+                <h2>Overview</h2>
                 <p>${chapter.summary}</p>
                 <div class="key-topics">
                     ${chapter.keyTopics.map((topic) => `<span>${topic}</span>`).join("")}
@@ -161,7 +161,7 @@ function renderChapterPage(chapterNumber) {
   if (sections) {
     sections.innerHTML = `
             <div class="content-section">
-                <h3>Sections</h3>
+                <h2>Sections</h2>
                 <ul>
                     ${chapter.sections.map((section) => `<li>${section}</li>`).join("")}
                 </ul>
@@ -171,7 +171,7 @@ function renderChapterPage(chapterNumber) {
 
   const videosContainer = document.querySelector("#chapter-videos");
   if (videosContainer) {
-    let html = '<h3>Videos</h3><div class="video-grid">';
+    let html = '<h2>Videos</h2><div class="video-grid">';
     chapter.videoSuggestions.forEach((video) => {
       const title = video.title || "Video";
       const source = video.source || "";
@@ -180,7 +180,7 @@ function renderChapterPage(chapterNumber) {
       if (type === "gif" && video.url) {
         html += `
                 <div class="video-card">
-                    <h4>${title}</h4>
+                    <h3>${title}</h3>
                     <p style="color: var(--text-muted); font-size: 0.9rem;">${source}</p>
                     <img class="video-embed gif-embed" src="${video.url}" alt="${title}" />
                 </div>
@@ -210,7 +210,7 @@ function renderChapterPage(chapterNumber) {
         if (embedSrc) {
           html += `
                 <div class="video-card">
-                    <h4>${title}</h4>
+                    <h3>${title}</h3>
                     <p style="color: var(--text-muted); font-size: 0.9rem;">${source}</p>
                     <iframe class="video-embed" src="${embedSrc}" title="${title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                 </div>
@@ -221,7 +221,7 @@ function renderChapterPage(chapterNumber) {
             `https://www.youtube.com/results?search_query=${encodeURIComponent(title + " " + source)}`;
           html += `
                 <div class="video-card">
-                    <h4>${title}</h4>
+                    <h3>${title}</h3>
                     <p style="color: var(--text-muted); font-size: 0.9rem;">${source}</p>
                     <a href="${linkUrl}" target="_blank">Open on YouTube</a>
                 </div>
@@ -231,7 +231,7 @@ function renderChapterPage(chapterNumber) {
         html += `
                 <div class="video-card">
                     <div style="font-size: 2rem;">🎬</div>
-                    <h4>${title}</h4>
+                    <h3>${title}</h3>
                     <p style="color: var(--text-muted); font-size: 0.9rem;">${source}</p>
                     <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(title + " " + source)}" target="_blank">Watch on YouTube</a>
                 </div>
@@ -244,11 +244,11 @@ function renderChapterPage(chapterNumber) {
 
   const resourcesContainer = document.querySelector("#chapter-resources");
   if (resourcesContainer) {
-    let html = '<h3>Resources</h3><div class="resource-list">';
+    let html = '<h2>Resources</h2><div class="resource-list">';
     chapter.resources.forEach((resource) => {
       html += `
                 <div class="resource-item">
-                    <h4>${resource.title}</h4>
+                    <h3>${resource.title}</h3>
                     <p>${resource.description}</p>
                     <a href="${resource.url}" target="_blank">Visit →</a>
                 </div>
