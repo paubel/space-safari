@@ -18,7 +18,12 @@
 body {
   margin: 0;
   font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
-  background: radial-gradient(circle at 20% 20%, #fbf6ec 0%, #f5efe5 45%, #efe2d3 100%);
+  background: radial-gradient(
+    circle at 20% 20%,
+    #fbf6ec 0%,
+    #f5efe5 45%,
+    #efe2d3 100%
+  );
   color: var(--ink);
 }
 
