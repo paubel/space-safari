@@ -4,24 +4,24 @@
       "id": 1,
       "number": 1,
       "title": "The Sun and the Edge of Home",
-      "description": "Explore our nearest star and its profound influence on all life in our solar system.",
+      "description": "Explore the Sun’s interior, light, magnetic activity, future, and influence on Earth and the surrounding solar system.",
       "sections": [
         "Our Star",
-        "Structure of the Sun",
-        "Light and Color",
-        "Magnetism and Solar Activity",
-        "A Star Among Billions",
-        "The Sun Through Human Eyes",
-        "The Life Story of the Sun",
-        "Solar Influence on Earth"
+        "Inside the Sun",
+        "Reading Sunlight",
+        "Magnetism and Space Weather",
+        "Is the Sun an Ordinary Star?",
+        "How We Observe the Sun",
+        "The Sun's Past and Future",
+        "The Sun and Earth"
       ],
-      "summary": "The Sun is not just a distant object in our sky—it is the foundation of our existence. This chapter traces the Sun's structure, from its core to its outer corona, and explores how solar energy drives weather, climate, and the very chemistry of life on Earth. Learn about stellar magnetism, solar cycles, and the remarkable journey light takes from the Sun to our world.",
+      "summary": "The journey begins with the Sun, the star that supplies Earth with light and heat and governs the solar system through gravity. The chapter explains the Sun’s layered interior, fusion, sunlight, magnetic activity, space weather, observation, and long-term evolution.",
       "keyTopics": [
         "Solar structure",
         "Nuclear fusion",
-        "Solar cycles",
-        "Light spectrum",
-        "Solar wind"
+        "Sunlight",
+        "Space weather",
+        "Solar evolution"
       ],
       "videoSuggestions": [
         {
@@ -30,7 +30,6 @@
           "type": "youtube",
           "url": "https://youtu.be/Mj06h8BeeOA?si=f44okqV1rWDQ3bPn"
         },
-
         {
           "title": "Stars: Stellar Classification explained and our why the Sun lookes white and not yellow or green ",
           "source": "Crash Course Astronomy",
@@ -60,23 +59,22 @@
       "id": 2,
       "number": 2,
       "title": "Human Satellites and Exploration",
-      "description": "Discover how humanity has placed thousands of artificial eyes above Earth.",
+      "description": "Discover the satellites, navigation systems, space stations, and orbital debris that make near-Earth space part of modern life.",
       "sections": [
-        "Eyes Above the Earth",
-        "The First Signal",
-        "A Network of Thought",
-        "How GPS Works",
+        "Eyes Above Earth",
+        "A Crowded Orbital Environment",
+        "Debris and Responsibility",
+        "How Satellite Navigation Works",
         "Living and Working in Orbit",
-        "Preparing for Life on Mars",
-        "The Fragility of Our Creations"
+        "From the ISS to Mars"
       ],
-      "summary": "Satellites have become an invisible infrastructure that connects our global civilization. From GPS to weather forecasting, from communications to Earth observation, this chapter reveals how thousands of spacecraft work in concert above our heads. Explore the challenges of orbital mechanics, the technology that enables modern life, and humanity's growing presence in space.",
+      "summary": "Near-Earth space is now filled with working satellites, crewed stations, and debris. The chapter explains orbits, satellite navigation, Earth observation, the International Space Station, orbital hazards, and how present missions are preparing technologies for journeys farther from Earth.",
       "keyTopics": [
-        "Orbital mechanics",
-        "GPS technology",
+        "Earth orbit",
+        "Satellite navigation",
+        "Earth observation",
         "Space stations",
-        "Remote sensing",
-        "Space debris"
+        "Orbital debris"
       ],
       "videoSuggestions": [
         {
@@ -120,23 +118,24 @@
       "id": 3,
       "number": 3,
       "title": "The Moon",
-      "description": "Our ancient companion in the sky, sculpted by billions of years of cosmic interaction.",
+      "description": "Explore the Moon’s origin, geology, tides, polar ice, exploration history, and continuing scientific importance.",
       "sections": [
-        "The First Clock of the Night",
-        "Birth from Catastrophe",
-        "The Silent Architect of Life",
-        "A Mirror of Stone",
-        "Reaching the Moon",
-        "Landscapes of Memory",
-        "The Moon and Humanity"
+        "Our Nearest World",
+        "How the Moon Formed",
+        "Tides, Rotation, and Earth's Tilt",
+        "A Surface That Changes Slowly",
+        "Apollo and Robotic Exploration",
+        "Water at the Poles",
+        "Artemis: Return in Stages",
+        "The Moon and Human Perspective"
       ],
-      "summary": "The Moon is far more than a romantic sight in the night sky. It is a record of the early solar system, a stabilizing force for Earth's climate, and a destination that has captured human imagination for millennia. This chapter explores the Moon's dramatic origin in a planetary collision, its profound influence on life, and humanity's remarkable achievements in lunar exploration.",
+      "summary": "The Moon preserves evidence from the early solar system and has influenced Earth through tides and the gradual evolution of its orbit. The chapter examines its likely formation, slowly changing surface, Apollo and robotic exploration, polar water ice, and the staged return of human missions.",
       "keyTopics": [
+        "Lunar origin",
         "Lunar geology",
-        "Tidal forces",
-        "Apollo missions",
-        "Crater formation",
-        "Lunar phases"
+        "Tides",
+        "Polar ice",
+        "Lunar exploration"
       ],
       "videoSuggestions": [
         {
@@ -180,21 +179,21 @@
       "id": 4,
       "number": 4,
       "title": "The Inner Planets",
-      "description": "Mercury, Venus, Earth, and Mars—four worlds, four stories.",
+      "description": "Compare Mercury, Venus, Earth, and Mars and see how four rocky planets developed such different environments.",
       "sections": [
-        "The Sun's Closest Children",
-        "Mercury – The Burned World",
-        "Venus – Earth's Mirror in Ruin",
-        "Earth – The Living Exception",
-        "Mars – The Red Memory",
-        "The Shared Story of the Inner Worlds"
+        "Four Rocky Worlds",
+        "Mercury --- Closest to the Sun",
+        "Venus --- A Greenhouse World",
+        "Earth --- The Known Living World",
+        "Mars --- Evidence of a Wetter Past",
+        "Comparing the Inner Planets"
       ],
-      "summary": "The inner solar system contains a diversity of worlds that tells the story of planetary formation, evolution, and habitability. Mercury bears the scars of solar bombardment; Venus reveals the catastrophic potential of a runaway greenhouse effect; Earth stands unique as a living world; and Mars preserves clues about the solar system's violent past. This chapter compares these four terrestrial planets and explores what made Earth special.",
+      "summary": "The four inner planets began with broadly similar materials but followed very different paths. By comparing their surfaces, atmospheres, climates, magnetic environments, and geological histories, the chapter shows why habitability depends on several interacting conditions rather than one simple ingredient.",
       "keyTopics": [
+        "Rocky planets",
         "Planetary atmospheres",
-        "Surface geology",
+        "Climate evolution",
         "Habitability",
-        "Planetary evolution",
         "Comparative planetology"
       ],
       "videoSuggestions": [
@@ -217,7 +216,6 @@
           "url": "https://youtu.be/I-88YWx71gE"
         }
       ],
-
       "resources": [
         {
           "title": "NASA Mercury",
@@ -240,24 +238,23 @@
       "id": 5,
       "number": 5,
       "title": "The Asteroid Belt",
-      "description": "The realm of small worlds orbiting between Mars and Jupiter.",
+      "description": "Explore the asteroid belt, Ceres, Vesta, impact hazards, and the rocky evidence left from the solar system’s formation.",
       "sections": [
         "Between Mars and Jupiter",
-        "A Planet That Never Was",
-        "Ceres and Vesta – Fossils of the Early Solar System",
-        "The Belt as a Bridge",
-        "Messengers and Threats",
+        "Why No Planet Formed Here",
+        "Ceres and Vesta",
+        "A Bridge Between Rock and Ice",
+        "Messengers and Hazards",
         "The Wider Family",
-        "Asteroids and Comets — What Is the Difference?",
-        "The Beauty of the Unfinished"
+        "Asteroids and Comets"
       ],
-      "summary": "The asteroid belt is home to millions of rocky remnants from the solar system's formation. Rather than chaotic debris, it reveals the underlying processes of planetary formation and migration. Some asteroids are metallic treasures; others are icy bodies halfway to comets. This chapter explores the belt's role as a scientific archive and its potential both as a resource and as a source of threats to Earth.",
+      "summary": "The asteroid belt is a sparse region of small worlds whose growth was disrupted by collisions and Jupiter’s gravity. Ceres, Vesta, asteroids, and meteorite evidence help scientists investigate early planetary formation while also raising practical questions about impact hazards and future exploration.",
       "keyTopics": [
-        "Asteroid types",
+        "Asteroid belt",
         "Ceres",
-        "Orbital dynamics",
-        "Impact hazards",
-        "Space resources"
+        "Vesta",
+        "Planet formation",
+        "Impact hazards"
       ],
       "videoSuggestions": [
         {
@@ -301,22 +298,23 @@
       "id": 6,
       "number": 6,
       "title": "Meteoroids, Meteors, and Meteorites",
-      "description": "Fragments of space that reach Earth's atmosphere and surface.",
+      "description": "Learn how meteoroids become meteors and meteorites and what surviving fragments reveal about the young solar system.",
       "sections": [
+        "Small Bodies, Different Names",
         "Meteoroids in the Solar System",
-        "Meteors – Light from Motion",
-        "Meteorites – Surviving Fragments",
+        "Meteors — Light from Motion",
+        "Meteorites — Pieces That Reach the Ground",
         "Meteor Showers",
         "Impacts and Planetary History",
-        "Scientific Importance"
+        "How Scientists Study Them"
       ],
-      "summary": "Meteors light up the night sky as fragments from space burn in our atmosphere, while meteorites that survive the journey carry priceless samples from the asteroid belt and early solar system. This chapter explores how meteorites have shaped planetary history, enabled life, and continue to provide crucial insights into the universe's chemical composition and age.",
+      "summary": "A meteoroid is a small body in space, a meteor is the light produced during atmospheric entry, and a meteorite is material that reaches the ground. The chapter explains meteor showers, atmospheric entry, impact effects, meteorite classification, and how laboratories use these samples to study early solar-system materials.",
       "keyTopics": [
+        "Meteoroids",
+        "Meteors",
+        "Meteorites",
         "Meteor showers",
-        "Meteorite classification",
-        "Impact craters",
-        "Panspermia",
-        "Meteorite analysis"
+        "Sample analysis"
       ],
       "videoSuggestions": [
         {
@@ -355,21 +353,23 @@
       "id": 7,
       "number": 7,
       "title": "The Outer Planets and the Migrating Worlds",
-      "description": "Jupiter, Saturn, Uranus, and Neptune—gas giants and ice giants.",
+      "description": "Visit Jupiter, Saturn, Uranus, and Neptune and examine how giant planets and migration shaped the outer solar system.",
       "sections": [
-        "Jupiter – The Planetary Anchor",
-        "Saturn – The Planet with Rings",
-        "Uranus and Neptune – The Ice Giants",
-        "Planetary Migration and the Nice Model",
-        "Lessons from Exoplanets"
+        "The Giant Planets",
+        "Jupiter — The Largest Planet",
+        "Saturn — Rings and Ocean Worlds",
+        "Uranus — The Sideways Ice Giant",
+        "Neptune — The Distant Windy World",
+        "Planetary Migration",
+        "Lessons from Other Planetary Systems"
       ],
-      "summary": "The outer solar system contains planetary giants that shape the entire structure of our cosmic neighborhood. Jupiter's enormous gravity has protected Earth from countless impacts, while Saturn's rings display the intricate dynamics of gravity and orbital resonance. This chapter explores these magnificent worlds and the theory that they have wandered far from their birth locations.",
+      "summary": "The outer planets are divided into gas giants and ice giants, each with distinctive atmospheres, interiors, rings, and moons. The chapter also explains how models of planetary migration help account for the present architecture of the solar system without treating any single reconstruction as a film of the past.",
       "keyTopics": [
-        "Gas giants",
+        "Giant planets",
         "Planetary rings",
-        "Great Red Spot",
-        "Planetary migration",
-        "Ice giants"
+        "Ocean moons",
+        "Ice giants",
+        "Planetary migration"
       ],
       "videoSuggestions": [
         {
@@ -397,7 +397,6 @@
           "url": "https://youtu.be/SurF6UtYMMY?si=SHyY-Cn0CGo9adOI"
         }
       ],
-
       "resources": [
         {
           "title": "NASA JUNO Mission",
@@ -414,8 +413,8 @@
     {
       "id": 8,
       "number": 8,
-      "title": "Comets, Kuiper Belt, and the Oort Cloud",
-      "description": "The icy reservoir at the edge of our solar system.",
+      "title": "Comets, the Kuiper Belt, and the Oort Cloud",
+      "description": "Journey through the realm of comets, Pluto, the Kuiper Belt, and the distant, inferred Oort Cloud.",
       "sections": [
         "The Kuiper Belt",
         "Dwarf Planets and Notable Objects",
@@ -424,13 +423,13 @@
         "The Oort Cloud",
         "Scientific Significance"
       ],
-      "summary": "Beyond Neptune lies a realm of icy bodies left over from the solar system's formation. The Kuiper Belt and Oort Cloud represent the frontier of our cosmic neighborhood, home to comets that periodically venture inward and dwarf planets that reveal planetary processes operating under extreme conditions. This chapter explores the outer limits of our solar system.",
+      "summary": "Beyond Neptune lies the broad and sparsely populated Kuiper Belt, while the much more distant Oort Cloud is inferred from the orbits of long-period comets. The chapter explains dwarf planets, comet activity, dust and ion tails, and the evidence astronomers use to map these remote regions.",
       "keyTopics": [
         "Kuiper Belt",
         "Pluto",
         "Comets",
-        "Oort Cloud",
-        "Dwarf planets"
+        "Comet tails",
+        "Oort Cloud"
       ],
       "videoSuggestions": [
         {
@@ -475,24 +474,21 @@
       "id": 9,
       "number": 9,
       "title": "Leaving the Solar System",
-      "description": "The heliopause and the edge of the Sun's domain.",
+      "description": "Follow the solar wind through the heliosphere to the heliopause and into the local interstellar medium.",
       "sections": [
         "The Heliosphere and the Heliopause",
         "The Solar Wind",
-        "The Edge of the Solar System",
-        "Voyager — Humanity's Emissaries to the Stars",
-        "A Living Boundary",
-        "Typical Particle Densities in the Solar and Interstellar Environment",
-        "What Lies Beyond the Heliopause",
-        "The Origins of the Elements"
+        "Voyager Crosses the Boundary",
+        "Beyond the Heliopause",
+        "Where the Elements Came From"
       ],
-      "summary": "The solar system doesn't end at Pluto—it extends to the heliopause, where the Sun's wind meets the interstellar medium. This dynamic boundary marks the transition from the Sun's domain to the galaxy beyond. The Voyager probes, humanity's most distant emissaries, are now crossing this frontier, sending back data about the composition and structure of the early universe.",
+      "summary": "The Sun creates a vast bubble in interstellar space through the solar wind. The chapter connects the termination shock, heliosheath, and heliopause, explains what Voyagers 1 and 2 measured after crossing the heliopause, and follows matter from stellar origins into planets and living organisms.",
       "keyTopics": [
         "Solar wind",
+        "Heliosphere",
+        "Termination shock",
         "Heliopause",
-        "Interstellar medium",
-        "Voyager missions",
-        "Cosmic rays"
+        "Voyager missions"
       ],
       "videoSuggestions": [
         {
@@ -541,24 +537,25 @@
     {
       "id": 10,
       "number": 10,
-      "title": "Beyond the Solar System: Worlds Around Other Stars",
-      "description": "The discovery of exoplanets and the search for habitable worlds.",
+      "title": "Worlds Around Other Stars",
+      "description": "Explore how exoplanets are detected and how astronomers investigate their climates, atmospheres, and possible habitability.",
       "sections": [
-        "A Universe of Hidden Worlds",
-        "Hot Jupiters and Super-Earths",
-        "The Habitable Zone: A Narrow Band of Opportunity",
-        "Why Not Red Dwarfs?",
-        "Why Blue Giants Don't Help Either",
-        "The Sun: A Rare Middle Ground",
+        "Finding Hidden Worlds",
+        "Hot Jupiters, Super-Earths, and Mini-Neptunes",
+        "The Habitable Zone",
+        "TRAPPIST-1 and Red Dwarf Stars",
+        "Stars That Live Too Fast",
+        "The Sun as a Useful Middle Ground",
+        "Reading Alien Atmospheres",
         "Are We Alone?"
       ],
-      "summary": "For centuries, the existence of other planetary systems was pure speculation. Today, we have discovered thousands of exoplanets orbiting distant stars, revealing a universe of worlds far more diverse than our own solar system. This chapter explores what makes a planet habitable and examines our place in a cosmos full of hidden worlds.",
+      "summary": "Thousands of planets are known around other stars, including hot Jupiters, super-Earths, mini-Neptunes, and compact systems unlike our own. The chapter explains detection methods, habitable zones, red-dwarf environments, and how telescopes such as JWST and the Extremely Large Telescope can study alien atmospheres.",
       "keyTopics": [
         "Exoplanet detection",
-        "Habitable zone",
-        "Transit method",
         "Planetary diversity",
-        "Biosignatures"
+        "Habitable zones",
+        "Red dwarfs",
+        "Atmospheric spectroscopy"
       ],
       "videoSuggestions": [
         {
@@ -589,22 +586,22 @@
     {
       "id": 11,
       "number": 11,
-      "title": "The Local Interstellar Cloud and the Local Bubble",
-      "description": "The galactic neighborhood in which the Sun resides.",
+      "title": "The Local Bubble and the Sun's Galactic Neighborhood",
+      "description": "Explore the Local Bubble, nearby interstellar clouds, and the changing galactic environment through which the Sun moves.",
       "sections": [
-        "What the Local Bubble Is and How It Formed",
-        "A Galactic Neighborhood Shaped by Explosions",
-        "Density and Temperature of Interstellar Gas",
-        "The Sun's Movement Through the Local Clouds",
+        "Inside a Bubble Made by Stars",
+        "A Neighborhood Shaped by Explosions",
+        "The Local Interstellar Cloud",
+        "The Sun's Motion",
         "Mapping the Local Bubble"
       ],
-      "summary": "The Sun does not exist in isolation—it travels through a region of the galaxy marked by expanding shells of gas created by ancient stellar explosions. The Local Bubble is a cavity in the interstellar medium, surrounded by the Local Interstellar Cloud. Understanding this galactic environment reveals how the Sun and its family of worlds exist within a constantly changing cosmic neighborhood.",
+      "summary": "The Sun lies inside the Local Bubble, a low-density cavity shaped by past stellar activity, and currently travels through the Local Interstellar Cloud. The chapter explains how astronomers map nearby gas, dust, bubble walls, and star-forming regions and how this environment changes over long periods.",
       "keyTopics": [
+        "Local Bubble",
         "Interstellar clouds",
-        "Supernova remnants",
-        "Local bubble",
-        "ISM structure",
-        "Stellar kinematics"
+        "Supernova feedback",
+        "Interstellar gas",
+        "Solar motion"
       ],
       "videoSuggestions": [
         {
@@ -637,19 +634,21 @@
       "id": 12,
       "number": 12,
       "title": "Our Nearest Stars",
-      "description": "The Alpha Centauri System and our closest stellar neighbors.",
+      "description": "Meet Proxima Centauri, Alpha Centauri, nearby red dwarfs, brown dwarfs, Sirius, and other close stellar neighbors.",
       "sections": [
-        "The Alpha Centauri System (A, B, and Proxima)",
-        "Stellar Distances and the Meaning of a Light-Year",
-        "The Future of Our Stellar Neighborhood"
+        "The Alpha Centauri System",
+        "Other Nearby Neighbors",
+        "What a Light-Year Means",
+        "Measuring the Distances",
+        "A Changing Neighborhood"
       ],
-      "summary": "Alpha Centauri, at just 4.37 light-years away, is our nearest stellar neighbor. This system of three stars offers a window into diverse stellar types and potentially habitable worlds. This chapter explores the scale of distances in space, the characteristics of nearby stars, and the technological and theoretical challenges of reaching our closest cosmic neighbors.",
+      "summary": "Proxima Centauri is the nearest individual star, while Alpha Centauri A and B form a neighboring stellar pair in the same wider system. The chapter introduces other nearby stars and brown dwarfs, reviews the current evidence for planets around several systems, and explains light-years, parallax, and changing stellar distances.",
       "keyTopics": [
-        "Alpha Centauri",
-        "Light-year",
         "Proxima Centauri",
-        "Stellar classification",
-        "Proper motion"
+        "Alpha Centauri",
+        "Nearby stars",
+        "Brown dwarfs",
+        "Stellar parallax"
       ],
       "videoSuggestions": [
         {
@@ -677,21 +676,23 @@
       "id": 13,
       "number": 13,
       "title": "The Solar Neighborhood",
-      "description": "Red dwarfs and the invisible majority of nearby stars.",
+      "description": "Survey nearby red dwarfs, white dwarfs, brown dwarfs, planetary systems, and the instruments used to map them.",
       "sections": [
-        "The Solar Neighborhood",
+        "A Nearby Sample of the Galaxy",
         "Red Dwarfs Dominate",
+        "White Dwarfs and Lost Planetary Systems",
+        "Brown Dwarfs: Between Stars and Planets",
+        "Nearby Planets",
         "Mapping the Invisible Majority",
-        "Known Exoplanets in the Solar Neighborhood",
-        "The Significance of Our Cosmic Neighborhood"
+        "Why the Solar Neighborhood Matters"
       ],
-      "summary": "The immediate solar neighborhood extends to about 32 light-years from Earth and contains many more red dwarf stars than bright Sun-like stars. This chapter explores the demographics of nearby space, the recent discoveries of potentially habitable exoplanets in our cosmic backyard, and what the nearby universe reveals about the frequency of worlds like Earth.",
+      "summary": "The solar neighborhood is a practical nearby sample of the Milky Way rather than a region with one universally fixed boundary. The chapter examines its numerous red dwarfs, chemically polluted white dwarfs, cool brown dwarfs, nearby planets, and the surveys that reveal objects too faint to see with the unaided eye.",
       "keyTopics": [
         "Red dwarfs",
-        "Stellar demographics",
-        "Nearby exoplanets",
-        "TRAPPIST-1 system",
-        "Space density"
+        "White dwarfs",
+        "Brown dwarfs",
+        "Nearby planets",
+        "Stellar surveys"
       ],
       "videoSuggestions": [
         {
@@ -724,22 +725,22 @@
     {
       "id": 14,
       "number": 14,
-      "title": "Local Stellar Associations and Moving Groups",
-      "description": "Families of stars born together and moving through space.",
+      "title": "Stellar Associations and Moving Groups",
+      "description": "Discover stellar associations, moving groups, shared stellar origins, and the difficult search for the Sun’s lost siblings.",
       "sections": [
-        "What Are Stellar Associations?",
-        "The Scorpius–Centaurus OB Association",
-        "The Hyades and Pleiades Moving Groups",
-        "The Sun and the Ursa Major Moving Group",
-        "The Role of Associations in Galactic Evolution"
+        "Stars Are Often Born Together",
+        "OB Associations and Sco--Cen",
+        "The Hyades and the Pleiades",
+        "The Sun's Lost Birth Family",
+        "Why Associations Matter"
       ],
-      "summary": "Stars are not randomly distributed but often form in groups that remain bound by gravity or kinematic association. This chapter explores stellar nurseries, moving groups that drift through the galaxy together, and the evidence that the Sun itself may have born in a dense cluster before being dispersed. Understanding these associations illuminates the cosmic choreography of stellar evolution.",
+      "summary": "Many stars form together but gradually disperse, leaving associations and moving groups whose members may share age, motion, and chemical patterns. The chapter visits Sco–Cen, the Hyades, the Pleiades, and the Ursa Major Moving Group and explains why motion alone cannot establish a common birthplace.",
       "keyTopics": [
-        "Star clusters",
-        "OB associations",
-        "Hyades",
-        "Pleiades",
-        "Proper motion"
+        "Stellar associations",
+        "Moving groups",
+        "Sco–Cen",
+        "Chemical tagging",
+        "Solar siblings"
       ],
       "videoSuggestions": [
         {
@@ -767,20 +768,22 @@
       "id": 15,
       "number": 15,
       "title": "The Interstellar Medium and Molecular Clouds",
-      "description": "The cosmic material from which new stars are born.",
+      "description": "Explore interstellar gas and dust, molecular clouds, stellar nurseries, and the environments in which new stars form.",
       "sections": [
-        "What Are Molecular Clouds?",
-        "How Stars Form from Molecular Clouds",
-        "Famous Nearby Molecular Clouds",
+        "What the Interstellar Medium Is",
+        "Dust, Molecules, and Chemistry",
+        "How Stars Form",
+        "Orion: Creation Beside Aftermath",
+        "Taurus, Rho Ophiuchi, and Other Nearby Clouds",
         "The Life Cycle of Clouds"
       ],
-      "summary": "Between the stars lies a rich and dynamic medium—a mixture of gas, dust, and complex molecules that is the birthplace of new stars. This chapter explores the life cycle of molecular clouds, the processes that trigger star formation, and some of the most famous stellar nurseries visible from Earth, including the Orion Nebula.",
+      "summary": "Space between the stars contains gas, dust, molecules, magnetic fields, and energetic particles rather than being truly empty. The chapter explains how cold molecular clouds form stars and compares nearby regions such as Orion, Taurus, and Rho Ophiuchi within the larger cycle of stellar birth and feedback.",
       "keyTopics": [
+        "Interstellar medium",
+        "Cosmic dust",
         "Molecular clouds",
-        "Dust grains",
         "Star formation",
-        "Nebulae",
-        "Stellar nurseries"
+        "Stellar feedback"
       ],
       "videoSuggestions": [
         {
@@ -807,22 +810,22 @@
     {
       "id": 16,
       "number": 16,
-      "title": "The Local Arm and Beyond",
-      "description": "Our place within the grand architecture of the Milky Way.",
+      "title": "The Local Arm and the Milky Way",
+      "description": "Locate the Sun in the Local Arm and explore how astronomers map the Milky Way’s disk, center, halo, gas, and dark matter.",
       "sections": [
-        "Our Place in the Galaxy",
-        "The Structure of the Orion Arm",
-        "Mapping the Galaxy",
-        "Beyond the Local Arm",
-        "The Galactic Disk, Halo, and the Greater Cosmos"
+        "Our Address in the Galaxy",
+        "The Local Arm",
+        "Mapping the Milky Way",
+        "Toward the Galactic Center",
+        "Disk, Halo, and Dark Matter"
       ],
-      "summary": "The Sun resides in a spiral arm of the Milky Way called the Orion Arm, a structure so vast that even at galactic scales, we occupy a peripheral location. This chapter traces our position in the galactic structure, the methods astronomers use to map the galaxy, and what the spiral architecture reveals about galactic dynamics and the universe's grand design.",
+      "summary": "The Sun occupies the Local Arm, also called the Orion Spur, within the Milky Way’s larger spiral pattern. Because we observe the galaxy from inside it, astronomers combine stellar distances, motions, infrared light, radio observations, gas tracers, and masers to reconstruct its disk, center, halo, and mass distribution.",
       "keyTopics": [
-        "Spiral arms",
-        "Orion Arm",
-        "Galactic structure",
+        "Local Arm",
+        "Milky Way mapping",
         "Galactic center",
-        "Dark matter halo"
+        "Galactic halo",
+        "Dark matter"
       ],
       "videoSuggestions": [
         {
@@ -844,21 +847,22 @@
       "id": 17,
       "number": 17,
       "title": "The Stellar Life Cycle in Orion",
-      "description": "Birth, life, and death of stars illustrated in the Orion region.",
+      "description": "Use Orion as a nearby laboratory for star formation, massive stars, stellar winds, and the recycling of matter.",
       "sections": [
-        "The Molecular Cloud – A Cradle of Creation",
-        "The Giants of Orion – Life on the Main Sequence",
-        "The Aging Titans – Betelgeuse and Rigel",
-        "Echoes of Death – Supernova Remnants in Orion",
-        "A Cosmic Continuum"
+        "Orion as a Nearby Laboratory",
+        "The Orion Nebula and the Trapezium",
+        "Massive Stars in Orion",
+        "Betelgeuse and Rigel",
+        "Supernova Feedback Around Orion",
+        "What Orion Teaches Us"
       ],
-      "summary": "The Orion region offers a textbook illustration of stellar evolution across multiple timescales. Young protostars emerge from the Orion Nebula, while massive stars like Betelgeuse near the end of their lives, and supernova remnants mark where ancient stars have already died. This chapter uses Orion as a case study to understand how stars are born, live, and ultimately return their material to the interstellar medium.",
+      "summary": "Orion contains molecular clouds, the Orion Nebula, the Trapezium, protoplanetary disks, and massive stars at different stages of evolution. These objects do not form one simple chronological sequence, but together they reveal how young stars form, reshape surrounding gas, and return matter and energy to interstellar space.",
       "keyTopics": [
-        "Stellar evolution",
+        "Orion Nebula",
+        "Trapezium",
+        "Protoplanetary disks",
         "Massive stars",
-        "Betelgeuse",
-        "Supernova remnants",
-        "Star formation timescales"
+        "Stellar feedback"
       ],
       "videoSuggestions": [
         {
@@ -879,21 +883,25 @@
     {
       "id": 18,
       "number": 18,
-      "title": "The Future of the Solar System's Journey",
-      "description": "Tracing the Sun's path through the galaxy and its long-term fate.",
+      "title": "The Solar System's Future Journey",
+      "description": "Follow the Sun’s galactic orbit and examine how the sky, planetary system, Sun, and Local Group may change in the future.",
       "sections": [
-        "The Sun's Galactic Voyage",
+        "The Sun's Galactic Orbit",
         "Future Encounters with Nearby Stars",
-        "The Long-Term Fate of the Solar System",
-        "Merging Galaxies and the Far Future"
+        "A Changing Night Sky",
+        "Planetary Orbits: Stable, but Not Fixed",
+        "The Sun's Own Future",
+        "A Brighter Sun Before the Red Giant Phase",
+        "Andromeda and the Uncertain Future of the Local Group",
+        "The Very Far Future"
       ],
-      "summary": "The Sun is not stationary—it travels through the galaxy at speeds of about 250 kilometers per second, taking 230 million years to complete one orbit. Over cosmic timescales, the solar system will encounter other stars, experience dynamical instability, and ultimately face merger with the Andromeda Galaxy. This chapter projects the solar system's future across billions of years.",
+      "summary": "The solar system moves through a changing galaxy, so nearby stars and familiar constellations will not retain their present arrangement forever. The chapter distinguishes well-supported solar evolution from more uncertain long-term orbital changes and explains why a future Milky Way–Andromeda merger remains possible rather than inevitable.",
       "keyTopics": [
         "Solar orbit",
-        "Stellar encounters",
-        "Orbital decay",
+        "Proper motion",
         "Planetary stability",
-        "Galaxy merger"
+        "Solar evolution",
+        "Local Group future"
       ],
       "videoSuggestions": [
         {
@@ -915,27 +923,24 @@
       "id": 19,
       "number": 19,
       "title": "Beyond the Milky Way: The Cosmic Web",
-      "description": "Galaxies, galaxy clusters, and the large-scale structure of the universe.",
+      "description": "Travel beyond the Milky Way through the Local Group, galaxy clusters, voids, filaments, and the large-scale cosmic web.",
       "sections": [
-        "The Outskirts of Our Galaxy",
-        "The Realm of Neighboring Galaxies",
+        "Leaving the Milky Way",
         "The Local Group",
-        "A Local Supervoid — The Mystery of the Local Hole",
-        "The Virgo Cluster and Beyond",
+        "Bound Systems and Expanding Space",
+        "Virgo and the Nearby Cosmic Landscape",
+        "Voids and the Local Hole",
         "The Cosmic Web",
-        "Cosmic Giants — Structures That Challenge Our Understanding",
-        "Laniakea — Our Home Supercluster",
-        "Giant Arcs and Quasar Megastructures",
-        "The Hercules–Corona Borealis Great Wall",
+        "Claimed Giant Structures",
         "Looking Outward, Looking Back"
       ],
-      "summary": "Beyond the Milky Way lies a universe of galaxies arranged in a vast cosmic web of clusters and filaments. This chapter charts humanity's expanding view of the cosmos, from nearby galaxies to superclusters billions of light-years away. It reveals how we are all connected through gravitational threads and matter flows, and how the large-scale structure of the universe illuminates its origin and fate.",
+      "summary": "Galaxies are distributed through groups, clusters, filaments, walls, and enormous voids rather than scattered uniformly through space. The chapter moves from the Local Group into the nearby cosmic landscape and explains how redshift surveys, galaxy motions, gravitational lensing, and simulations reveal the cosmic web.",
       "keyTopics": [
-        "Galaxy clusters",
         "Local Group",
-        "Superclusters",
+        "Galaxy clusters",
         "Cosmic web",
-        "Dark matter distribution"
+        "Cosmic voids",
+        "Dark matter"
       ],
       "videoSuggestions": [
         {
@@ -969,22 +974,22 @@
       "id": 20,
       "number": 20,
       "title": "Cosmic Origins: A Journey Through Time and Space",
-      "description": "The Big Bang, the early universe, and cosmic history.",
+      "description": "Trace cosmic history from the hot early universe to the first stars and galaxies revealed by modern observatories.",
       "sections": [
         "The Mirror of the Universe",
         "The Story of Matter and Life",
         "The Expanding Mystery",
-        "The JWST Early Galaxy Problem — Too Big, Too Soon",
+        "JWST and the First Bright Galaxies",
         "The Light of Understanding",
         "The Long Arc of Time"
       ],
-      "summary": "Looking at distant galaxies is looking back in time. By studying the most distant objects in the universe, we can reconstruct the history of cosmic expansion and the formation of the first stars and galaxies. This chapter explores the universe's earliest moments, the mystery of cosmic inflation, and how recent discoveries from the James Webb Space Telescope are reshaping our understanding of the cosmos.",
+      "summary": "The Big Bang describes an early hot, dense, expanding universe rather than an explosion into pre-existing empty space. The chapter follows the evidence from cosmic expansion and the microwave background to the first stars and galaxies, including JWST’s bright early galaxies and the still-debated nature of little red dots.",
       "keyTopics": [
         "Big Bang",
-        "Cosmic inflation",
-        "Redshift",
+        "Cosmic expansion",
         "Cosmic microwave background",
-        "First galaxies"
+        "First galaxies",
+        "JWST"
       ],
       "videoSuggestions": [
         {
@@ -1006,21 +1011,22 @@
       "id": 21,
       "number": 21,
       "title": "A Universe at Two Speeds",
-      "description": "The Hubble Tension and mysteries of cosmic expansion.",
+      "description": "Examine why two leading methods give different values for today’s cosmic expansion rate and what might explain the mismatch.",
       "sections": [
-        "A Universe at Two Speeds — The Hubble Tension",
-        "67 km/s/Mpc — The Early Universe's Answer",
-        "73 km/s/Mpc — The Local Universe's Answer",
-        "A Crisis or a Clue?",
-        "A Signpost Toward New Physics"
+        "The Hubble Tension",
+        "Reading the Early Universe",
+        "Building a Distance Ladder",
+        "What JWST Has Tested",
+        "What DESI Adds",
+        "What Might Explain the Difference?"
       ],
-      "summary": "The universe is expanding, but astronomers have found a discrepancy in how fast. Different methods of measuring cosmic expansion yield different results—a puzzle known as the Hubble Tension. This chapter explores one of modern cosmology's most intriguing mysteries, what it might reveal about the nature of space and time, and how its resolution could point toward new physics beyond our current understanding.",
+      "summary": "Measurements based on the early universe and measurements built from the local distance ladder currently give different values for the Hubble constant. The chapter explains both approaches, what JWST and DESI have added, and why measurement systematics, model assumptions, and possible new physics all remain under investigation.",
       "keyTopics": [
         "Hubble constant",
         "Cosmic expansion",
+        "Early-universe inference",
         "Distance ladder",
-        "Type Ia supernovae",
-        "New physics"
+        "Measurement uncertainty"
       ],
       "videoSuggestions": [
         {
@@ -1042,21 +1048,22 @@
       "id": 22,
       "number": 22,
       "title": "The Fate of Light and Time",
-      "description": "The ultimate destiny of the universe and the end of all things.",
+      "description": "Explore model-based possibilities for the remote future of stars, galaxies, black holes, light, and cosmic expansion.",
       "sections": [
-        "The Dimming of the Stars",
-        "The Age of Darkness",
-        "The Black Hole Era",
-        "The Fading of Light and the Death of Time",
-        "The Meaning of an Ending"
+        "Looking Far Beyond the Present",
+        "When Star Formation Declines",
+        "Galaxies in an Expanding Universe",
+        "The Possible Black Hole Era",
+        "Heat Death and Other Possibilities",
+        "Why This Future Matters"
       ],
-      "summary": "In the unimaginably distant future, stars will burn out, galaxies will grow cold and dark, and even black holes will evaporate through Hawking radiation. This final chapter traces the universe's journey from the Big Bang to its ultimate end, exploring the deep physics of entropy, time's arrow, and the profound meaning of a cosmos that began in light and will end in darkness.",
+      "summary": "The very distant future cannot be observed directly and depends on physical theories extrapolated across immense spans of time. The chapter describes declining star formation, increasingly isolated galaxies, possible black-hole evaporation, and heat death while clearly separating established physics from uncertain long-term projections.",
       "keyTopics": [
-        "Heat death",
-        "Black hole evaporation",
-        "Entropy",
-        "Time's arrow",
-        "Ultimate fate of universe"
+        "Far-future astronomy",
+        "Stellar remnants",
+        "Cosmic expansion",
+        "Black holes",
+        "Heat death"
       ],
       "videoSuggestions": [
         {
