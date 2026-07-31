@@ -160,10 +160,33 @@ body {
   color: var(--accent);
   font-weight: 600;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .navbar .logo:hover {
   text-decoration: none;
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.site-icon {
+  width: 1.15em;
+  height: 1.15em;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: -0.12em;
+  box-shadow: 0 0 0.45rem rgba(74, 158, 255, 0.45);
+}
+
+.navbar .site-icon {
+  width: 1.65rem;
+  height: 1.65rem;
 }
 
 .menu-toggle {
