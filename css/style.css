@@ -76,6 +76,10 @@ body {
   box-shadow: 0 8px 28px rgba(74, 158, 255, 0.4);
 }
 
+.preview-link + .preview-link {
+  margin-left: 0.75rem;
+}
+
 /* Buy Guide */
 .buy-guide {
   margin-top: 2.5rem;
@@ -660,6 +664,10 @@ footer a {
   .preview-link {
     padding: 0.75rem 2rem;
     font-size: 1rem;
+  }
+
+  .preview-link + .preview-link {
+    margin: 0.75rem 0 0;
   }
 
   .chapter-link {

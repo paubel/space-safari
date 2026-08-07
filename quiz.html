@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Test your knowledge of the cosmic neighborhood with the Space Safari quiz.">
+    <title>Space Safari Quiz</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/quiz.css">
+    <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
+</head>
+
+<body class="quiz-page">
+    <nav class="navbar">
+        <a href="index.html" class="logo"><img src="assets/images/cats-eye-icon.webp" class="site-icon"
+                alt=""> Space Safari</a>
+        <a href="index.html" class="quiz-home-link" aria-label="Back to the Space Safari book page">
+            <span aria-hidden="true">←</span> Back to the book page
+        </a>
+    </nav>
+
+    <main class="quiz-shell">
+        <header class="quiz-hero">
+            <p class="quiz-kicker">Explore your cosmic knowledge</p>
+            <h1>Space Safari Quiz</h1>
+            <p>Choose the length of your journey. Questions and answer choices are shuffled every time.</p>
+        </header>
+
+        <section id="quiz-setup" class="quiz-panel" aria-labelledby="setup-title">
+            <h2 id="setup-title">How many questions?</h2>
+            <div class="quiz-length-options" role="radiogroup" aria-label="Quiz length">
+                <label><input type="radio" name="quiz-length" value="5"> <span>5 questions</span></label>
+                <label><input type="radio" name="quiz-length" value="10" checked> <span>10 questions</span></label>
+                <label><input type="radio" name="quiz-length" value="15"> <span>15 questions</span></label>
+            </div>
+            <button id="start-quiz" class="quiz-primary" type="button">Start the quiz</button>
+        </section>
+
+        <section id="quiz-area" class="quiz-panel" hidden aria-labelledby="quiz-title">
+            <div class="quiz-progress-row">
+                <h2 id="quiz-title">Your questions</h2>
+                <span id="quiz-progress" aria-live="polite"></span>
+            </div>
+            <form id="quiz-form">
+                <div id="questions-container"></div>
+                <p id="quiz-message" class="quiz-message" role="alert" aria-live="polite"></p>
+                <div id="quiz-feedback" class="quiz-feedback" aria-live="polite" hidden></div>
+                <button id="check-answer" class="quiz-primary" type="submit">Check answer</button>
+                <button id="next-question" class="quiz-primary" type="button" hidden>Next question</button>
+            </form>
+        </section>
+
+        <section id="quiz-result" class="quiz-panel quiz-result" hidden aria-labelledby="result-title">
+            <p class="quiz-kicker">Journey complete</p>
+            <h2 id="result-title">Your score</h2>
+            <p id="score-line" class="score-line" aria-live="polite"></p>
+            <p>Continue exploring the ideas behind the questions and their place in our cosmic neighborhood.</p>
+            <a class="quiz-buy" href="index.html#buy-the-book">Continue the journey</a>
+            <button id="restart-quiz" class="quiz-secondary" type="button">Try another quiz</button>
+        </section>
+    </main>
+
+    <footer class="quiz-footer">
+        <p>© Paul Belfrage. All rights reserved.</p>
+    </footer>
+
+    <script src="js/quiz.js"></script>
+</body>
+
+</html>
