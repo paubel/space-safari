@@ -3,9 +3,41 @@
 let chaptersData = [];
 
 document.addEventListener("DOMContentLoaded", () => {
+  renderExploreMenu();
   loadChaptersData();
   setupMenuToggle();
 });
+
+function renderExploreMenu() {
+  const sideMenu = document.getElementById("side-menu");
+  if (!sideMenu || sideMenu.querySelector(".explore-menu")) return;
+
+  const isChapterPage = document.body.classList.contains("chapter-page");
+  const prefix = isChapterPage ? "../" : "";
+  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  const links = [
+    { href: "gallery.html", icon: "✦", label: "Astrophotography Gallery" },
+    { href: "planetarium.html", icon: "◎", label: "Interactive Planetarium" },
+  ];
+
+  const nav = document.createElement("nav");
+  nav.className = "explore-menu";
+  nav.setAttribute("aria-label", "Explore Space Safari");
+  links.forEach((item) => {
+    const link = document.createElement("a");
+    link.href = `${prefix}${item.href}`;
+    link.className = "explore-link";
+    if (currentPage === item.href) {
+      link.classList.add("active");
+      link.setAttribute("aria-current", "page");
+    }
+    link.innerHTML = `<span aria-hidden="true">${item.icon}</span><span>${item.label}</span>`;
+    nav.appendChild(link);
+  });
+
+  const heading = sideMenu.querySelector("h2");
+  sideMenu.insertBefore(nav, heading);
+}
 
 function setupMenuToggle() {
   const menuToggle = document.getElementById("menu-toggle");
