@@ -93,6 +93,13 @@ const observations = [
     summary: 'A bubble of gas inflated by the fierce wind from a massive hot star. This wide field also shows open cluster M52 and the larger Lobster Claw region, Sh2-157.'
   },
   {
+    id: 'ic1805', title: 'The Heart Nebula', catalogue: 'IC 1805 · Melotte 15', constellation: 'Cassiopeia',
+    ra: 2.545, dec: 61.45, image: 'assets/images/astrophoto/Heart nebula ic 1805.jpg', frame: [2.67, 4.0],
+    type: 'Emission nebula · star-forming region',
+    distance: 'about 7,500 light-years', size: 'about 2° across', moons: 'about 4 Moon diameters',
+    summary: 'A vast complex of glowing hydrogen and dark dust. Radiation and stellar winds from the young stars of Melotte 15 sculpt its clouds and central pillars.'
+  },
+  {
     id: 'ngc281', title: 'The Pacman Nebula', catalogue: 'NGC 281 · IC 1590', constellation: 'Cassiopeia',
     ra: 0.8832, dec: 56.622, image: 'assets/images/astrophoto/Ngc-281.jpg', frame: [3.8, 3.8],
     type: 'Emission nebula · star-forming region',
