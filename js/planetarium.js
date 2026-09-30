@@ -51,6 +51,13 @@ const observations = [
     summary: 'A vast hydrogen-emission region whose bright clouds and dark dust lanes trace a familiar continental silhouette.'
   },
   {
+    id: 'ngc6888', title: 'The Crescent Nebula', catalogue: 'NGC 6888 · Caldwell 27', constellation: 'Cygnus',
+    ra: 20.2083, dec: 38.4167, image: 'assets/images/astrophoto/Ngc-6888.jpg', frame: [2.25, 4.0],
+    type: 'Wind-blown emission nebula',
+    distance: 'about 4,700 light-years', size: 'about 0.30° × 0.20°', moons: 'about 0.6 × 0.4 Moon diameters',
+    summary: 'A glowing shell of gas driven outward by fierce winds from WR 136, the massive Wolf-Rayet star near its centre.'
+  },
+  {
     id: 'ic1396', title: 'Elephant’s Trunk Nebula', catalogue: 'IC 1396A', constellation: 'Cepheus',
     ra: 21.650, dec: 57.50, image: 'assets/images/astrophoto/elephants-trunk-nebula.jpg', frame: [2.25, 4.0],
     type: 'Dark nebula · star-forming region',
