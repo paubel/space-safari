@@ -3,10 +3,47 @@
 let chaptersData = [];
 
 document.addEventListener("DOMContentLoaded", () => {
+  renderSocialLinks();
   renderExploreMenu();
   loadChaptersData();
   setupMenuToggle();
 });
+
+function renderSocialLinks() {
+  if (document.querySelector(".site-socials")) return;
+
+  const socialLinks = document.createElement("nav");
+  socialLinks.className = "site-socials";
+  socialLinks.setAttribute("aria-label", "Follow Paul Belfrage on social media");
+  socialLinks.innerHTML = `
+    <span class="site-socials-label">Follow Paul Belfrage</span>
+    <span class="site-socials-links">
+      <a href="https://x.com/paulbelfrage" target="_blank" rel="me noopener noreferrer" aria-label="Paul Belfrage on X" title="X">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26L22.827 21.75h-6.657l-5.214-6.817-5.967 6.817H1.68l7.73-8.835L1.254 2.25h6.826l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/___paubel___/" target="_blank" rel="me noopener noreferrer" aria-label="Paul Belfrage on Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.25"/><circle class="social-icon-dot" cx="17.4" cy="6.7" r="1"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/paubelfrage/" target="_blank" rel="me noopener noreferrer" aria-label="Paul Belfrage on LinkedIn" title="LinkedIn">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V8.99h3.42v1.57h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.32 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.1 20.45H3.54V8.99H7.1v11.46Z"/></svg>
+      </a>
+    </span>`;
+
+  if (document.body.classList.contains("astro-planetarium-page")) {
+    socialLinks.classList.add("site-socials-planetarium");
+    const skyMenu = document.querySelector(".sky-menu");
+    if (skyMenu) skyMenu.appendChild(socialLinks);
+    return;
+  }
+
+  let footer = document.querySelector("footer");
+  if (!footer) {
+    footer = document.createElement("footer");
+    footer.className = "site-footer-generated";
+    document.body.appendChild(footer);
+  }
+  footer.prepend(socialLinks);
+}
 
 function renderExploreMenu() {
   const sideMenu = document.getElementById("side-menu");
@@ -44,6 +81,8 @@ function setupMenuToggle() {
   const menuClose = document.getElementById("menu-close");
   const sideMenu = document.getElementById("side-menu");
   const chapterLinks = document.querySelectorAll(".side-menu .chapter-link");
+
+  if (!sideMenu) return;
 
   if (menuToggle) {
     menuToggle.addEventListener("click", () => {
