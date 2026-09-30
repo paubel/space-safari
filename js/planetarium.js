@@ -93,6 +93,13 @@ const observations = [
     summary: 'A bubble of gas inflated by the fierce wind from a massive hot star. This wide field also shows open cluster M52 and the larger Lobster Claw region, Sh2-157.'
   },
   {
+    id: 'ngc281', title: 'The Pacman Nebula', catalogue: 'NGC 281 · IC 1590', constellation: 'Cassiopeia',
+    ra: 0.8832, dec: 56.622, image: 'assets/images/astrophoto/Ngc-281.jpg', frame: [3.8, 3.8],
+    type: 'Emission nebula · star-forming region',
+    distance: 'about 6,500 light-years', size: 'about 0.6° across', moons: 'about 1.2 Moon diameters',
+    summary: 'A vast star-forming cloud shaped by the hot young stars of cluster IC 1590. Dark dust lanes and dense Bok globules create its Pac-Man-like silhouette.'
+  },
+  {
     id: 'ic1848', title: 'The Soul Nebula', catalogue: 'IC 1848 · W5 · Sh2-199', constellation: 'Cassiopeia',
     ra: 2.9, dec: 60.4, image: 'assets/images/astrophoto/IC 1848 – Soul Nebula.jpg', frame: [3.8, 3.8],
     type: 'Emission nebula · star-forming complex',
