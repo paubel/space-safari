@@ -219,8 +219,10 @@
         <section class="contact-section">
             <h2>Get in Touch</h2>
             <p>Have questions about Space Safari? I'd love to hear from you.</p>
-            <form class="contact-form" target="_blank" action="https://formsubmit.co/fc585dbcd8ea518bfccc9c4030074c61"
-                method="POST">
+            <form class="contact-form" action="https://formspree.io/f/xdekjdgp" method="POST">
+                <input type="hidden" name="_subject" value="New message from the Space Safari website">
+                <input class="form-honeypot" type="text" name="_gotcha" tabindex="-1" autocomplete="off"
+                    aria-hidden="true">
                 <input type="text" name="name" placeholder="Full Name" required>
                 <input type="email" name="email" placeholder="Email Address" required>
                 <textarea name="message" rows="6" placeholder="Your Message" required></textarea>
