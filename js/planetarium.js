@@ -205,6 +205,8 @@ function random(seed) {
 }
 
 function makeStars() {
+  const group = new THREE.Group();
+  group.name = 'decorative-background-stars';
   const rand = random(302026);
   const positions = [];
   const colors = [];
@@ -223,7 +225,7 @@ function makeStars() {
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   const points = new THREE.Points(geometry, new THREE.PointsMaterial({ size: .18, sizeAttenuation: true, vertexColors: true, transparent: true, opacity: .82, depthWrite: false }));
-  scene.add(points);
+  group.add(points);
 
   const brightStars = [
     [6.753,-16.716,0.75],[6.399,-52.696,0.72],[14.261,19.182,0.65],[18.615,38.784,0.68],
@@ -236,7 +238,9 @@ function makeStars() {
   brightStars.forEach(([ra, dec]) => brightPositions.push(...celestialVector(ra, dec, 98).toArray()));
   const brightGeometry = new THREE.BufferGeometry();
   brightGeometry.setAttribute('position', new THREE.Float32BufferAttribute(brightPositions, 3));
-  scene.add(new THREE.Points(brightGeometry, new THREE.PointsMaterial({ color: 0xeaf4ff, size: .56, transparent: true, opacity: .95, depthWrite: false })));
+  group.add(new THREE.Points(brightGeometry, new THREE.PointsMaterial({ color: 0xeaf4ff, size: .56, transparent: true, opacity: .95, depthWrite: false })));
+  scene.add(group);
+  return group;
 }
 
 function starColour(temperature) {
@@ -441,7 +445,7 @@ async function populateConstellations(group) {
 }
 
 const grid = makeGrid();
-makeStars();
+const backgroundStarLayer = makeStars();
 const constellationFigures = makeConstellationLayer();
 const selectable = [];
 const textureLoader = new THREE.TextureLoader();
@@ -944,12 +948,14 @@ document.querySelector('[data-sky-action="zoom-in"]').addEventListener('click', 
 document.querySelector('[data-sky-action="zoom-out"]').addEventListener('click', () => adjustZoom(8));
 document.querySelector('[data-sky-action="labels"]').addEventListener('click', event => {
   grid.visible = !grid.visible;
-  constellationFigures.visible = grid.visible;
+  constellationFigures.visible = grid.visible && !interactiveStarLayer.visible;
   event.currentTarget.classList.toggle('is-active', grid.visible);
   event.currentTarget.setAttribute('aria-pressed', String(grid.visible));
 });
 function setInteractiveStars(enabled) {
   interactiveStarLayer.visible = enabled;
+  backgroundStarLayer.visible = !enabled;
+  constellationFigures.visible = !enabled && grid.visible;
   starLayerButton.classList.toggle('is-active', enabled);
   starLayerButton.setAttribute('aria-pressed', String(enabled));
   starExplorerLaunch.setAttribute('aria-pressed', String(enabled));

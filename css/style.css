@@ -1372,6 +1372,8 @@ footer a {
 .sky-toolbar button:last-child { border-right: 0; }
 .sky-toolbar button:hover, .sky-toolbar button.is-active { color: var(--accent); background: rgba(74, 158, 255, 0.1); }
 .sky-toolbar button[hidden] { display: none; }
+.sky-toolbar .star-filter-toolbar { width: auto; min-width: 138px; grid-template-columns: auto auto; gap: 0.45rem; padding: 0 0.75rem; }
+.sky-toolbar .star-filter-toolbar strong { font-size: 0.61rem; letter-spacing: 0.04em; white-space: nowrap; }
 .sky-coordinates { position: absolute; z-index: 4; right: 24px; top: 28px; display: flex; gap: 1.3rem; color: #8590a0; font: 600 0.58rem ui-monospace, monospace; letter-spacing: 0.07em; }
 .sky-help { position: absolute; z-index: 4; bottom: 30px; left: 50%; margin: 0; color: #717d8d; font-size: 0.62rem; letter-spacing: 0.05em; transform: translateX(-50%); }
 .sky-help span { color: var(--accent); margin-right: 0.4rem; }

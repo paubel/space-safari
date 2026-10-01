@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Explore the position and scale of every Space Safari astrophotograph in an interactive celestial atlas.">
     <title>Interactive Planetarium - Space Safari</title>
-    <link rel="stylesheet" href="css/style.css?v=3d-star-filter-2">
+    <link rel="stylesheet" href="css/style.css?v=3d-star-filter-3">
     <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
     <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script>
 </head>
@@ -72,7 +72,7 @@
                 <button type="button" data-sky-action="zoom-in" aria-label="Zoom in" title="Zoom in">+</button>
                 <button type="button" data-sky-action="zoom-out" aria-label="Zoom out" title="Zoom out">−</button>
                 <button type="button" data-sky-action="labels" class="is-active" aria-pressed="true" aria-label="Toggle constellation lines and coordinate grid" title="Constellations and coordinate grid">⌗</button>
-                <button type="button" data-sky-action="stars" aria-pressed="false" aria-label="Toggle interactive stars" title="Interactive stars">★</button>
+                <button class="star-filter-toolbar" type="button" data-sky-action="stars" aria-pressed="false" aria-label="Open Star Map Filter" title="Show only the 93 filterable catalogue stars"><span aria-hidden="true">★</span><strong>Star Map Filter</strong></button>
                 <button type="button" data-sky-action="star-tools" aria-expanded="false" aria-controls="star-tools-panel" aria-label="Open advanced star tools" title="Advanced star tools" hidden>☷</button>
             </div>
 
@@ -111,6 +111,6 @@
     </div>
 
     <script src="js/main.js"></script>
-    <script type="module" src="js/planetarium.js?v=3d-star-filter-2"></script>
+    <script type="module" src="js/planetarium.js?v=3d-star-filter-3"></script>
 </body>
 </html>
