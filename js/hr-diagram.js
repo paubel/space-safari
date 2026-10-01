@@ -18,6 +18,8 @@ if (chartElement && window.d3) {
   const spectralButtons = [...document.querySelectorAll('#hr-spectral-chips button')];
   const clearTypes = document.querySelector('#hr-clear-types');
   const clearSpectral = document.querySelector('#hr-clear-spectral');
+  const selectTypes = document.querySelector('#hr-select-types');
+  const selectSpectral = document.querySelector('#hr-select-spectral');
   const constellationSearch = document.querySelector('#hr-constellation-search');
   const constellationList = document.querySelector('#hr-constellation-list');
   const clearConstellations = document.querySelector('#hr-clear-constellations');
@@ -434,9 +436,19 @@ if (chartElement && window.d3) {
     typeButtons.forEach(button => button.setAttribute('aria-pressed', 'false'));
     applyFilters();
   });
+  selectTypes.addEventListener('click', () => {
+    activeTypes = new Set(typeButtons.map(button => button.dataset.value));
+    typeButtons.forEach(button => button.setAttribute('aria-pressed', 'true'));
+    applyFilters();
+  });
   clearSpectral.addEventListener('click', () => {
     activeSpectral.clear();
     spectralButtons.forEach(button => button.setAttribute('aria-pressed', 'false'));
+    applyFilters();
+  });
+  selectSpectral.addEventListener('click', () => {
+    activeSpectral = new Set(spectralButtons.map(button => button.dataset.value));
+    spectralButtons.forEach(button => button.setAttribute('aria-pressed', 'true'));
     applyFilters();
   });
   constellationSearch.addEventListener('input', () => renderConstellations(constellationSearch.value));

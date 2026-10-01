@@ -413,6 +413,11 @@
   font-weight: 700;
 }
 
+.hr-chip-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
 .hr-chip-heading button:hover,
 .hr-chip-heading button:focus-visible {
   color: #fff;
