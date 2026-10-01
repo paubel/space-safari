@@ -31,12 +31,13 @@
 
             <aside class="sky-menu" aria-label="Photograph destinations">
                 <div class="sky-menu-heading"><span>Observations</span><strong>20</strong></div>
+                <button class="star-explorer-launch" id="star-explorer-launch" type="button" aria-pressed="false"><span aria-hidden="true">★</span><span><strong>Star Map Filter</strong><small>Explore 93 interactive stars</small></span><i aria-hidden="true">→</i></button>
                 <div class="sky-targets"></div>
             </aside>
 
             <aside class="star-tools-panel" id="star-tools-panel" aria-label="Advanced star tools" hidden>
-                <header><div><p class="overline">Optional layer</p><h2>Interactive stars</h2></div><button id="close-star-tools" type="button" aria-label="Close advanced star tools">×</button></header>
-                <p class="star-tools-intro">Search, select, and filter real stars without changing the astrophotography layer.</p>
+                <header><div><p class="overline">Optional 3D layer</p><h2>Star Map Filter</h2></div><button id="close-star-tools" type="button" aria-label="Close advanced star tools">×</button></header>
+                <p class="star-tools-intro">The tools from the original Star Map Filter, integrated into this 3D planetarium. Drag to look around, scroll to zoom, and select a star for details.</p>
 
                 <label class="star-search" for="star-search"><span>Find a star</span><input id="star-search" type="search" placeholder="Try Sirius, Vega, Polaris…" autocomplete="off"></label>
                 <p class="star-filter-count" id="star-filter-count" aria-live="polite">93 of 93 stars shown</p>
@@ -53,7 +54,7 @@
                 <fieldset class="star-spectral-filter"><legend>Spectral class</legend><div class="star-filter-actions"><button id="clear-star-spectral" type="button">Clear all</button><button id="select-star-spectral" type="button">Select all</button></div><div id="star-spectral-chips"><button type="button" data-value="O" aria-pressed="true">O</button><button type="button" data-value="B" aria-pressed="true">B</button><button type="button" data-value="A" aria-pressed="true">A</button><button type="button" data-value="F" aria-pressed="true">F</button><button type="button" data-value="G" aria-pressed="true">G</button><button type="button" data-value="K" aria-pressed="true">K</button><button type="button" data-value="M" aria-pressed="true">M</button></div></fieldset>
                 <label class="star-search" for="star-constellation"><span>Constellation</span><select id="star-constellation"><option value="all">All constellations</option></select></label>
 
-                <details class="observer-settings">
+                <details class="observer-settings" open>
                     <summary>Sky from my location <span>Optional</span></summary>
                     <div class="observer-settings-content">
                         <label class="observer-toggle"><input id="observer-mode" type="checkbox"><span>Show only stars above my horizon</span></label>
@@ -93,7 +94,7 @@
                 <p class="overline">Interactive star</p>
                 <h2 class="star-panel-name">Select a star</h2>
                 <p class="star-panel-description"></p>
-                <dl><div><dt>Constellation</dt><dd data-star-detail="constellation"></dd></div><div><dt>Spectral class</dt><dd data-star-detail="spectral"></dd></div><div><dt>Magnitude</dt><dd data-star-detail="magnitude"></dd></div><div><dt>Distance</dt><dd data-star-detail="distance"></dd></div><div><dt>Temperature</dt><dd data-star-detail="temperature"></dd></div><div><dt>Luminosity</dt><dd data-star-detail="luminosity"></dd></div><div><dt>Mass</dt><dd data-star-detail="mass"></dd></div><div><dt>Age</dt><dd data-star-detail="age"></dd></div><div><dt>Position</dt><dd data-star-detail="position"></dd></div></dl>
+                <dl><div><dt>Constellation</dt><dd data-star-detail="constellation"></dd></div><div><dt>Spectral class</dt><dd data-star-detail="spectral"></dd></div><div><dt>Magnitude</dt><dd data-star-detail="magnitude"></dd></div><div><dt>Distance</dt><dd data-star-detail="distance"></dd></div><div><dt>Temperature</dt><dd data-star-detail="temperature"></dd></div><div><dt>Luminosity</dt><dd data-star-detail="luminosity"></dd></div><div><dt>Mass</dt><dd data-star-detail="mass"></dd></div><div><dt>Radius</dt><dd data-star-detail="radius"></dd></div><div><dt>Age</dt><dd data-star-detail="age"></dd></div><div><dt>Position</dt><dd data-star-detail="position"></dd></div></dl>
                 <a class="star-hr-link" href="hr-diagram.html">Find in the H–R diagram <span aria-hidden="true">→</span></a>
             </article>
 

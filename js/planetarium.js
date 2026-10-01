@@ -296,7 +296,7 @@ interactiveStars.forEach(star => {
   const position = celestialVector(star.ra / 15, star.dec, 92);
   const material = new THREE.SpriteMaterial({ map: glowTexture, color: starColour(star.temperature), transparent: true, depthTest: false, depthWrite: false });
   const sprite = new THREE.Sprite(material);
-  const size = THREE.MathUtils.clamp(1.15 - star.magnitude * .12, .45, 1.5);
+  const size = THREE.MathUtils.clamp(1.8 - star.magnitude * .18, .7, 2.4);
   sprite.position.copy(position);
   sprite.scale.setScalar(size);
   sprite.renderOrder = 12;
@@ -305,7 +305,7 @@ interactiveStars.forEach(star => {
   interactiveStarLayer.add(sprite);
   starSprites.push(sprite);
 
-  if (star.magnitude <= 1.35) {
+  if (star.magnitude < 2.5) {
     const label = makeStarLabel(star);
     const direction = position.clone().normalize();
     let tangent = new THREE.Vector3(0, 1, 0).cross(direction);
@@ -484,6 +484,7 @@ observations.forEach((observation, index) => {
 
 const starLayerButton = document.querySelector('[data-sky-action="stars"]');
 const starToolsButton = document.querySelector('[data-sky-action="star-tools"]');
+const starExplorerLaunch = document.querySelector('#star-explorer-launch');
 const starSearch = document.querySelector('#star-search');
 const starCount = document.querySelector('#star-filter-count');
 const constellationSelect = document.querySelector('#star-constellation');
@@ -801,6 +802,7 @@ function selectInteractiveStar(star) {
   starDetailFields.temperature.textContent = `${starInteger.format(star.temperature)} K`;
   starDetailFields.luminosity.textContent = `${starNumber.format(star.luminosity)} L☉`;
   starDetailFields.mass.textContent = `${starNumber.format(star.mass)} M☉`;
+  starDetailFields.radius.textContent = `${starNumber.format(star.radius)} R☉`;
   starDetailFields.age.textContent = `${starNumber.format(star.age)} billion years`;
   starDetailFields.position.textContent = `RA ${position.ra} · Dec ${position.dec}`;
   starPanel.querySelector('.star-hr-link').href = `hr-diagram.html?star=${encodeURIComponent(star.name)}`;
@@ -946,13 +948,17 @@ document.querySelector('[data-sky-action="labels"]').addEventListener('click', e
   event.currentTarget.classList.toggle('is-active', grid.visible);
   event.currentTarget.setAttribute('aria-pressed', String(grid.visible));
 });
-starLayerButton.addEventListener('click', () => {
-  interactiveStarLayer.visible = !interactiveStarLayer.visible;
-  starLayerButton.classList.toggle('is-active', interactiveStarLayer.visible);
-  starLayerButton.setAttribute('aria-pressed', String(interactiveStarLayer.visible));
-  starToolsButton.hidden = !interactiveStarLayer.visible;
-  if (interactiveStarLayer.visible) {
+function setInteractiveStars(enabled) {
+  interactiveStarLayer.visible = enabled;
+  starLayerButton.classList.toggle('is-active', enabled);
+  starLayerButton.setAttribute('aria-pressed', String(enabled));
+  starExplorerLaunch.setAttribute('aria-pressed', String(enabled));
+  starToolsButton.hidden = !enabled;
+  if (enabled) {
     applyStarFilters();
+    starToolsPanel.hidden = false;
+    starToolsButton.classList.add('is-active');
+    starToolsButton.setAttribute('aria-expanded', 'true');
   } else {
     closeStarTools();
     closeStarPanel();
@@ -960,7 +966,9 @@ starLayerButton.addEventListener('click', () => {
     starTooltip.hidden = true;
     canvas.style.cursor = 'grab';
   }
-});
+}
+starLayerButton.addEventListener('click', () => setInteractiveStars(!interactiveStarLayer.visible));
+starExplorerLaunch.addEventListener('click', () => setInteractiveStars(!interactiveStarLayer.visible));
 starToolsButton.addEventListener('click', () => {
   const opening = starToolsPanel.hidden;
   starToolsPanel.hidden = !opening;
