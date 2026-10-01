@@ -36,6 +36,14 @@
                 <p>Select any image to see the full frame and capture details.</p>
             </section>
 
+            <section class="gallery-slideshow-bar" aria-labelledby="slideshow-heading">
+                <div><p class="overline">Slideshow</p><h2 id="slideshow-heading">Watch the complete collection</h2><p>Use the on-screen arrows or the left and right arrow keys.</p></div>
+                <div class="gallery-slideshow-launch">
+                    <button id="start-slideshow" type="button"><span aria-hidden="true">▶</span> Normal slideshow</button>
+                    <button id="start-fullscreen-slideshow" type="button"><span aria-hidden="true">⛶</span> Full screen · image only</button>
+                </div>
+            </section>
+
             <nav class="gallery-category-nav" aria-label="Gallery categories">
                 <a href="#galaxies">Galaxies <span>4</span></a>
                 <a href="#nebulae">Nebulae <span>12</span></a>
@@ -115,6 +123,14 @@
 
     <dialog class="lightbox gallery-lightbox" aria-labelledby="lightbox-title">
         <button class="lightbox-close" type="button" aria-label="Close image">×</button>
+        <button class="slideshow-arrow slideshow-previous" type="button" aria-label="Previous photograph" title="Previous photograph (left arrow)">‹</button>
+        <button class="slideshow-arrow slideshow-next" type="button" aria-label="Next photograph" title="Next photograph (right arrow)">›</button>
+        <div class="slideshow-toolbar" aria-label="Slideshow controls">
+            <button id="slideshow-play" type="button" aria-pressed="false" title="Play or pause slideshow"><span class="control-icon" aria-hidden="true">▶</span><span class="control-label">Play</span></button>
+            <button id="slideshow-normal" class="is-active" type="button" aria-pressed="true" title="Normal view with information"><span class="control-icon" aria-hidden="true">ⓘ</span><span class="control-label">Normal view</span></button>
+            <button id="slideshow-fullscreen" type="button" aria-pressed="false" title="Full screen with image only"><span class="control-icon" aria-hidden="true">⛶</span><span class="control-label">Image only</span></button>
+            <span id="slideshow-counter" aria-live="polite">1 / 20</span>
+        </div>
         <figure><img src="" alt=""><figcaption><div class="lightbox-caption-head"><strong id="lightbox-title"></strong><span></span></div><p class="lightbox-summary"></p><dl class="lightbox-facts"><div><dt>Object</dt><dd data-lightbox-fact="type"></dd></div><div><dt>Distance</dt><dd data-lightbox-fact="distance"></dd></div><div><dt>Angular size</dt><dd data-lightbox-fact="size"></dd></div><div><dt>Full moons</dt><dd data-lightbox-fact="moons"></dd></div></dl></figcaption></figure>
     </dialog>
 

@@ -28,6 +28,92 @@ if (lightbox) {
   };
   const lightboxSummary = lightbox.querySelector('.lightbox-summary');
   const lightboxFacts = Object.fromEntries([...lightbox.querySelectorAll('[data-lightbox-fact]')].map(item => [item.dataset.lightboxFact, item]));
+  const slideshowCounter = document.querySelector('#slideshow-counter');
+  const playButton = document.querySelector('#slideshow-play');
+  const normalViewButton = document.querySelector('#slideshow-normal');
+  const fullscreenButton = document.querySelector('#slideshow-fullscreen');
+  const previousButton = lightbox.querySelector('.slideshow-previous');
+  const nextButton = lightbox.querySelector('.slideshow-next');
+  const startSlideshow = document.querySelector('#start-slideshow');
+  const startFullscreenSlideshow = document.querySelector('#start-fullscreen-slideshow');
+  let currentCard = galleryCards[0];
+  let slideshowTimer = null;
+
+  function visibleCards() {
+    return [...document.querySelectorAll('.gallery-card')].filter(card => !card.closest('[hidden]'));
+  }
+
+  function showCard(card) {
+    if (!card) return;
+    currentCard = card;
+    const info = galleryObjects[card.dataset.title];
+    lightboxImage.src = card.dataset.full;
+    lightboxImage.alt = card.querySelector('img').alt;
+    lightboxTitle.textContent = card.dataset.title;
+    lightboxMeta.textContent = card.dataset.meta;
+    if (lightboxSummary && info) {
+      lightboxSummary.textContent = info.summary;
+      lightboxFacts.type.textContent = info.type;
+      lightboxFacts.distance.textContent = info.distanceLabel;
+      lightboxFacts.size.textContent = info.sizeLabel;
+      lightboxFacts.moons.textContent = info.moons;
+    }
+    const cards = visibleCards();
+    const currentIndex = Math.max(0, cards.indexOf(card));
+    slideshowCounter.textContent = `${currentIndex + 1} / ${cards.length}`;
+    const nextCard = cards[(currentIndex + 1) % cards.length];
+    if (nextCard) {
+      const preload = new Image();
+      preload.src = nextCard.dataset.full;
+    }
+  }
+
+  function moveSlide(direction) {
+    const cards = visibleCards();
+    if (!cards.length) return;
+    const currentIndex = Math.max(0, cards.indexOf(currentCard));
+    const nextIndex = (currentIndex + direction + cards.length) % cards.length;
+    showCard(cards[nextIndex]);
+  }
+
+  function setAutoplay(shouldPlay) {
+    if (slideshowTimer) window.clearInterval(slideshowTimer);
+    slideshowTimer = shouldPlay ? window.setInterval(() => moveSlide(1), 5000) : null;
+    playButton.setAttribute('aria-pressed', String(shouldPlay));
+    playButton.classList.toggle('is-active', shouldPlay);
+    playButton.querySelector('.control-icon').textContent = shouldPlay ? 'Ⅱ' : '▶';
+    playButton.querySelector('.control-label').textContent = shouldPlay ? 'Pause' : 'Play';
+  }
+
+  function setImageOnly(isImageOnly) {
+    lightbox.classList.toggle('is-image-only', isImageOnly);
+    normalViewButton.classList.toggle('is-active', !isImageOnly);
+    normalViewButton.setAttribute('aria-pressed', String(!isImageOnly));
+    fullscreenButton.classList.toggle('is-active', isImageOnly);
+    fullscreenButton.setAttribute('aria-pressed', String(isImageOnly));
+  }
+
+  function enterImageOnly() {
+    setImageOnly(true);
+    if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  }
+
+  function leaveImageOnly() {
+    setImageOnly(false);
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+
+  function openViewer(card, options = {}) {
+    showCard(card);
+    if (!lightbox.open) lightbox.showModal();
+    setAutoplay(Boolean(options.autoplay));
+    if (options.imageOnly) enterImageOnly();
+    else leaveImageOnly();
+  }
 
   galleryCards.forEach(card => {
     const info = galleryObjects[card.dataset.title];
@@ -39,21 +125,7 @@ if (lightbox) {
       facts.innerHTML = `<span>${info.distanceLabel}</span><span>${info.sizeLabel}</span>`;
       card.querySelector('.gallery-overlay > span:first-child').append(facts);
     }
-    card.addEventListener('click', () => {
-      const info = galleryObjects[card.dataset.title];
-      lightboxImage.src = card.dataset.full;
-      lightboxImage.alt = card.querySelector('img').alt;
-      lightboxTitle.textContent = card.dataset.title;
-      lightboxMeta.textContent = card.dataset.meta;
-      if (lightboxSummary && info) {
-        lightboxSummary.textContent = info.summary;
-        lightboxFacts.type.textContent = info.type;
-        lightboxFacts.distance.textContent = info.distanceLabel;
-        lightboxFacts.size.textContent = info.sizeLabel;
-        lightboxFacts.moons.textContent = info.moons;
-      }
-      lightbox.showModal();
-    });
+    card.addEventListener('click', () => openViewer(card));
   });
 
   const gallerySort = document.querySelector('#gallery-sort');
@@ -92,9 +164,36 @@ if (lightbox) {
       sortStatus.textContent = `Showing all ${galleryCards.length} photographs sorted by ${property === 'size' ? 'angular size' : 'distance'}, ${orderLabel}.`;
     });
   }
+  startSlideshow.addEventListener('click', () => openViewer(visibleCards()[0], { autoplay: true }));
+  startFullscreenSlideshow.addEventListener('click', () => openViewer(visibleCards()[0], { autoplay: true, imageOnly: true }));
+  previousButton.addEventListener('click', () => moveSlide(-1));
+  nextButton.addEventListener('click', () => moveSlide(1));
+  playButton.addEventListener('click', () => setAutoplay(!slideshowTimer));
+  normalViewButton.addEventListener('click', leaveImageOnly);
+  fullscreenButton.addEventListener('click', enterImageOnly);
   lightbox.querySelector('.lightbox-close').addEventListener('click', () => lightbox.close());
   lightbox.addEventListener('click', event => {
     if (event.target === lightbox) lightbox.close();
+  });
+  lightbox.addEventListener('close', () => {
+    setAutoplay(false);
+    leaveImageOnly();
+  });
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && lightbox.classList.contains('is-image-only')) setImageOnly(false);
+  });
+  document.addEventListener('keydown', event => {
+    if (!lightbox.open) return;
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      moveSlide(-1);
+    } else if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      moveSlide(1);
+    } else if (event.key === ' ') {
+      event.preventDefault();
+      setAutoplay(!slideshowTimer);
+    }
   });
 }
 
