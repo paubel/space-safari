@@ -55,6 +55,7 @@ function renderExploreMenu() {
   const links = [
     { href: "gallery.html", icon: "✦", label: "Astrophotography Gallery" },
     { href: "planetarium.html", icon: "◎", label: "Interactive Planetarium" },
+    { href: "hr-diagram.html", icon: "⋱", label: "Interactive H–R Diagram" },
   ];
 
   const nav = document.createElement("nav");

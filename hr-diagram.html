@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore how temperature, luminosity, radius, spectral class, and stellar evolution connect in an interactive Hertzsprung–Russell diagram.">
+    <title>Interactive H–R Diagram - Space Safari</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/hr-diagram.css">
+    <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
+    <script defer src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script defer src="js/hr-diagram.js"></script>
+</head>
+
+<body class="hr-diagram-page">
+    <nav class="navbar">
+        <a href="index.html" class="logo"><img src="assets/images/cats-eye-icon.webp" class="site-icon" alt=""> Space Safari</a>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Open navigation">☰</button>
+    </nav>
+
+    <div class="side-menu" id="side-menu">
+        <a href="index.html" class="menu-close" id="menu-close">✕</a>
+        <h2>All Chapters</h2>
+        <nav class="chapter-menu" id="chapters-menu"></nav>
+    </div>
+
+    <div class="container hr-container">
+        <header class="hr-header">
+            <a href="index.html" class="astro-brand"><img src="assets/images/cats-eye-icon.webp" class="site-icon" alt=""> Space Safari</a>
+            <p class="section-label">Interactive stellar laboratory</p>
+            <h1>The Hertzsprung–Russell Diagram</h1>
+            <p>Explore 182 stars and see how surface temperature, luminosity, colour, radius, and stage of stellar evolution fit together.</p>
+        </header>
+
+        <main>
+            <section class="hr-intro" aria-labelledby="hr-intro-heading">
+                <div>
+                    <p class="section-label">What you can do</p>
+                    <h2 id="hr-intro-heading">Read the lives of stars from one diagram</h2>
+                </div>
+                <div class="hr-intro-copy">
+                    <p>Each point is a real star. Move over or select a point to inspect it, search by name, isolate a stellar type, limit the sample by distance, and switch between true radius and equal-size markers.</p>
+                    <p>Temperature decreases from left to right, while luminosity rises upwards. This unusual arrangement reveals the diagonal main sequence, swollen giants above it, and faint white dwarfs below it.</p>
+                </div>
+            </section>
+
+            <section class="hr-lab" aria-labelledby="hr-lab-heading">
+                <div class="hr-lab-heading">
+                    <div><p class="overline">182-star catalogue</p><h2 id="hr-lab-heading">Explore the stellar population</h2></div>
+                    <p id="hr-count" aria-live="polite">Loading stars…</p>
+                </div>
+
+                <div class="hr-controls" aria-label="Diagram filters">
+                    <label class="hr-field hr-search-field" for="hr-search">
+                        <span>Find a star</span>
+                        <input id="hr-search" type="search" placeholder="Try Sirius, Betelgeuse, Sol…" autocomplete="off">
+                    </label>
+                    <label class="hr-field" for="hr-type-filter">
+                        <span>Stellar type</span>
+                        <select id="hr-type-filter">
+                            <option value="all">All types</option>
+                            <option value="main sequence">Main sequence</option>
+                            <option value="subgiant">Subgiants</option>
+                            <option value="giant">Giants</option>
+                            <option value="supergiant">Supergiants</option>
+                            <option value="hypergiant">Hypergiants</option>
+                            <option value="red dwarf">Red dwarfs</option>
+                            <option value="white dwarf">White dwarfs</option>
+                        </select>
+                    </label>
+                    <label class="hr-field" for="hr-size-mode">
+                        <span>Marker size</span>
+                        <select id="hr-size-mode">
+                            <option value="radius">Stellar radius</option>
+                            <option value="equal">Equal size</option>
+                        </select>
+                    </label>
+                    <label class="hr-field hr-distance-field" for="hr-distance">
+                        <span>Maximum distance <output id="hr-distance-value" for="hr-distance">All distances</output></span>
+                        <input id="hr-distance" type="range" min="1" max="5" step="1" value="5">
+                    </label>
+                    <label class="hr-check" for="hr-labels">
+                        <input id="hr-labels" type="checkbox">
+                        <span>Show star names</span>
+                    </label>
+                    <button id="hr-reset" type="button">Reset view</button>
+                </div>
+
+                <div class="hr-workspace">
+                    <div class="hr-chart-wrap">
+                        <svg id="hr-chart" role="img" aria-labelledby="hr-chart-title hr-chart-desc">
+                            <title id="hr-chart-title">Hertzsprung–Russell diagram of nearby and notable stars</title>
+                            <desc id="hr-chart-desc">A scatter plot with stellar surface temperature decreasing from left to right and luminosity increasing from bottom to top.</desc>
+                        </svg>
+                        <div id="hr-tooltip" class="hr-tooltip" role="tooltip" hidden></div>
+                        <p id="hr-error" class="hr-error" role="alert" hidden>The stellar catalogue could not be loaded.</p>
+                    </div>
+
+                    <aside class="hr-details" aria-live="polite" aria-label="Selected star details">
+                        <p class="overline">Selected star</p>
+                        <h3 id="hr-star-name">Select a star</h3>
+                        <p id="hr-star-summary">Click a point in the diagram to keep its properties here.</p>
+                        <dl>
+                            <div><dt>Type</dt><dd id="hr-star-type">—</dd></div>
+                            <div><dt>Spectral class</dt><dd id="hr-star-spectral">—</dd></div>
+                            <div><dt>Temperature</dt><dd id="hr-star-temperature">—</dd></div>
+                            <div><dt>Luminosity</dt><dd id="hr-star-luminosity">—</dd></div>
+                            <div><dt>Radius</dt><dd id="hr-star-radius">—</dd></div>
+                            <div><dt>Distance</dt><dd id="hr-star-distance-detail">—</dd></div>
+                            <div><dt>Constellation</dt><dd id="hr-star-constellation">—</dd></div>
+                        </dl>
+                    </aside>
+                </div>
+
+                <div class="hr-temperature-key" aria-label="Spectral classes from hot to cool">
+                    <span>Hotter</span>
+                    <div><i class="spectral-o">O</i><i class="spectral-b">B</i><i class="spectral-a">A</i><i class="spectral-f">F</i><i class="spectral-g">G</i><i class="spectral-k">K</i><i class="spectral-m">M</i></div>
+                    <span>Cooler</span>
+                </div>
+            </section>
+
+            <section class="hr-reading" aria-labelledby="hr-reading-heading">
+                <p class="section-label">How to read the diagram</p>
+                <h2 id="hr-reading-heading">Three patterns to look for</h2>
+                <div class="hr-reading-grid">
+                    <article><span>01</span><h3>Follow the main sequence</h3><p>Most stars form a diagonal band from hot, luminous blue stars to cool, faint red stars. This is where stars spend most of their lives fusing hydrogen.</p></article>
+                    <article><span>02</span><h3>Compare colour and heat</h3><p>Blue-white stars on the left have hotter surfaces. Orange and red stars on the right are cooler—even when a giant’s large surface makes it extremely luminous.</p></article>
+                    <article><span>03</span><h3>Find the stellar outliers</h3><p>Giants and supergiants sit above the main sequence. White dwarfs sit below it: very hot, but faint because their radiating surfaces are so small.</p></article>
+                </div>
+            </section>
+        </main>
+
+        <footer><p><a href="index.html">← Back to Space Safari</a></p><p>© Paul Belfrage. Original H–R diagram and stellar catalogue © 2024 Paul Belfrage, MIT License.</p></footer>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
