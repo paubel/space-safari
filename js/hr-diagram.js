@@ -8,12 +8,38 @@ if (chartElement && window.d3) {
   const count = document.querySelector('#hr-count');
   const errorMessage = document.querySelector('#hr-error');
   const searchInput = document.querySelector('#hr-search');
-  const typeFilter = document.querySelector('#hr-type-filter');
   const sizeMode = document.querySelector('#hr-size-mode');
-  const distanceInput = document.querySelector('#hr-distance');
-  const distanceValue = document.querySelector('#hr-distance-value');
   const labelsInput = document.querySelector('#hr-labels');
   const resetButton = document.querySelector('#hr-reset');
+  const advancedPanel = document.querySelector('#hr-advanced-panel');
+  const advancedToggle = document.querySelector('#hr-advanced-toggle');
+  const advancedStatus = document.querySelector('#hr-advanced-status');
+  const typeButtons = [...document.querySelectorAll('#hr-type-chips button')];
+  const spectralButtons = [...document.querySelectorAll('#hr-spectral-chips button')];
+  const clearTypes = document.querySelector('#hr-clear-types');
+  const clearSpectral = document.querySelector('#hr-clear-spectral');
+  const constellationSearch = document.querySelector('#hr-constellation-search');
+  const constellationList = document.querySelector('#hr-constellation-list');
+  const clearConstellations = document.querySelector('#hr-clear-constellations');
+
+  const ranges = {
+    temperature: {
+      min: document.querySelector('#hr-temp-min'), max: document.querySelector('#hr-temp-max'),
+      output: document.querySelector('#hr-temp-output'), defaults: [2500, 40000]
+    },
+    distance: {
+      min: document.querySelector('#hr-distance-min'), max: document.querySelector('#hr-distance-max'),
+      output: document.querySelector('#hr-distance-output'), defaults: [0, 4.5]
+    },
+    magnitude: {
+      min: document.querySelector('#hr-mag-min'), max: document.querySelector('#hr-mag-max'),
+      output: document.querySelector('#hr-mag-output'), defaults: [-27, 28]
+    },
+    radius: {
+      min: document.querySelector('#hr-radius-min'), max: document.querySelector('#hr-radius-max'),
+      output: document.querySelector('#hr-radius-output'), defaults: [-2.25, 3.25]
+    }
+  };
 
   const details = {
     name: document.querySelector('#hr-star-name'),
@@ -27,7 +53,6 @@ if (chartElement && window.d3) {
     constellation: document.querySelector('#hr-star-constellation')
   };
 
-  const distanceStops = [25, 100, 500, 2500, Infinity];
   const temperatureStops = [2500, 3500, 5000, 6000, 7500, 10000, 20000, 40000];
   const temperatureColors = ['#ff6045', '#ff8b55', '#ffc56b', '#fff1b0', '#f1f4ff', '#d5e4ff', '#a9c8ff', '#7aa7ff'];
   const colorScale = d3.scaleLinear().domain(temperatureStops).range(temperatureColors).clamp(true);
@@ -38,6 +63,12 @@ if (chartElement && window.d3) {
   let filteredStars = [];
   let selectedStar = null;
   let dimensions = { width: 900, height: 690 };
+  let constellations = [];
+  let activeTypes = new Set(typeButtons.map(button => button.dataset.value));
+  let activeSpectral = new Set(spectralButtons.map(button => button.dataset.value));
+  let activeConstellations = new Set();
+
+  advancedPanel.open = false;
 
   function finite(value) {
     return value !== null && value !== '' && Number.isFinite(Number(value));
@@ -106,28 +137,112 @@ if (chartElement && window.d3) {
     });
   }
 
-  function currentDistanceLimit() {
-    return distanceStops[Number(distanceInput.value) - 1];
+  function rangeValues(name) {
+    const range = ranges[name];
+    const first = Number(range.min.value);
+    const second = Number(range.max.value);
+    return [Math.min(first, second), Math.max(first, second)];
   }
 
-  function updateDistanceLabel() {
-    const limit = currentDistanceLimit();
-    distanceValue.textContent = Number.isFinite(limit) ? `${integerFormat.format(limit)} ly` : 'All distances';
+  function isDefaultRange(name) {
+    const values = rangeValues(name);
+    return values[0] === ranges[name].defaults[0] && values[1] === ranges[name].defaults[1];
+  }
+
+  function updateRangeDisplay(name) {
+    const range = ranges[name];
+    const values = rangeValues(name);
+    const domainMin = Number(range.min.min);
+    const domainMax = Number(range.min.max);
+    const start = ((values[0] - domainMin) / (domainMax - domainMin)) * 100;
+    const end = ((values[1] - domainMin) / (domainMax - domainMin)) * 100;
+    const wrapper = range.min.closest('.hr-dual-range');
+    wrapper.style.setProperty('--range-start', `${start}%`);
+    wrapper.style.setProperty('--range-end', `${end}%`);
+
+    if (name === 'temperature') {
+      range.output.textContent = `${integerFormat.format(values[0])}–${integerFormat.format(values[1])} K`;
+    } else if (name === 'distance') {
+      const minimum = values[0] === 0 ? 0 : Math.round(10 ** values[0]);
+      const maximum = Math.round(10 ** values[1]);
+      range.output.textContent = `${integerFormat.format(minimum)}–${integerFormat.format(maximum)} ly`;
+    } else if (name === 'magnitude') {
+      range.output.textContent = `${values[0].toFixed(1).replace('-', '−')}–${values[1].toFixed(1).replace('-', '−')}`;
+    } else {
+      const minimum = 10 ** values[0];
+      const maximum = 10 ** values[1];
+      range.output.textContent = `${formatScientific(minimum)}–${formatScientific(maximum)} R☉`;
+    }
+  }
+
+  function updateAdvancedStatus() {
+    let activeCount = Object.keys(ranges).filter(name => !isDefaultRange(name)).length;
+    if (activeTypes.size !== typeButtons.length) activeCount++;
+    if (activeSpectral.size !== spectralButtons.length) activeCount++;
+    if (activeConstellations.size) activeCount++;
+    advancedStatus.textContent = activeCount
+      ? `${activeCount} advanced filter${activeCount === 1 ? '' : 's'} active`
+      : 'Optional · currently showing all stars';
+  }
+
+  function renderConstellations(query = '') {
+    const needle = query.trim().toLowerCase();
+    const visible = constellations.filter(item => item.name.toLowerCase().includes(needle));
+    constellationList.replaceChildren(...visible.map(item => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.value = item.name;
+      button.setAttribute('aria-pressed', String(activeConstellations.has(item.name)));
+      const name = document.createElement('span');
+      name.textContent = item.name;
+      const total = document.createElement('span');
+      total.textContent = item.count;
+      button.append(name, total);
+      button.addEventListener('click', () => {
+        if (activeConstellations.has(item.name)) activeConstellations.delete(item.name);
+        else activeConstellations.add(item.name);
+        renderConstellations(constellationSearch.value);
+        applyFilters();
+      });
+      return button;
+    }));
+  }
+
+  function buildConstellations() {
+    const counts = d3.rollup(stars.filter(star => star.constellation), values => values.length, star => star.constellation);
+    constellations = [...counts].map(([name, total]) => ({ name, count: total }))
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+    renderConstellations();
   }
 
   function applyFilters() {
     const query = searchInput.value.trim().toLowerCase();
-    const chosenType = typeFilter.value;
-    const limit = currentDistanceLimit();
+    const temperature = rangeValues('temperature');
+    const distanceLog = rangeValues('distance');
+    const magnitude = rangeValues('magnitude');
+    const radiusLog = rangeValues('radius');
+    const distance = [distanceLog[0] === 0 ? 0 : 10 ** distanceLog[0], 10 ** distanceLog[1]];
+    const radius = [10 ** radiusLog[0], 10 ** radiusLog[1]];
 
     filteredStars = stars.filter(star => {
       const nameMatches = !query || (star.name || '').toLowerCase().includes(query);
-      const typeMatches = chosenType === 'all' || (star.type || '').toLowerCase() === chosenType;
-      const distanceMatches = !Number.isFinite(limit) || !finite(star.distance) || Number(star.distance) <= limit;
-      return nameMatches && typeMatches && distanceMatches;
+      const typeMatches = activeTypes.has((star.type || '').toLowerCase());
+      const spectralClass = (star.spectralClass || '').charAt(0).toUpperCase();
+      const spectralMatches = activeSpectral.has(spectralClass);
+      const constellationMatches = !activeConstellations.size || activeConstellations.has(star.constellation);
+      const temperatureMatches = Number(star.temperature) >= temperature[0] && Number(star.temperature) <= temperature[1];
+      const distanceMatches = Number(star.distance) >= distance[0] && Number(star.distance) <= distance[1];
+      const magnitudeMatches = !finite(star.apparentMagnitude)
+        ? isDefaultRange('magnitude')
+        : Number(star.apparentMagnitude) >= magnitude[0] && Number(star.apparentMagnitude) <= magnitude[1];
+      const radiusMatches = !finite(star.radius)
+        ? isDefaultRange('radius')
+        : Number(star.radius) >= radius[0] && Number(star.radius) <= radius[1];
+      return nameMatches && typeMatches && spectralMatches && constellationMatches && temperatureMatches && distanceMatches && magnitudeMatches && radiusMatches;
     });
 
-    updateDistanceLabel();
+    Object.keys(ranges).forEach(updateRangeDisplay);
+    updateAdvancedStatus();
     count.textContent = `${filteredStars.length} of ${stars.length} stars shown`;
     draw();
 
@@ -277,16 +392,66 @@ if (chartElement && window.d3) {
 
   function reset() {
     searchInput.value = '';
-    typeFilter.value = 'all';
     sizeMode.value = 'radius';
-    distanceInput.value = '5';
     labelsInput.checked = false;
+    Object.values(ranges).forEach(range => {
+      range.min.value = range.defaults[0];
+      range.max.value = range.defaults[1];
+    });
+    activeTypes = new Set(typeButtons.map(button => button.dataset.value));
+    activeSpectral = new Set(spectralButtons.map(button => button.dataset.value));
+    activeConstellations.clear();
+    typeButtons.forEach(button => button.setAttribute('aria-pressed', 'true'));
+    spectralButtons.forEach(button => button.setAttribute('aria-pressed', 'true'));
+    constellationSearch.value = '';
+    renderConstellations();
     applyFilters();
     const sun = stars.find(star => /^(sol|sun)$/i.test(star.name || ''));
     if (sun) selectStar(sun);
   }
 
-  [searchInput, typeFilter, distanceInput].forEach(control => control.addEventListener('input', applyFilters));
+  searchInput.addEventListener('input', applyFilters);
+  Object.values(ranges).forEach(range => {
+    range.min.addEventListener('input', applyFilters);
+    range.max.addEventListener('input', applyFilters);
+  });
+  typeButtons.forEach(button => button.addEventListener('click', () => {
+    const value = button.dataset.value;
+    if (activeTypes.has(value)) activeTypes.delete(value);
+    else activeTypes.add(value);
+    button.setAttribute('aria-pressed', String(activeTypes.has(value)));
+    applyFilters();
+  }));
+  spectralButtons.forEach(button => button.addEventListener('click', () => {
+    const value = button.dataset.value;
+    if (activeSpectral.has(value)) activeSpectral.delete(value);
+    else activeSpectral.add(value);
+    button.setAttribute('aria-pressed', String(activeSpectral.has(value)));
+    applyFilters();
+  }));
+  clearTypes.addEventListener('click', () => {
+    activeTypes.clear();
+    typeButtons.forEach(button => button.setAttribute('aria-pressed', 'false'));
+    applyFilters();
+  });
+  clearSpectral.addEventListener('click', () => {
+    activeSpectral.clear();
+    spectralButtons.forEach(button => button.setAttribute('aria-pressed', 'false'));
+    applyFilters();
+  });
+  constellationSearch.addEventListener('input', () => renderConstellations(constellationSearch.value));
+  clearConstellations.addEventListener('click', () => {
+    activeConstellations.clear();
+    renderConstellations(constellationSearch.value);
+    applyFilters();
+  });
+  advancedToggle.addEventListener('click', () => {
+    advancedPanel.open = !advancedPanel.open;
+  });
+  advancedPanel.addEventListener('toggle', () => {
+    advancedToggle.setAttribute('aria-expanded', String(advancedPanel.open));
+    advancedToggle.querySelector('span').textContent = advancedPanel.open ? '↑' : '↓';
+  });
   sizeMode.addEventListener('change', draw);
   labelsInput.addEventListener('change', draw);
   resetButton.addEventListener('click', reset);
@@ -302,6 +467,7 @@ if (chartElement && window.d3) {
   d3.json('data/hr-diagram/stars.json')
     .then(data => {
       stars = data.filter(star => finite(star.temperature) && finite(star.luminosity) && Number(star.temperature) > 0 && Number(star.luminosity) > 0);
+      buildConstellations();
       reset();
       requestAnimationFrame(() => requestAnimationFrame(applyFilters));
     })

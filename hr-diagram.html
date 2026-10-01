@@ -27,24 +27,12 @@
 
     <div class="container hr-container">
         <header class="hr-header">
-            <a href="index.html" class="astro-brand"><img src="assets/images/cats-eye-icon.webp" class="site-icon" alt=""> Space Safari</a>
             <p class="section-label">Interactive stellar laboratory</p>
             <h1>The Hertzsprung–Russell Diagram</h1>
-            <p>Explore 182 stars and see how surface temperature, luminosity, colour, radius, and stage of stellar evolution fit together.</p>
+            <p>Explore 182 stars by temperature and luminosity.</p>
         </header>
 
         <main>
-            <section class="hr-intro" aria-labelledby="hr-intro-heading">
-                <div>
-                    <p class="section-label">What you can do</p>
-                    <h2 id="hr-intro-heading">Read the lives of stars from one diagram</h2>
-                </div>
-                <div class="hr-intro-copy">
-                    <p>Each point is a real star. Move over or select a point to inspect it, search by name, isolate a stellar type, limit the sample by distance, and switch between true radius and equal-size markers.</p>
-                    <p>Temperature decreases from left to right, while luminosity rises upwards. This unusual arrangement reveals the diagonal main sequence, swollen giants above it, and faint white dwarfs below it.</p>
-                </div>
-            </section>
-
             <section class="hr-lab" aria-labelledby="hr-lab-heading">
                 <div class="hr-lab-heading">
                     <div><p class="overline">182-star catalogue</p><h2 id="hr-lab-heading">Explore the stellar population</h2></div>
@@ -56,19 +44,6 @@
                         <span>Find a star</span>
                         <input id="hr-search" type="search" placeholder="Try Sirius, Betelgeuse, Sol…" autocomplete="off">
                     </label>
-                    <label class="hr-field" for="hr-type-filter">
-                        <span>Stellar type</span>
-                        <select id="hr-type-filter">
-                            <option value="all">All types</option>
-                            <option value="main sequence">Main sequence</option>
-                            <option value="subgiant">Subgiants</option>
-                            <option value="giant">Giants</option>
-                            <option value="supergiant">Supergiants</option>
-                            <option value="hypergiant">Hypergiants</option>
-                            <option value="red dwarf">Red dwarfs</option>
-                            <option value="white dwarf">White dwarfs</option>
-                        </select>
-                    </label>
                     <label class="hr-field" for="hr-size-mode">
                         <span>Marker size</span>
                         <select id="hr-size-mode">
@@ -76,16 +51,92 @@
                             <option value="equal">Equal size</option>
                         </select>
                     </label>
-                    <label class="hr-field hr-distance-field" for="hr-distance">
-                        <span>Maximum distance <output id="hr-distance-value" for="hr-distance">All distances</output></span>
-                        <input id="hr-distance" type="range" min="1" max="5" step="1" value="5">
-                    </label>
                     <label class="hr-check" for="hr-labels">
                         <input id="hr-labels" type="checkbox">
                         <span>Show star names</span>
                     </label>
+                    <button class="hr-advanced-jump" id="hr-advanced-toggle" type="button" aria-expanded="false" aria-controls="hr-advanced-panel">Advanced filters <span aria-hidden="true">↓</span></button>
                     <button id="hr-reset" type="button">Reset view</button>
                 </div>
+
+                <details class="hr-advanced" id="hr-advanced-panel">
+                    <summary>
+                        <span><strong>Advanced filters</strong><small>Temperature, distance, magnitude, radius, stellar type, spectral class, and constellation</small></span>
+                        <span id="hr-advanced-status">Optional · currently showing all stars</span>
+                    </summary>
+                    <div class="hr-advanced-content">
+                        <div class="hr-range-grid">
+                            <section class="hr-range-section" aria-labelledby="hr-temp-heading">
+                                <div class="hr-range-heading"><h3 id="hr-temp-heading">Temperature</h3><output id="hr-temp-output">2,500–40,000 K</output></div>
+                                <div class="hr-dual-range" data-range="temperature">
+                                    <span class="hr-range-track" aria-hidden="true"></span>
+                                    <input id="hr-temp-min" type="range" min="2500" max="40000" step="100" value="2500" aria-label="Minimum temperature in kelvin">
+                                    <input id="hr-temp-max" type="range" min="2500" max="40000" step="100" value="40000" aria-label="Maximum temperature in kelvin">
+                                </div>
+                            </section>
+                            <section class="hr-range-section" aria-labelledby="hr-distance-heading">
+                                <div class="hr-range-heading"><h3 id="hr-distance-heading">Distance</h3><output id="hr-distance-output">0–31,623 ly</output></div>
+                                <div class="hr-dual-range" data-range="distance">
+                                    <span class="hr-range-track" aria-hidden="true"></span>
+                                    <input id="hr-distance-min" type="range" min="0" max="4.5" step="0.05" value="0" aria-label="Minimum distance on a logarithmic scale">
+                                    <input id="hr-distance-max" type="range" min="0" max="4.5" step="0.05" value="4.5" aria-label="Maximum distance on a logarithmic scale">
+                                </div>
+                            </section>
+                            <section class="hr-range-section" aria-labelledby="hr-mag-heading">
+                                <div class="hr-range-heading"><h3 id="hr-mag-heading">Apparent magnitude</h3><output id="hr-mag-output">−27.0–28.0</output></div>
+                                <div class="hr-dual-range" data-range="magnitude">
+                                    <span class="hr-range-track" aria-hidden="true"></span>
+                                    <input id="hr-mag-min" type="range" min="-27" max="28" step="0.1" value="-27" aria-label="Minimum apparent magnitude">
+                                    <input id="hr-mag-max" type="range" min="-27" max="28" step="0.1" value="28" aria-label="Maximum apparent magnitude">
+                                </div>
+                            </section>
+                            <section class="hr-range-section" aria-labelledby="hr-radius-heading">
+                                <div class="hr-range-heading"><h3 id="hr-radius-heading">Radius</h3><output id="hr-radius-output">0.006–1,778 R☉</output></div>
+                                <div class="hr-dual-range" data-range="radius">
+                                    <span class="hr-range-track" aria-hidden="true"></span>
+                                    <input id="hr-radius-min" type="range" min="-2.25" max="3.25" step="0.05" value="-2.25" aria-label="Minimum radius on a logarithmic scale">
+                                    <input id="hr-radius-max" type="range" min="-2.25" max="3.25" step="0.05" value="3.25" aria-label="Maximum radius on a logarithmic scale">
+                                </div>
+                            </section>
+                        </div>
+
+                        <div class="hr-advanced-options">
+                            <fieldset class="hr-chip-group">
+                                <legend>Stellar type</legend>
+                                <div class="hr-chip-heading"><span>Choose one or more</span><button id="hr-clear-types" type="button">Clear all</button></div>
+                                <div id="hr-type-chips" class="hr-chip-list">
+                                    <button type="button" data-value="main sequence" aria-pressed="true">Main sequence</button>
+                                    <button type="button" data-value="subgiant" aria-pressed="true">Subgiant</button>
+                                    <button type="button" data-value="giant" aria-pressed="true">Giant</button>
+                                    <button type="button" data-value="supergiant" aria-pressed="true">Supergiant</button>
+                                    <button type="button" data-value="hypergiant" aria-pressed="true">Hypergiant</button>
+                                    <button type="button" data-value="red dwarf" aria-pressed="true">Red dwarf</button>
+                                    <button type="button" data-value="white dwarf" aria-pressed="true">White dwarf</button>
+                                </div>
+                            </fieldset>
+                            <fieldset class="hr-chip-group">
+                                <legend>Spectral class</legend>
+                                <div class="hr-chip-heading"><span>Choose one or more</span><button id="hr-clear-spectral" type="button">Clear all</button></div>
+                                <div id="hr-spectral-chips" class="hr-chip-list hr-spectral-chips">
+                                    <button type="button" data-value="O" aria-pressed="true">O</button>
+                                    <button type="button" data-value="B" aria-pressed="true">B</button>
+                                    <button type="button" data-value="A" aria-pressed="true">A</button>
+                                    <button type="button" data-value="F" aria-pressed="true">F</button>
+                                    <button type="button" data-value="G" aria-pressed="true">G</button>
+                                    <button type="button" data-value="K" aria-pressed="true">K</button>
+                                    <button type="button" data-value="M" aria-pressed="true">M</button>
+                                    <button type="button" data-value="L" aria-pressed="true">L</button>
+                                    <button type="button" data-value="D" aria-pressed="true">D</button>
+                                </div>
+                            </fieldset>
+                            <section class="hr-constellations" aria-labelledby="hr-constellation-heading">
+                                <div class="hr-constellation-heading"><h3 id="hr-constellation-heading">Constellations</h3><button id="hr-clear-constellations" type="button">Clear selection</button></div>
+                                <label class="hr-field" for="hr-constellation-search"><span>Search constellations</span><input id="hr-constellation-search" type="search" placeholder="Try Orion or Ursa Major…" autocomplete="off"></label>
+                                <div id="hr-constellation-list" class="hr-constellation-list"></div>
+                            </section>
+                        </div>
+                    </div>
+                </details>
 
                 <div class="hr-workspace">
                     <div class="hr-chart-wrap">
@@ -117,6 +168,17 @@
                     <span>Hotter</span>
                     <div><i class="spectral-o">O</i><i class="spectral-b">B</i><i class="spectral-a">A</i><i class="spectral-f">F</i><i class="spectral-g">G</i><i class="spectral-k">K</i><i class="spectral-m">M</i></div>
                     <span>Cooler</span>
+                </div>
+            </section>
+
+            <section class="hr-intro" aria-labelledby="hr-intro-heading">
+                <div>
+                    <p class="section-label">What you can do</p>
+                    <h2 id="hr-intro-heading">Read the lives of stars from one diagram</h2>
+                </div>
+                <div class="hr-intro-copy">
+                    <p>Each point is a real star. Move over or select a point to inspect it, search by name, isolate a stellar type, limit the sample by distance, and switch between true radius and equal-size markers.</p>
+                    <p>Temperature decreases from left to right, while luminosity rises upwards. This unusual arrangement reveals the diagonal main sequence, swollen giants above it, and faint white dwarfs below it.</p>
                 </div>
             </section>
 

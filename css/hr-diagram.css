@@ -9,29 +9,32 @@
 }
 
 .hr-header {
-  max-width: 900px;
-  padding: 1.5rem 0 2.5rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem 1.25rem;
+  max-width: none;
+  padding: 0.8rem 0 1rem;
 }
 
 .hr-header h1 {
-  max-width: 780px;
-  margin: 0.4rem 0 0.8rem;
-  font-size: clamp(2.5rem, 6vw, 5.8rem);
-  line-height: 0.98;
-  letter-spacing: -0.055em;
+  margin: 0;
+  font-size: clamp(1.35rem, 2.5vw, 2.1rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
 }
 
 .hr-header > p:last-child {
-  max-width: 720px;
+  margin-left: auto;
   color: var(--text-muted);
-  font-size: 1.08rem;
+  font-size: 0.82rem;
+  white-space: nowrap;
 }
 
 .hr-intro {
   display: grid;
   grid-template-columns: minmax(240px, 0.75fr) minmax(0, 1.25fr);
   gap: 2rem;
-  margin-bottom: 2rem;
+  margin-top: 2rem;
   padding: 1.5rem;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -82,7 +85,7 @@
 
 .hr-controls {
   display: grid;
-  grid-template-columns: minmax(190px, 1.5fr) repeat(2, minmax(150px, 0.8fr)) minmax(190px, 1fr) auto auto;
+  grid-template-columns: minmax(220px, 1.5fr) minmax(160px, 0.75fr) auto auto auto;
   gap: 0.75rem;
   align-items: end;
   padding: 1rem 1.4rem;
@@ -166,8 +169,323 @@
   white-space: nowrap;
 }
 
+.hr-advanced-jump {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 42px;
+  padding: 0 0.9rem;
+  color: var(--accent);
+  background: rgba(74, 158, 255, 0.08);
+  border: 1px solid rgba(74, 158, 255, 0.45);
+  border-radius: 5px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.hr-advanced-jump:hover,
 #hr-reset:hover {
   border-color: var(--accent);
+}
+
+.hr-advanced {
+  background: #0b101d;
+  border-bottom: 1px solid var(--border);
+}
+
+.hr-advanced summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 72px;
+  padding: 0.9rem 1.4rem;
+  color: var(--text);
+  cursor: pointer;
+  list-style: none;
+}
+
+.hr-advanced summary::-webkit-details-marker {
+  display: none;
+}
+
+.hr-advanced summary::before {
+  content: "+";
+  display: grid;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.hr-advanced[open] summary::before {
+  content: "−";
+}
+
+.hr-advanced summary > span:first-of-type {
+  display: grid;
+  flex: 1;
+}
+
+.hr-advanced summary strong {
+  font-size: 0.92rem;
+}
+
+.hr-advanced summary small,
+#hr-advanced-status {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+#hr-advanced-status {
+  text-align: right;
+}
+
+.hr-advanced-content {
+  display: grid;
+  gap: 1.25rem;
+  padding: 0 1.4rem 1.4rem;
+}
+
+.hr-range-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.hr-range-section {
+  min-width: 0;
+  padding: 0.9rem;
+  background: #0e1423;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.hr-range-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.hr-range-heading h3,
+.hr-constellation-heading h3 {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.hr-range-heading output {
+  color: var(--text-muted);
+  font: 0.66rem ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-align: right;
+}
+
+.hr-dual-range {
+  --range-start: 0%;
+  --range-end: 100%;
+  position: relative;
+  height: 42px;
+  margin-top: 0.45rem;
+}
+
+.hr-dual-range::before,
+.hr-range-track {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.hr-dual-range::before {
+  content: "";
+  right: 0;
+  left: 0;
+  background: #293147;
+}
+
+.hr-range-track {
+  right: calc(100% - var(--range-end));
+  left: var(--range-start);
+  z-index: 1;
+  background: var(--accent);
+}
+
+.hr-dual-range input[type="range"] {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+}
+
+.hr-dual-range input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  background: transparent;
+}
+
+.hr-dual-range input[type="range"]::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  margin-top: -7px;
+  appearance: none;
+  background: #9fd0ff;
+  border: 2px solid #07101e;
+  border-radius: 50%;
+  pointer-events: auto;
+}
+
+.hr-dual-range input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: transparent;
+}
+
+.hr-dual-range input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #9fd0ff;
+  border: 2px solid #07101e;
+  border-radius: 50%;
+  pointer-events: auto;
+}
+
+.hr-advanced-options {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.7fr) minmax(260px, 1.1fr);
+  gap: 1rem;
+}
+
+.hr-chip-group,
+.hr-constellations {
+  min-width: 0;
+  padding: 0.9rem;
+  background: #0e1423;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.hr-chip-group {
+  margin: 0;
+}
+
+.hr-chip-group legend {
+  padding: 0 0.3rem;
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.hr-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.hr-chip-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  margin: 0 0 0.7rem;
+  color: var(--text-muted);
+  font-size: 0.66rem;
+}
+
+.hr-chip-heading button {
+  padding: 0.25rem 0.55rem;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid rgba(74, 158, 255, 0.45);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.hr-chip-heading button:hover,
+.hr-chip-heading button:focus-visible {
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.hr-chip-list button,
+.hr-constellation-list button,
+#hr-clear-constellations {
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.72rem;
+}
+
+.hr-chip-list button {
+  min-height: 34px;
+  padding: 0.35rem 0.7rem;
+}
+
+.hr-chip-list button[aria-pressed="true"],
+.hr-constellation-list button[aria-pressed="true"] {
+  color: #ddecff;
+  background: rgba(74, 158, 255, 0.14);
+  border-color: var(--accent);
+}
+
+.hr-spectral-chips button {
+  min-width: 36px;
+  padding-right: 0.45rem;
+  padding-left: 0.45rem;
+}
+
+.hr-constellations {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.hr-constellation-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+#hr-clear-constellations {
+  padding: 0.25rem 0.55rem;
+}
+
+.hr-constellation-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  max-height: 180px;
+  overflow: auto;
+  padding-right: 0.2rem;
+}
+
+.hr-constellation-list button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 34px;
+  padding: 0.35rem 0.65rem;
+  border-radius: 5px;
+  text-align: left;
+}
+
+.hr-constellation-list button span:last-child {
+  color: #758098;
+  font: 0.64rem ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 .hr-workspace {
@@ -424,12 +742,26 @@
 
 @media (max-width: 1180px) {
   .hr-controls {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(220px, 1.4fr) minmax(150px, 0.8fr) auto auto auto;
   }
 
   .hr-check,
   #hr-reset {
     align-self: end;
+  }
+}
+
+@media (max-width: 1050px) {
+  .hr-range-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hr-advanced-options {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hr-constellations {
+    grid-column: 1 / -1;
   }
 }
 
@@ -454,6 +786,16 @@
 }
 
 @media (max-width: 700px) {
+  .hr-header {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .hr-header > p:last-child {
+    margin-left: 0;
+    white-space: normal;
+  }
+
   .hr-container {
     padding-right: 0.8rem;
     padding-left: 0.8rem;
@@ -468,9 +810,24 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .hr-search-field,
-  .hr-distance-field {
+  .hr-search-field {
     grid-column: 1 / -1;
+  }
+
+  .hr-advanced-jump,
+  #hr-reset {
+    min-width: 0;
+  }
+
+  .hr-advanced summary {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  #hr-advanced-status {
+    width: 100%;
+    padding-left: 44px;
+    text-align: left;
   }
 
   #hr-chart {
@@ -498,16 +855,28 @@
 
 @media (max-width: 460px) {
   .hr-header h1 {
-    font-size: 2.5rem;
+    font-size: 1.55rem;
   }
 
   .hr-controls {
     grid-template-columns: 1fr;
   }
 
-  .hr-search-field,
-  .hr-distance-field {
+  .hr-search-field {
     grid-column: auto;
+  }
+
+  .hr-range-grid,
+  .hr-advanced-options {
+    grid-template-columns: 1fr;
+  }
+
+  .hr-constellations {
+    grid-column: auto;
+  }
+
+  .hr-constellation-list {
+    grid-template-columns: 1fr;
   }
 
   .hr-details dl {
