@@ -34,11 +34,45 @@
                 <div class="sky-targets"></div>
             </aside>
 
+            <aside class="star-tools-panel" id="star-tools-panel" aria-label="Advanced star tools" hidden>
+                <header><div><p class="overline">Optional layer</p><h2>Interactive stars</h2></div><button id="close-star-tools" type="button" aria-label="Close advanced star tools">×</button></header>
+                <p class="star-tools-intro">Search, select, and filter real stars without changing the astrophotography layer.</p>
+
+                <label class="star-search" for="star-search"><span>Find a star</span><input id="star-search" type="search" placeholder="Try Sirius, Vega, Polaris…" autocomplete="off"></label>
+                <p class="star-filter-count" id="star-filter-count" aria-live="polite">93 of 93 stars shown</p>
+
+                <div class="star-filter-grid">
+                    <section class="star-range-filter" data-star-range="magnitude"><div><h3>Brightness</h3><output id="star-magnitude-output">−2.0–6.0 mag</output></div><div class="star-dual-range"><input id="star-magnitude-min" type="range" min="-2" max="6" step="0.1" value="-2" aria-label="Minimum stellar magnitude"><input id="star-magnitude-max" type="range" min="-2" max="6" step="0.1" value="6" aria-label="Maximum stellar magnitude"></div></section>
+                    <section class="star-range-filter" data-star-range="distance"><div><h3>Distance</h3><output id="star-distance-output">1–3,000 ly</output></div><div class="star-dual-range"><input id="star-distance-min" type="range" min="0" max="3.4771" step="0.02" value="0" aria-label="Minimum stellar distance"><input id="star-distance-max" type="range" min="0" max="3.4771" step="0.02" value="3.4771" aria-label="Maximum stellar distance"></div></section>
+                    <section class="star-range-filter" data-star-range="age"><div><h3>Age</h3><output id="star-age-output">0.0–8.0 Gy</output></div><div class="star-dual-range"><input id="star-age-min" type="range" min="0" max="8" step="0.1" value="0" aria-label="Minimum stellar age"><input id="star-age-max" type="range" min="0" max="8" step="0.1" value="8" aria-label="Maximum stellar age"></div></section>
+                    <section class="star-range-filter" data-star-range="mass"><div><h3>Mass</h3><output id="star-mass-output">0.5–35.0 M☉</output></div><div class="star-dual-range"><input id="star-mass-min" type="range" min="0.5" max="35" step="0.1" value="0.5" aria-label="Minimum stellar mass"><input id="star-mass-max" type="range" min="0.5" max="35" step="0.1" value="35" aria-label="Maximum stellar mass"></div></section>
+                    <section class="star-range-filter" data-star-range="luminosity"><div><h3>Luminosity</h3><output id="star-luminosity-output">0.1–1M L☉</output></div><div class="star-dual-range"><input id="star-luminosity-min" type="range" min="-1" max="6" step="0.05" value="-1" aria-label="Minimum stellar luminosity"><input id="star-luminosity-max" type="range" min="-1" max="6" step="0.05" value="6" aria-label="Maximum stellar luminosity"></div></section>
+                    <section class="star-range-filter" data-star-range="temperature"><div><h3>Temperature</h3><output id="star-temperature-output">3,000–45,000 K</output></div><div class="star-dual-range"><input id="star-temperature-min" type="range" min="3000" max="45000" step="100" value="3000" aria-label="Minimum stellar temperature"><input id="star-temperature-max" type="range" min="3000" max="45000" step="100" value="45000" aria-label="Maximum stellar temperature"></div></section>
+                </div>
+
+                <fieldset class="star-spectral-filter"><legend>Spectral class</legend><div class="star-filter-actions"><button id="clear-star-spectral" type="button">Clear all</button><button id="select-star-spectral" type="button">Select all</button></div><div id="star-spectral-chips"><button type="button" data-value="O" aria-pressed="true">O</button><button type="button" data-value="B" aria-pressed="true">B</button><button type="button" data-value="A" aria-pressed="true">A</button><button type="button" data-value="F" aria-pressed="true">F</button><button type="button" data-value="G" aria-pressed="true">G</button><button type="button" data-value="K" aria-pressed="true">K</button><button type="button" data-value="M" aria-pressed="true">M</button></div></fieldset>
+                <label class="star-search" for="star-constellation"><span>Constellation</span><select id="star-constellation"><option value="all">All constellations</option></select></label>
+
+                <details class="observer-settings">
+                    <summary>Sky from my location <span>Optional</span></summary>
+                    <div class="observer-settings-content">
+                        <label class="observer-toggle"><input id="observer-mode" type="checkbox"><span>Show only stars above my horizon</span></label>
+                        <button id="use-my-location" type="button">Use my location</button>
+                        <p id="observer-location" aria-live="polite">Default location: Stockholm</p>
+                        <div class="observer-date-time"><label>Date<input id="observer-date" type="date"></label><label>Time<input id="observer-time" type="time"></label></div>
+                        <div class="observer-actions"><button id="apply-observer-time" type="button">Apply</button><button id="observer-now" type="button">Reset to now</button></div>
+                    </div>
+                </details>
+                <button id="reset-star-filters" class="reset-star-filters" type="button">Reset star filters</button>
+            </aside>
+
             <div class="sky-toolbar" aria-label="Sky controls">
                 <button type="button" data-sky-action="home" aria-label="Show the whole sky" title="Overview">⌂</button>
                 <button type="button" data-sky-action="zoom-in" aria-label="Zoom in" title="Zoom in">+</button>
                 <button type="button" data-sky-action="zoom-out" aria-label="Zoom out" title="Zoom out">−</button>
                 <button type="button" data-sky-action="labels" class="is-active" aria-pressed="true" aria-label="Toggle constellation lines and coordinate grid" title="Constellations and coordinate grid">⌗</button>
+                <button type="button" data-sky-action="stars" aria-pressed="false" aria-label="Toggle interactive stars" title="Interactive stars">★</button>
+                <button type="button" data-sky-action="star-tools" aria-expanded="false" aria-controls="star-tools-panel" aria-label="Open advanced star tools" title="Advanced star tools" hidden>☷</button>
             </div>
 
             <div class="sky-coordinates" aria-live="polite"><span>RA 00h 42m</span><span>DEC +41° 16′</span><span>FOV 75°</span></div>
@@ -53,6 +87,17 @@
                 <p class="object-note">Angular size describes the photographed object, not the camera frame. One full Moon is approximately 0.5° across.</p>
                 <a class="object-full-image" href="">Open full photograph <span aria-hidden="true">↗</span></a>
             </article>
+
+            <article class="object-panel star-panel" aria-live="polite" aria-label="Selected star information" hidden>
+                <button class="star-panel-close" type="button" aria-label="Close star information">×</button>
+                <p class="overline">Interactive star</p>
+                <h2 class="star-panel-name">Select a star</h2>
+                <p class="star-panel-description"></p>
+                <dl><div><dt>Constellation</dt><dd data-star-detail="constellation"></dd></div><div><dt>Spectral class</dt><dd data-star-detail="spectral"></dd></div><div><dt>Magnitude</dt><dd data-star-detail="magnitude"></dd></div><div><dt>Distance</dt><dd data-star-detail="distance"></dd></div><div><dt>Temperature</dt><dd data-star-detail="temperature"></dd></div><div><dt>Luminosity</dt><dd data-star-detail="luminosity"></dd></div><div><dt>Mass</dt><dd data-star-detail="mass"></dd></div><div><dt>Age</dt><dd data-star-detail="age"></dd></div><div><dt>Position</dt><dd data-star-detail="position"></dd></div></dl>
+                <a class="star-hr-link" href="hr-diagram.html">Find in the H–R diagram <span aria-hidden="true">→</span></a>
+            </article>
+
+            <div class="star-tooltip" role="tooltip" hidden></div>
 
             <dialog class="lightbox planetarium-lightbox" aria-labelledby="planetarium-lightbox-title">
                 <button class="planetarium-lightbox-back" type="button"><span aria-hidden="true">←</span> Back to sky atlas</button>

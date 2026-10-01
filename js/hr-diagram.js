@@ -481,7 +481,16 @@ if (chartElement && window.d3) {
       stars = data.filter(star => finite(star.temperature) && finite(star.luminosity) && Number(star.temperature) > 0 && Number(star.luminosity) > 0);
       buildConstellations();
       reset();
-      requestAnimationFrame(() => requestAnimationFrame(applyFilters));
+      const requestedName = new URLSearchParams(window.location.search).get('star');
+      if (requestedName) searchInput.value = requestedName;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        applyFilters();
+        if (!requestedName) return;
+        const normalizedName = requestedName.toLowerCase();
+        const requestedStar = stars.find(star => star.name.toLowerCase() === normalizedName) ||
+          stars.find(star => star.name.toLowerCase().startsWith(normalizedName));
+        if (requestedStar) selectStar(requestedStar);
+      }));
     })
     .catch(error => {
       console.error('Could not load the H–R catalogue.', error);

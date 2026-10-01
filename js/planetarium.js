@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { STARS as interactiveStars } from '../data/astrophoto/interactive-stars.js';
 
 const observations = [
   {
@@ -148,6 +149,9 @@ const canvas = document.querySelector('#sky-canvas');
 const loading = document.querySelector('.sky-loading');
 const targetList = document.querySelector('.sky-targets');
 const panel = document.querySelector('.object-panel');
+const starPanel = document.querySelector('.star-panel');
+const starToolsPanel = document.querySelector('#star-tools-panel');
+const starTooltip = document.querySelector('.star-tooltip');
 const coordinates = document.querySelector('.sky-coordinates');
 
 const scene = new THREE.Scene();
@@ -234,6 +238,91 @@ function makeStars() {
   brightGeometry.setAttribute('position', new THREE.Float32BufferAttribute(brightPositions, 3));
   scene.add(new THREE.Points(brightGeometry, new THREE.PointsMaterial({ color: 0xeaf4ff, size: .56, transparent: true, opacity: .95, depthWrite: false })));
 }
+
+function starColour(temperature) {
+  if (temperature >= 30000) return 0x8eb8ff;
+  if (temperature >= 10000) return 0xadc9ff;
+  if (temperature >= 7500) return 0xd7e2ff;
+  if (temperature >= 6000) return 0xfff7df;
+  if (temperature >= 5200) return 0xffe38c;
+  if (temperature >= 3700) return 0xffb05c;
+  return 0xff6b48;
+}
+
+function makeGlowTexture() {
+  const textureCanvas = document.createElement('canvas');
+  textureCanvas.width = 128;
+  textureCanvas.height = 128;
+  const context = textureCanvas.getContext('2d');
+  const gradient = context.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(.12, 'rgba(255,255,255,.98)');
+  gradient.addColorStop(.34, 'rgba(255,255,255,.55)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, 128, 128);
+  const texture = new THREE.CanvasTexture(textureCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function makeStarLabel(star) {
+  const labelCanvas = document.createElement('canvas');
+  labelCanvas.width = 320;
+  labelCanvas.height = 64;
+  const context = labelCanvas.getContext('2d');
+  context.font = '600 26px system-ui, sans-serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillStyle = 'rgba(235,243,255,.96)';
+  context.fillText(star.name, 160, 32);
+  const texture = new THREE.CanvasTexture(labelCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: .92, depthTest: false, depthWrite: false }));
+  label.scale.set(5.8, 1.16, 1);
+  label.userData.starLabel = true;
+  return label;
+}
+
+const interactiveStarLayer = new THREE.Group();
+interactiveStarLayer.name = 'interactive-stars';
+interactiveStarLayer.visible = false;
+scene.add(interactiveStarLayer);
+const starSprites = [];
+const starLabels = [];
+const glowTexture = makeGlowTexture();
+
+interactiveStars.forEach(star => {
+  const position = celestialVector(star.ra / 15, star.dec, 92);
+  const material = new THREE.SpriteMaterial({ map: glowTexture, color: starColour(star.temperature), transparent: true, depthTest: false, depthWrite: false });
+  const sprite = new THREE.Sprite(material);
+  const size = THREE.MathUtils.clamp(1.15 - star.magnitude * .12, .45, 1.5);
+  sprite.position.copy(position);
+  sprite.scale.setScalar(size);
+  sprite.renderOrder = 12;
+  sprite.userData.star = star;
+  sprite.userData.baseScale = size;
+  interactiveStarLayer.add(sprite);
+  starSprites.push(sprite);
+
+  if (star.magnitude <= 1.35) {
+    const label = makeStarLabel(star);
+    const direction = position.clone().normalize();
+    let tangent = new THREE.Vector3(0, 1, 0).cross(direction);
+    if (tangent.lengthSq() < .01) tangent = new THREE.Vector3(1, 0, 0);
+    label.position.copy(position).add(tangent.normalize().multiplyScalar(1.4));
+    label.renderOrder = 13;
+    label.userData.star = star;
+    interactiveStarLayer.add(label);
+    starLabels.push(label);
+    sprite.userData.label = label;
+  }
+});
+
+const horizonLayer = new THREE.Group();
+horizonLayer.name = 'observer-horizon';
+horizonLayer.visible = false;
+scene.add(horizonLayer);
 
 // A figure is included if at least one of its line stars rises above the
 // mathematical horizon during the year at the configured observing latitude.
@@ -393,6 +482,243 @@ observations.forEach((observation, index) => {
 
 });
 
+const starLayerButton = document.querySelector('[data-sky-action="stars"]');
+const starToolsButton = document.querySelector('[data-sky-action="star-tools"]');
+const starSearch = document.querySelector('#star-search');
+const starCount = document.querySelector('#star-filter-count');
+const constellationSelect = document.querySelector('#star-constellation');
+const spectralButtons = [...document.querySelectorAll('#star-spectral-chips button')];
+const observerMode = document.querySelector('#observer-mode');
+const observerDate = document.querySelector('#observer-date');
+const observerTime = document.querySelector('#observer-time');
+const observerLocation = document.querySelector('#observer-location');
+const starDetailFields = Object.fromEntries([...starPanel.querySelectorAll('[data-star-detail]')].map(item => [item.dataset.starDetail, item]));
+const starNumber = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
+const starInteger = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+let activeSpectral = new Set(spectralButtons.map(button => button.dataset.value));
+let observerLatitude = 59.334;
+let observerLongitude = 18.063;
+let observerDateTime = new Date();
+let selectedStar = null;
+
+const starRanges = {
+  magnitude: { min: document.querySelector('#star-magnitude-min'), max: document.querySelector('#star-magnitude-max'), output: document.querySelector('#star-magnitude-output'), defaults: [-2, 6] },
+  distance: { min: document.querySelector('#star-distance-min'), max: document.querySelector('#star-distance-max'), output: document.querySelector('#star-distance-output'), defaults: [0, 3.4771] },
+  age: { min: document.querySelector('#star-age-min'), max: document.querySelector('#star-age-max'), output: document.querySelector('#star-age-output'), defaults: [0, 8] },
+  mass: { min: document.querySelector('#star-mass-min'), max: document.querySelector('#star-mass-max'), output: document.querySelector('#star-mass-output'), defaults: [.5, 35] },
+  luminosity: { min: document.querySelector('#star-luminosity-min'), max: document.querySelector('#star-luminosity-max'), output: document.querySelector('#star-luminosity-output'), defaults: [-1, 6] },
+  temperature: { min: document.querySelector('#star-temperature-min'), max: document.querySelector('#star-temperature-max'), output: document.querySelector('#star-temperature-output'), defaults: [3000, 45000] }
+};
+
+function starRangeValues(name) {
+  const range = starRanges[name];
+  const first = Number(range.min.value);
+  const second = Number(range.max.value);
+  return [Math.min(first, second), Math.max(first, second)];
+}
+
+function compactNumber(value) {
+  if (value >= 1000000) return `${starNumber.format(value / 1000000)}M`;
+  if (value >= 1000) return `${starNumber.format(value / 1000)}k`;
+  return starNumber.format(value);
+}
+
+function updateStarRange(name) {
+  const range = starRanges[name];
+  const values = starRangeValues(name);
+  const domainMin = Number(range.min.min);
+  const domainMax = Number(range.min.max);
+  const start = ((values[0] - domainMin) / (domainMax - domainMin)) * 100;
+  const end = ((values[1] - domainMin) / (domainMax - domainMin)) * 100;
+  range.min.parentElement.style.background = `linear-gradient(to right, #293147 0%, #293147 ${start}%, #4a9eff ${start}%, #4a9eff ${end}%, #293147 ${end}%, #293147 100%) center / 100% 3px no-repeat`;
+  if (name === 'magnitude') range.output.textContent = `${values[0].toFixed(1).replace('-', '−')}–${values[1].toFixed(1).replace('-', '−')} mag`;
+  if (name === 'distance') range.output.textContent = `${starInteger.format(10 ** values[0])}–${starInteger.format(10 ** values[1])} ly`;
+  if (name === 'age') range.output.textContent = `${values[0].toFixed(1)}–${values[1].toFixed(1)} Gy`;
+  if (name === 'mass') range.output.textContent = `${values[0].toFixed(1)}–${values[1].toFixed(1)} M☉`;
+  if (name === 'luminosity') range.output.textContent = `${compactNumber(10 ** values[0])}–${compactNumber(10 ** values[1])} L☉`;
+  if (name === 'temperature') range.output.textContent = `${starInteger.format(values[0])}–${starInteger.format(values[1])} K`;
+}
+
+function localSiderealHours(date, longitude) {
+  const julianDay = date.getTime() / 86400000 + 2440587.5;
+  const centuries = (julianDay - 2451545) / 36525;
+  let degrees = 280.46061837 + 360.98564736629 * (julianDay - 2451545) + .000387933 * centuries ** 2 - centuries ** 3 / 38710000 + longitude;
+  degrees = ((degrees % 360) + 360) % 360;
+  return degrees / 15;
+}
+
+function altitudeForStar(star) {
+  const hourAngle = THREE.MathUtils.degToRad(localSiderealHours(observerDateTime, observerLongitude) * 15 - star.ra);
+  const latitude = THREE.MathUtils.degToRad(observerLatitude);
+  const declination = THREE.MathUtils.degToRad(star.dec);
+  return THREE.MathUtils.radToDeg(Math.asin(
+    Math.sin(declination) * Math.sin(latitude) + Math.cos(declination) * Math.cos(latitude) * Math.cos(hourAngle)
+  ));
+}
+
+function horizonVector(azimuthDegrees, radius = 93) {
+  const latitude = THREE.MathUtils.degToRad(observerLatitude);
+  const sidereal = THREE.MathUtils.degToRad(localSiderealHours(observerDateTime, observerLongitude) * 15);
+  const azimuth = THREE.MathUtils.degToRad(azimuthDegrees);
+  const north = new THREE.Vector3(-Math.sin(latitude) * Math.cos(sidereal), -Math.sin(latitude) * Math.sin(sidereal), Math.cos(latitude));
+  const east = new THREE.Vector3(-Math.sin(sidereal), Math.cos(sidereal), 0);
+  const conventional = north.multiplyScalar(Math.cos(azimuth)).add(east.multiplyScalar(Math.sin(azimuth))).normalize();
+  return new THREE.Vector3(conventional.x, conventional.z, -conventional.y).multiplyScalar(radius);
+}
+
+function makeCompassLabel(text) {
+  const labelCanvas = document.createElement('canvas');
+  labelCanvas.width = 80;
+  labelCanvas.height = 80;
+  const context = labelCanvas.getContext('2d');
+  context.font = '700 42px system-ui, sans-serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillStyle = '#8fd2ff';
+  context.fillText(text, 40, 40);
+  const texture = new THREE.CanvasTexture(labelCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false, depthWrite: false }));
+  label.scale.set(2.4, 2.4, 1);
+  return label;
+}
+
+function rebuildHorizon() {
+  horizonLayer.clear();
+  const points = [];
+  for (let azimuth = 0; azimuth <= 360; azimuth += 2) points.push(horizonVector(azimuth));
+  horizonLayer.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), new THREE.LineBasicMaterial({ color: 0x64c7ff, transparent: true, opacity: .8, depthWrite: false })));
+  [['N', 0], ['E', 90], ['S', 180], ['W', 270]].forEach(([text, azimuth]) => {
+    const label = makeCompassLabel(text);
+    label.position.copy(horizonVector(azimuth, 92.7));
+    horizonLayer.add(label);
+  });
+  horizonLayer.visible = interactiveStarLayer.visible && observerMode.checked;
+}
+
+function applyStarFilters() {
+  const query = starSearch.value.trim().toLowerCase();
+  const magnitude = starRangeValues('magnitude');
+  const distanceLog = starRangeValues('distance');
+  const distance = [10 ** distanceLog[0], 10 ** distanceLog[1]];
+  const age = starRangeValues('age');
+  const mass = starRangeValues('mass');
+  const luminosityLog = starRangeValues('luminosity');
+  const luminosity = [10 ** luminosityLog[0], 10 ** luminosityLog[1]];
+  const temperature = starRangeValues('temperature');
+  const constellation = constellationSelect.value;
+  let shown = 0;
+  starSprites.forEach(sprite => {
+    const star = sprite.userData.star;
+    const spectral = (star.spectralClass || '').charAt(0).toUpperCase();
+    const matches = (!query || star.name.toLowerCase().includes(query)) &&
+      star.magnitude >= magnitude[0] && star.magnitude <= magnitude[1] &&
+      star.distance >= distance[0] && star.distance <= distance[1] &&
+      star.age >= age[0] && star.age <= age[1] &&
+      star.mass >= mass[0] && star.mass <= mass[1] &&
+      star.luminosity >= luminosity[0] && star.luminosity <= luminosity[1] &&
+      star.temperature >= temperature[0] && star.temperature <= temperature[1] &&
+      activeSpectral.has(spectral) &&
+      (constellation === 'all' || star.constellation === constellation) &&
+      (!observerMode.checked || altitudeForStar(star) >= 0);
+    sprite.visible = matches;
+    if (sprite.userData.label) sprite.userData.label.visible = matches;
+    if (matches) shown++;
+  });
+  Object.keys(starRanges).forEach(updateStarRange);
+  starCount.textContent = `${shown} of ${interactiveStars.length} stars shown${observerMode.checked ? ' above the horizon' : ''}`;
+  horizonLayer.visible = interactiveStarLayer.visible && observerMode.checked;
+  if (selectedStar) {
+    const selectedSprite = starSprites.find(sprite => sprite.userData.star === selectedStar);
+    if (!selectedSprite?.visible) closeStarPanel();
+  }
+}
+
+function setObserverInputs(date = new Date()) {
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  observerDate.value = local.toISOString().slice(0, 10);
+  observerTime.value = local.toISOString().slice(11, 16);
+  observerDateTime = new Date(`${observerDate.value}T${observerTime.value}`);
+}
+
+function applyObserverView() {
+  observerDateTime = new Date(`${observerDate.value}T${observerTime.value}`);
+  if (Number.isNaN(observerDateTime.getTime())) observerDateTime = new Date();
+  rebuildHorizon();
+  applyStarFilters();
+  if (!observerMode.checked) return;
+  const zenith = celestialVector(localSiderealHours(observerDateTime, observerLongitude), observerLatitude, 1).normalize();
+  const startDirection = viewDirection.clone();
+  targetDirection = zenith;
+  animation = { start: performance.now(), duration: 1400, startDirection, startFov: camera.fov, targetFov: 95 };
+}
+
+const constellationNames = [...new Set(interactiveStars.map(star => star.constellation))].sort((a, b) => a.localeCompare(b));
+constellationSelect.append(...constellationNames.map(name => {
+  const option = document.createElement('option');
+  option.value = name;
+  option.textContent = name;
+  return option;
+}));
+setObserverInputs();
+applyStarFilters();
+
+Object.values(starRanges).forEach(range => {
+  range.min.addEventListener('input', applyStarFilters);
+  range.max.addEventListener('input', applyStarFilters);
+});
+starSearch.addEventListener('input', applyStarFilters);
+starSearch.addEventListener('keydown', event => {
+  if (event.key !== 'Enter') return;
+  const match = starSprites.find(sprite => sprite.visible && sprite.userData.star.name.toLowerCase().includes(starSearch.value.trim().toLowerCase()));
+  if (match) selectInteractiveStar(match.userData.star);
+});
+constellationSelect.addEventListener('change', applyStarFilters);
+spectralButtons.forEach(button => button.addEventListener('click', () => {
+  const value = button.dataset.value;
+  if (activeSpectral.has(value)) activeSpectral.delete(value);
+  else activeSpectral.add(value);
+  button.setAttribute('aria-pressed', String(activeSpectral.has(value)));
+  applyStarFilters();
+}));
+document.querySelector('#clear-star-spectral').addEventListener('click', () => {
+  activeSpectral.clear();
+  spectralButtons.forEach(button => button.setAttribute('aria-pressed', 'false'));
+  applyStarFilters();
+});
+document.querySelector('#select-star-spectral').addEventListener('click', () => {
+  activeSpectral = new Set(spectralButtons.map(button => button.dataset.value));
+  spectralButtons.forEach(button => button.setAttribute('aria-pressed', 'true'));
+  applyStarFilters();
+});
+observerMode.addEventListener('change', applyObserverView);
+document.querySelector('#apply-observer-time').addEventListener('click', applyObserverView);
+document.querySelector('#observer-now').addEventListener('click', () => { setObserverInputs(); applyObserverView(); });
+document.querySelector('#use-my-location').addEventListener('click', () => {
+  if (!navigator.geolocation) {
+    observerLocation.textContent = 'Location is not available in this browser.';
+    return;
+  }
+  observerLocation.textContent = 'Requesting location…';
+  navigator.geolocation.getCurrentPosition(position => {
+    observerLatitude = position.coords.latitude;
+    observerLongitude = position.coords.longitude;
+    observerLocation.textContent = `${observerLatitude.toFixed(3)}°, ${observerLongitude.toFixed(3)}°`;
+    observerMode.checked = true;
+    applyObserverView();
+  }, () => { observerLocation.textContent = 'Location was not shared. Using Stockholm.'; });
+});
+document.querySelector('#reset-star-filters').addEventListener('click', () => {
+  starSearch.value = '';
+  Object.values(starRanges).forEach(range => { range.min.value = range.defaults[0]; range.max.value = range.defaults[1]; });
+  activeSpectral = new Set(spectralButtons.map(button => button.dataset.value));
+  spectralButtons.forEach(button => button.setAttribute('aria-pressed', 'true'));
+  constellationSelect.value = 'all';
+  observerMode.checked = false;
+  horizonLayer.visible = false;
+  applyStarFilters();
+});
+
 let viewDirection = celestialVector(0.712, 41.269, 1).normalize();
 let targetDirection = viewDirection.clone();
 let animation = null;
@@ -428,7 +754,64 @@ function formatPosition(direction) {
   };
 }
 
+function closeStarTools() {
+  starToolsPanel.hidden = true;
+  starToolsButton.classList.remove('is-active');
+  starToolsButton.setAttribute('aria-expanded', 'false');
+}
+
+function closeStarPanel() {
+  selectedStar = null;
+  starPanel.classList.remove('is-visible');
+  setTimeout(() => {
+    if (!starPanel.classList.contains('is-visible')) starPanel.hidden = true;
+  }, 350);
+}
+
+function closePhotoPanel() {
+  selected = null;
+  document.querySelectorAll('.sky-targets button').forEach(button => button.classList.remove('is-active'));
+  panel.classList.remove('is-visible');
+  setTimeout(() => {
+    if (!panel.classList.contains('is-visible')) panel.hidden = true;
+  }, 350);
+}
+
+function selectInteractiveStar(star) {
+  selectedStar = star;
+  closePhotoPanel();
+  closeStarTools();
+  targetDirection = celestialVector(star.ra / 15, star.dec, 1).normalize();
+  const startDirection = viewDirection.clone();
+  animation = {
+    start: performance.now(),
+    duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 1500,
+    startDirection,
+    startFov: camera.fov,
+    targetFov: 18
+  };
+
+  const position = formatPosition(targetDirection);
+  starPanel.querySelector('.star-panel-name').textContent = star.name;
+  starPanel.querySelector('.star-panel-description').textContent = star.description || `${star.name} is a ${star.spectralClass}-class star in ${star.constellation}.`;
+  starDetailFields.constellation.textContent = star.constellation;
+  starDetailFields.spectral.textContent = star.spectralClass;
+  starDetailFields.magnitude.textContent = star.magnitude.toFixed(2).replace('-', '−');
+  starDetailFields.distance.textContent = `${starNumber.format(star.distance)} light-years`;
+  starDetailFields.temperature.textContent = `${starInteger.format(star.temperature)} K`;
+  starDetailFields.luminosity.textContent = `${starNumber.format(star.luminosity)} L☉`;
+  starDetailFields.mass.textContent = `${starNumber.format(star.mass)} M☉`;
+  starDetailFields.age.textContent = `${starNumber.format(star.age)} billion years`;
+  starDetailFields.position.textContent = `RA ${position.ra} · Dec ${position.dec}`;
+  starPanel.querySelector('.star-hr-link').href = `hr-diagram.html?star=${encodeURIComponent(star.name)}`;
+  starPanel.hidden = false;
+  starPanel.classList.remove('is-visible');
+  requestAnimationFrame(() => starPanel.classList.add('is-visible'));
+}
+
 function selectObservation(observation) {
+  closeStarPanel();
+  closeStarTools();
   selected = observation;
   document.querySelectorAll('.sky-targets button').forEach(button => button.classList.toggle('is-active', button.dataset.target === observation.id));
   targetDirection = celestialVector(observation.ra, observation.dec, 1).normalize();
@@ -451,10 +834,9 @@ function selectObservation(observation) {
 }
 
 function overview() {
-  selected = null;
-  document.querySelectorAll('.sky-targets button').forEach(button => button.classList.remove('is-active'));
-  panel.classList.remove('is-visible');
-  setTimeout(() => { if (!panel.classList.contains('is-visible')) panel.hidden = true; }, 350);
+  closePhotoPanel();
+  closeStarPanel();
+  closeStarTools();
   const startDirection = viewDirection.clone();
   targetDirection = celestialVector(0.712, 41.269, 1).normalize();
   animation = { start: performance.now(), duration: 1500, startDirection, startFov: camera.fov, targetFov: 75 };
@@ -473,7 +855,27 @@ canvas.addEventListener('pointerdown', event => {
 });
 
 canvas.addEventListener('pointermove', event => {
-  if (!dragging) return;
+  if (!dragging) {
+    if (!interactiveStarLayer.visible) return;
+    const rect = canvas.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    const hit = raycaster.intersectObjects(starSprites.filter(sprite => sprite.visible), false)[0];
+    if (!hit) {
+      starTooltip.hidden = true;
+      canvas.style.cursor = 'grab';
+      return;
+    }
+    const star = hit.object.userData.star;
+    starTooltip.innerHTML = `<strong>${star.name}</strong><span>${star.spectralClass} · ${star.constellation}</span>`;
+    starTooltip.style.left = `${event.clientX - rect.left}px`;
+    starTooltip.style.top = `${event.clientY - rect.top}px`;
+    starTooltip.hidden = false;
+    canvas.style.cursor = 'pointer';
+    return;
+  }
+  starTooltip.hidden = true;
   const dx = event.clientX - previousX;
   const dy = event.clientY - previousY;
   if (Math.abs(dx) + Math.abs(dy) > 2) dragged = true;
@@ -494,8 +896,20 @@ canvas.addEventListener('pointerup', event => {
   pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
   raycaster.setFromCamera(pointer, camera);
-  const hit = raycaster.intersectObjects(selectable, false)[0];
-  if (hit?.object.userData.observation) selectObservation(hit.object.userData.observation);
+  if (interactiveStarLayer.visible) {
+    const starHit = raycaster.intersectObjects(starSprites.filter(sprite => sprite.visible), false)[0];
+    if (starHit?.object.userData.star) {
+      selectInteractiveStar(starHit.object.userData.star);
+      return;
+    }
+  }
+  const photoHit = raycaster.intersectObjects(selectable, false)[0];
+  if (photoHit?.object.userData.observation) selectObservation(photoHit.object.userData.observation);
+});
+
+canvas.addEventListener('pointerleave', () => {
+  starTooltip.hidden = true;
+  if (!dragging) canvas.style.cursor = 'grab';
 });
 
 canvas.addEventListener('wheel', event => {
@@ -512,6 +926,7 @@ canvas.addEventListener('touchmove', event => {
 }, { passive: true });
 
 panel.querySelector('.object-panel-close').addEventListener('click', overview);
+starPanel.querySelector('.star-panel-close').addEventListener('click', closeStarPanel);
 fullImageLink.addEventListener('click', event => {
   event.preventDefault();
   if (!selected) return;
@@ -531,6 +946,28 @@ document.querySelector('[data-sky-action="labels"]').addEventListener('click', e
   event.currentTarget.classList.toggle('is-active', grid.visible);
   event.currentTarget.setAttribute('aria-pressed', String(grid.visible));
 });
+starLayerButton.addEventListener('click', () => {
+  interactiveStarLayer.visible = !interactiveStarLayer.visible;
+  starLayerButton.classList.toggle('is-active', interactiveStarLayer.visible);
+  starLayerButton.setAttribute('aria-pressed', String(interactiveStarLayer.visible));
+  starToolsButton.hidden = !interactiveStarLayer.visible;
+  if (interactiveStarLayer.visible) {
+    applyStarFilters();
+  } else {
+    closeStarTools();
+    closeStarPanel();
+    horizonLayer.visible = false;
+    starTooltip.hidden = true;
+    canvas.style.cursor = 'grab';
+  }
+});
+starToolsButton.addEventListener('click', () => {
+  const opening = starToolsPanel.hidden;
+  starToolsPanel.hidden = !opening;
+  starToolsButton.classList.toggle('is-active', opening);
+  starToolsButton.setAttribute('aria-expanded', String(opening));
+});
+document.querySelector('#close-star-tools').addEventListener('click', closeStarTools);
 
 function resize() {
   const width = viewer.clientWidth;
@@ -558,6 +995,8 @@ function animate(time) {
   coordinates.children[2].textContent = `FOV ${Math.round(camera.fov)}°`;
   const labelScale = Math.max(.2, camera.fov / 75);
   constellationFigures.userData.labels.forEach(label => label.scale.copy(label.userData.baseScale).multiplyScalar(labelScale));
+  const starScale = THREE.MathUtils.clamp(camera.fov / 50, .4, 1.5);
+  starSprites.forEach(sprite => sprite.scale.setScalar(sprite.userData.baseScale * starScale));
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
