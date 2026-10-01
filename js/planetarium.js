@@ -37,11 +37,25 @@ const observations = [
     summary: 'A nearby young open cluster whose brightest blue stars are visible to the unaided eye. Their light is scattered by surrounding dust, producing the delicate blue reflection nebulosity.'
   },
   {
+    id: 'ngc869-884', title: 'The Double Cluster', catalogue: 'NGC 869 · NGC 884 · Caldwell 14', constellation: 'Perseus',
+    ra: 2.333, dec: 57.13, image: 'assets/images/astrophoto/Double%20cluster%20NGC%20869%20and%20NGC%20884.jpg', frame: [3.8, 3.8],
+    type: 'Pair of open star clusters',
+    distance: 'about 7,500 light-years', size: 'about 1° across (the pair)', moons: 'about 2 Moon diameters',
+    summary: 'NGC 869 and NGC 884—also called h and Chi Persei—are neighbouring young open clusters born from the same star-forming region. Together they contain hundreds of hot, luminous stars.'
+  },
+  {
     id: 'm51', title: 'The Whirlpool Galaxy', catalogue: 'M51 · NGC 5195', constellation: 'Canes Venatici',
     ra: 13.498, dec: 47.195, image: 'assets/images/astrophoto/M51.jpg', frame: [2.25, 4.0],
     type: 'Interacting galaxies',
     distance: 'about 31 million light-years', size: '0.19° × 0.12°', moons: '0.37 × 0.23 Moon diameters',
     summary: 'A face-on spiral and its smaller companion. Their interaction helps make the Whirlpool’s two sweeping arms so distinct.'
+  },
+  {
+    id: 'ngc7331', title: 'NGC 7331 & Stephan’s Quintet', catalogue: 'NGC 7331 · Caldwell 30 · HCG 92', constellation: 'Pegasus',
+    ra: 22.618, dec: 34.416, image: 'assets/images/astrophoto/Ngc%207331%20with%20very%20fait%20Stephan%27s%20Quintet.jpg', frame: [3.8, 3.8],
+    type: 'Spiral galaxy field · compact galaxy group',
+    distance: 'NGC 7331: about 50 million ly · Quintet: about 290 million ly', size: 'NGC 7331: about 0.18° × 0.06°', moons: 'about 0.35 × 0.12 Moon diameters',
+    summary: 'NGC 7331 is the bright spiral near the centre. Look carefully near the lower right of the frame: Stephan’s Quintet appears as a very faint, diffuse smudge. Four of its galaxies form a distant interacting group; NGC 7320 is a foreground galaxy.'
   },
   {
     id: 'ngc7000', title: 'North America Nebula', catalogue: 'NGC 7000', constellation: 'Cygnus',
