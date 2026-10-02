@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { STARS as interactiveStars } from '../data/astrophoto/interactive-stars.js?v=phecda-fix-1';
+import { STARS as interactiveStars } from '../data/astrophoto/interactive-stars.js?v=brightest-stars-1';
 
 const observations = [
   {
@@ -177,6 +177,27 @@ function celestialVector(raHours, decDegrees, radius = 90) {
   );
 }
 
+// The Sun is the only catalogue entry whose equatorial coordinates change
+// appreciably. This low-error solar model keeps it aligned with the date and
+// time selected in the observer controls instead of pinning it to J2000.
+function sunEquatorial(date) {
+  const julianDay = date.getTime() / 86400000 + 2440587.5;
+  const days = julianDay - 2451545;
+  const meanLongitude = THREE.MathUtils.degToRad((280.46 + .9856474 * days) % 360);
+  const anomaly = THREE.MathUtils.degToRad((357.528 + .9856003 * days) % 360);
+  const eclipticLongitude = meanLongitude + THREE.MathUtils.degToRad(1.915) * Math.sin(anomaly) + THREE.MathUtils.degToRad(.02) * Math.sin(2 * anomaly);
+  const obliquity = THREE.MathUtils.degToRad(23.439 - .0000004 * days);
+  const ra = THREE.MathUtils.radToDeg(Math.atan2(Math.cos(obliquity) * Math.sin(eclipticLongitude), Math.cos(eclipticLongitude)));
+  const dec = THREE.MathUtils.radToDeg(Math.asin(Math.sin(obliquity) * Math.sin(eclipticLongitude)));
+  return { ra: (ra + 360) % 360, dec };
+}
+
+function updateDynamicStarCoordinates(date) {
+  interactiveStars.forEach(star => {
+    if (star.dynamicPosition === 'sun') Object.assign(star, sunEquatorial(date));
+  });
+}
+
 function makeGrid() {
   const material = new THREE.LineBasicMaterial({ color: 0x42617b, transparent: true, opacity: 0.17, depthWrite: false });
   const group = new THREE.Group();
@@ -302,12 +323,23 @@ const starSprites = [];
 const starLabels = [];
 const glowTexture = makeGlowTexture();
 
-interactiveStars.forEach(star => {
+updateDynamicStarCoordinates(new Date());
+
+function placeStarSprite(sprite) {
+  const star = sprite.userData.star;
   const position = celestialVector(star.ra / 15, star.dec, 92);
+  sprite.position.copy(position);
+  if (!sprite.userData.label) return;
+  const direction = position.clone().normalize();
+  let tangent = new THREE.Vector3(0, 1, 0).cross(direction);
+  if (tangent.lengthSq() < .01) tangent = new THREE.Vector3(1, 0, 0);
+  sprite.userData.label.position.copy(position).add(tangent.normalize().multiplyScalar(4.5));
+}
+
+interactiveStars.forEach(star => {
   const material = new THREE.SpriteMaterial({ map: glowTexture, color: starColour(star.temperature), transparent: true, depthTest: false, depthWrite: false });
   const sprite = new THREE.Sprite(material);
   const size = THREE.MathUtils.clamp(1.8 - star.magnitude * .18, .7, 2.4);
-  sprite.position.copy(position);
   sprite.scale.setScalar(size);
   sprite.renderOrder = 12;
   sprite.userData.star = star;
@@ -317,16 +349,13 @@ interactiveStars.forEach(star => {
 
   if (star.magnitude < 2.5) {
     const label = makeStarLabel(star);
-    const direction = position.clone().normalize();
-    let tangent = new THREE.Vector3(0, 1, 0).cross(direction);
-    if (tangent.lengthSq() < .01) tangent = new THREE.Vector3(1, 0, 0);
-    label.position.copy(position).add(tangent.normalize().multiplyScalar(4.5));
     label.renderOrder = 13;
     label.userData.star = star;
     interactiveStarLayer.add(label);
     starLabels.push(label);
     sprite.userData.label = label;
   }
+  placeStarSprite(sprite);
 });
 
 const horizonLayer = new THREE.Group();
@@ -513,6 +542,7 @@ const observerLocation = document.querySelector('#observer-location');
 const starDetailFields = Object.fromEntries([...starPanel.querySelectorAll('[data-star-detail]')].map(item => [item.dataset.starDetail, item]));
 const starNumber = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 const starInteger = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+document.querySelectorAll('[data-star-total]').forEach(element => { element.textContent = interactiveStars.length; });
 let activeSpectral = new Set(spectralButtons.map(button => button.dataset.value));
 let observerLatitude = 59.334;
 let observerLongitude = 18.063;
@@ -520,9 +550,9 @@ let observerDateTime = new Date();
 let selectedStar = null;
 
 const starRanges = {
-  magnitude: { min: document.querySelector('#star-magnitude-min'), max: document.querySelector('#star-magnitude-max'), output: document.querySelector('#star-magnitude-output'), defaults: [-2, 6] },
-  distance: { min: document.querySelector('#star-distance-min'), max: document.querySelector('#star-distance-max'), output: document.querySelector('#star-distance-output'), defaults: [0, 3.4771] },
-  age: { min: document.querySelector('#star-age-min'), max: document.querySelector('#star-age-max'), output: document.querySelector('#star-age-output'), defaults: [0, 8] },
+  magnitude: { min: document.querySelector('#star-magnitude-min'), max: document.querySelector('#star-magnitude-max'), output: document.querySelector('#star-magnitude-output'), defaults: [-27, 6] },
+  distance: { min: document.querySelector('#star-distance-min'), max: document.querySelector('#star-distance-max'), output: document.querySelector('#star-distance-output'), defaults: [-4.81, 3.5] },
+  age: { min: document.querySelector('#star-age-min'), max: document.querySelector('#star-age-max'), output: document.querySelector('#star-age-output'), defaults: [0, 10] },
   mass: { min: document.querySelector('#star-mass-min'), max: document.querySelector('#star-mass-max'), output: document.querySelector('#star-mass-output'), defaults: [.5, 35] },
   luminosity: { min: document.querySelector('#star-luminosity-min'), max: document.querySelector('#star-luminosity-max'), output: document.querySelector('#star-luminosity-output'), defaults: [-1, 6] },
   temperature: { min: document.querySelector('#star-temperature-min'), max: document.querySelector('#star-temperature-max'), output: document.querySelector('#star-temperature-output'), defaults: [3000, 45000] }
@@ -536,6 +566,7 @@ function starRangeValues(name) {
 }
 
 function compactNumber(value) {
+  if (value < .01) return value.toFixed(6);
   if (value >= 1000000) return `${starNumber.format(value / 1000000)}M`;
   if (value >= 1000) return `${starNumber.format(value / 1000)}k`;
   return starNumber.format(value);
@@ -550,7 +581,7 @@ function updateStarRange(name) {
   const end = ((values[1] - domainMin) / (domainMax - domainMin)) * 100;
   range.min.parentElement.style.background = `linear-gradient(to right, #293147 0%, #293147 ${start}%, #4a9eff ${start}%, #4a9eff ${end}%, #293147 ${end}%, #293147 100%) center / 100% 3px no-repeat`;
   if (name === 'magnitude') range.output.textContent = `${values[0].toFixed(1).replace('-', '−')}–${values[1].toFixed(1).replace('-', '−')} mag`;
-  if (name === 'distance') range.output.textContent = `${starInteger.format(10 ** values[0])}–${starInteger.format(10 ** values[1])} ly`;
+  if (name === 'distance') range.output.textContent = `${compactNumber(10 ** values[0])}–${compactNumber(10 ** values[1])} ly`;
   if (name === 'age') range.output.textContent = `${values[0].toFixed(1)}–${values[1].toFixed(1)} Gy`;
   if (name === 'mass') range.output.textContent = `${values[0].toFixed(1)}–${values[1].toFixed(1)} M☉`;
   if (name === 'luminosity') range.output.textContent = `${compactNumber(10 ** values[0])}–${compactNumber(10 ** values[1])} L☉`;
@@ -662,6 +693,8 @@ function setObserverInputs(date = new Date()) {
 function applyObserverView() {
   observerDateTime = new Date(`${observerDate.value}T${observerTime.value}`);
   if (Number.isNaN(observerDateTime.getTime())) observerDateTime = new Date();
+  updateDynamicStarCoordinates(observerDateTime);
+  starSprites.filter(sprite => sprite.userData.star.dynamicPosition).forEach(placeStarSprite);
   rebuildHorizon();
   applyStarFilters();
   if (!observerMode.checked) return;
