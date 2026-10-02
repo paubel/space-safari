@@ -1335,6 +1335,8 @@ footer a {
 /* Interactive planetarium */
 .astro-planetarium-page { overflow: hidden; background: #03060b; }
 .planetarium-shell { flex: 1; min-width: 0; }
+.astro-planetarium-page.hide-main-menu > .side-menu,
+.astro-planetarium-page.hide-main-menu > .navbar { display: none; }
 .sky-viewer { position: relative; width: 100%; height: 100vh; min-height: 620px; overflow: hidden; color: #f3f5fa; background: #03060b; }
 #sky-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
 #sky-canvas:active { cursor: grabbing; }

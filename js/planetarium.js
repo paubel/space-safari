@@ -531,6 +531,7 @@ const starExplorerLaunch = document.querySelector('#star-explorer-launch');
 const showStarConstellations = document.querySelector('#show-star-constellations');
 const showStarPhotos = document.querySelector('#show-star-photos');
 const showPhotoMenu = document.querySelector('#show-photo-menu');
+const showMainMenu = document.querySelector('#show-main-menu');
 const starSearch = document.querySelector('#star-search');
 const starCount = document.querySelector('#star-filter-count');
 const constellationSelect = document.querySelector('#star-constellation');
@@ -771,6 +772,7 @@ document.querySelector('#reset-star-filters').addEventListener('click', () => {
 });
 showStarPhotos.addEventListener('change', syncStarDisplayOptions);
 showPhotoMenu.addEventListener('change', syncStarDisplayOptions);
+showMainMenu.addEventListener('change', syncStarDisplayOptions);
 showStarConstellations.addEventListener('change', syncStarDisplayOptions);
 
 let viewDirection = celestialVector(0.712, 41.269, 1).normalize();
@@ -1029,7 +1031,9 @@ function syncStarDisplayOptions() {
   const filteringStars = interactiveStarLayer.visible;
   selectable.forEach(plane => { plane.visible = !filteringStars || showStarPhotos.checked; });
   skyMenu.hidden = filteringStars && !showPhotoMenu.checked;
+  document.body.classList.toggle('hide-main-menu', filteringStars && !showMainMenu.checked);
   constellationFigures.visible = grid.visible && (!filteringStars || showStarConstellations.checked);
+  requestAnimationFrame(resize);
 }
 starLayerButton.addEventListener('click', () => setInteractiveStars(!interactiveStarLayer.visible));
 starExplorerLaunch.addEventListener('click', () => setInteractiveStars(!interactiveStarLayer.visible));
