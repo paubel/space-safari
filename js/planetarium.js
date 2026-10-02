@@ -499,6 +499,7 @@ observations.forEach((observation, index) => {
 const starLayerButton = document.querySelector('[data-sky-action="stars"]');
 const starToolsButton = document.querySelector('[data-sky-action="star-tools"]');
 const starExplorerLaunch = document.querySelector('#star-explorer-launch');
+const showStarConstellations = document.querySelector('#show-star-constellations');
 const showStarPhotos = document.querySelector('#show-star-photos');
 const showPhotoMenu = document.querySelector('#show-photo-menu');
 const starSearch = document.querySelector('#star-search');
@@ -737,6 +738,7 @@ document.querySelector('#reset-star-filters').addEventListener('click', () => {
 });
 showStarPhotos.addEventListener('change', syncStarDisplayOptions);
 showPhotoMenu.addEventListener('change', syncStarDisplayOptions);
+showStarConstellations.addEventListener('change', syncStarDisplayOptions);
 
 let viewDirection = celestialVector(0.712, 41.269, 1).normalize();
 let targetDirection = viewDirection.clone();
@@ -962,7 +964,7 @@ document.querySelector('[data-sky-action="zoom-in"]').addEventListener('click', 
 document.querySelector('[data-sky-action="zoom-out"]').addEventListener('click', () => adjustZoom(8));
 document.querySelector('[data-sky-action="labels"]').addEventListener('click', event => {
   grid.visible = !grid.visible;
-  constellationFigures.visible = grid.visible && !interactiveStarLayer.visible;
+  constellationFigures.visible = grid.visible && (!interactiveStarLayer.visible || showStarConstellations.checked);
   event.currentTarget.classList.toggle('is-active', grid.visible);
   event.currentTarget.setAttribute('aria-pressed', String(grid.visible));
 });
@@ -994,6 +996,7 @@ function syncStarDisplayOptions() {
   const filteringStars = interactiveStarLayer.visible;
   selectable.forEach(plane => { plane.visible = !filteringStars || showStarPhotos.checked; });
   skyMenu.hidden = filteringStars && !showPhotoMenu.checked;
+  constellationFigures.visible = grid.visible && (!filteringStars || showStarConstellations.checked);
 }
 starLayerButton.addEventListener('click', () => setInteractiveStars(!interactiveStarLayer.visible));
 starExplorerLaunch.addEventListener('click', () => setInteractiveStars(!interactiveStarLayer.visible));
