@@ -148,6 +148,7 @@ const viewer = document.querySelector('.sky-viewer');
 const canvas = document.querySelector('#sky-canvas');
 const loading = document.querySelector('.sky-loading');
 const targetList = document.querySelector('.sky-targets');
+const skyMenu = document.querySelector('.sky-menu');
 const panel = document.querySelector('.object-panel');
 const starPanel = document.querySelector('.star-panel');
 const starToolsPanel = document.querySelector('#star-tools-panel');
@@ -272,18 +273,24 @@ function makeGlowTexture() {
 
 function makeStarLabel(star) {
   const labelCanvas = document.createElement('canvas');
-  labelCanvas.width = 320;
-  labelCanvas.height = 64;
+  labelCanvas.width = 384;
+  labelCanvas.height = 80;
   const context = labelCanvas.getContext('2d');
-  context.font = '600 26px system-ui, sans-serif';
+  context.fillStyle = 'rgba(2, 6, 14, .9)';
+  context.fillRect(2, 8, 380, 64);
+  context.strokeStyle = 'rgba(111, 181, 255, .72)';
+  context.lineWidth = 2;
+  context.strokeRect(3, 9, 378, 62);
+  context.font = '700 35px system-ui, sans-serif';
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   context.fillStyle = 'rgba(235,243,255,.96)';
-  context.fillText(star.name, 160, 32);
+  context.fillText(star.name, 192, 40);
   const texture = new THREE.CanvasTexture(labelCanvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: .92, depthTest: false, depthWrite: false }));
-  label.scale.set(5.8, 1.16, 1);
+  label.userData.baseScale = new THREE.Vector3(16, 3.5, 1);
+  label.scale.copy(label.userData.baseScale);
   label.userData.starLabel = true;
   return label;
 }
@@ -314,7 +321,7 @@ interactiveStars.forEach(star => {
     const direction = position.clone().normalize();
     let tangent = new THREE.Vector3(0, 1, 0).cross(direction);
     if (tangent.lengthSq() < .01) tangent = new THREE.Vector3(1, 0, 0);
-    label.position.copy(position).add(tangent.normalize().multiplyScalar(1.4));
+    label.position.copy(position).add(tangent.normalize().multiplyScalar(2.1));
     label.renderOrder = 13;
     label.userData.star = star;
     interactiveStarLayer.add(label);
@@ -437,7 +444,11 @@ async function populateConstellations(group) {
 
     const starGeometry = new THREE.BufferGeometry();
     starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
-    group.add(new THREE.Points(starGeometry, new THREE.PointsMaterial({ color: 0xe5f5ff, size: .72, transparent: true, opacity: 1, depthWrite: false })));
+    const constellationStarPoints = new THREE.Points(starGeometry, new THREE.PointsMaterial({ color: 0xe5f5ff, size: .72, transparent: true, opacity: 1, depthWrite: false }));
+    constellationStarPoints.name = 'constellation-reference-stars';
+    constellationStarPoints.visible = !interactiveStarLayer.visible;
+    group.userData.starPoints = constellationStarPoints;
+    group.add(constellationStarPoints);
     group.userData.figureCount = visibleFigures.length;
   } catch (error) {
     console.warn('Could not load constellation figures.', error);
@@ -489,6 +500,8 @@ observations.forEach((observation, index) => {
 const starLayerButton = document.querySelector('[data-sky-action="stars"]');
 const starToolsButton = document.querySelector('[data-sky-action="star-tools"]');
 const starExplorerLaunch = document.querySelector('#star-explorer-launch');
+const showStarPhotos = document.querySelector('#show-star-photos');
+const showPhotoMenu = document.querySelector('#show-photo-menu');
 const starSearch = document.querySelector('#star-search');
 const starCount = document.querySelector('#star-filter-count');
 const constellationSelect = document.querySelector('#star-constellation');
@@ -723,6 +736,8 @@ document.querySelector('#reset-star-filters').addEventListener('click', () => {
   horizonLayer.visible = false;
   applyStarFilters();
 });
+showStarPhotos.addEventListener('change', syncStarDisplayOptions);
+showPhotoMenu.addEventListener('change', syncStarDisplayOptions);
 
 let viewDirection = celestialVector(0.712, 41.269, 1).normalize();
 let targetDirection = viewDirection.clone();
@@ -955,11 +970,13 @@ document.querySelector('[data-sky-action="labels"]').addEventListener('click', e
 function setInteractiveStars(enabled) {
   interactiveStarLayer.visible = enabled;
   backgroundStarLayer.visible = !enabled;
-  constellationFigures.visible = !enabled && grid.visible;
+  constellationFigures.visible = grid.visible;
+  if (constellationFigures.userData.starPoints) constellationFigures.userData.starPoints.visible = !enabled;
   starLayerButton.classList.toggle('is-active', enabled);
   starLayerButton.setAttribute('aria-pressed', String(enabled));
   starExplorerLaunch.setAttribute('aria-pressed', String(enabled));
   starToolsButton.hidden = !enabled;
+  syncStarDisplayOptions();
   if (enabled) {
     applyStarFilters();
     starToolsPanel.hidden = false;
@@ -972,6 +989,12 @@ function setInteractiveStars(enabled) {
     starTooltip.hidden = true;
     canvas.style.cursor = 'grab';
   }
+}
+
+function syncStarDisplayOptions() {
+  const filteringStars = interactiveStarLayer.visible;
+  selectable.forEach(plane => { plane.visible = !filteringStars || showStarPhotos.checked; });
+  skyMenu.hidden = filteringStars && !showPhotoMenu.checked;
 }
 starLayerButton.addEventListener('click', () => setInteractiveStars(!interactiveStarLayer.visible));
 starExplorerLaunch.addEventListener('click', () => setInteractiveStars(!interactiveStarLayer.visible));
@@ -1009,6 +1032,7 @@ function animate(time) {
   coordinates.children[2].textContent = `FOV ${Math.round(camera.fov)}°`;
   const labelScale = Math.max(.2, camera.fov / 75);
   constellationFigures.userData.labels.forEach(label => label.scale.copy(label.userData.baseScale).multiplyScalar(labelScale));
+  starLabels.forEach(label => label.scale.copy(label.userData.baseScale).multiplyScalar(labelScale));
   const starScale = THREE.MathUtils.clamp(camera.fov / 50, .4, 1.5);
   starSprites.forEach(sprite => sprite.scale.setScalar(sprite.userData.baseScale * starScale));
   renderer.render(scene, camera);

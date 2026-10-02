@@ -1359,6 +1359,7 @@ footer a {
 .sky-targets button:hover, .sky-targets button.is-active { color: #fff; background: rgba(74, 158, 255, 0.1); }
 .sky-targets button:hover i, .sky-targets button.is-active i { opacity: 1; transform: none; }
 .sky-targets button.is-active > span:first-child { color: var(--accent); }
+.sky-menu[hidden] { display: none; }
 .star-explorer-launch { display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 0.65rem; width: calc(100% - 24px); margin: 0 12px 10px; padding: 0.75rem; color: #eaf4ff; text-align: left; background: linear-gradient(135deg, rgba(74, 158, 255, 0.18), rgba(74, 158, 255, 0.06)); border: 1px solid rgba(74, 158, 255, 0.42); border-radius: 5px; cursor: pointer; }
 .star-explorer-launch > span:first-child { display: grid; width: 32px; height: 32px; place-items: center; color: #fff3b0; background: rgba(74, 158, 255, 0.16); border: 1px solid rgba(126, 190, 255, 0.45); border-radius: 50%; font-size: 1rem; }
 .star-explorer-launch > span:nth-child(2) { display: grid; min-width: 0; }
@@ -1417,7 +1418,15 @@ footer a {
 .star-tools-panel > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
 .star-tools-panel h2 { margin: 0; font-size: 1.5rem; }
 .star-tools-panel > header button { width: 32px; height: 32px; flex: 0 0 auto; color: #aeb7c7; background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; font-size: 1.25rem; }
-.star-tools-intro { margin: 0.65rem 0 1rem; color: #8590a0; font-size: 0.73rem; line-height: 1.45; }
+.star-tools-explainer { margin: 0.65rem 0 0.85rem; padding: 0.75rem; color: #aab6c7; background: rgba(74, 158, 255, 0.07); border-left: 2px solid var(--accent); font-size: 0.7rem; line-height: 1.45; }
+.star-tools-explainer p { margin: 0 0 0.4rem; }
+.star-tools-explainer p:last-of-type { margin-bottom: 0.35rem; }
+.star-tools-explainer strong { color: #eef6ff; }
+.star-tools-explainer ul { margin: 0; padding-left: 1rem; }
+.star-display-options { display: grid; gap: 0.45rem; margin: 0 0 0.85rem; padding: 0.65rem 0.75rem 0.75rem; border: 1px solid rgba(255, 255, 255, 0.11); border-radius: 5px; }
+.star-display-options legend { padding: 0 0.25rem; font-size: 0.68rem; font-weight: 700; }
+.star-display-options label { display: flex; align-items: center; gap: 0.55rem; color: #c4cedb; font-size: 0.7rem; }
+.star-display-options input { width: 16px; height: 16px; accent-color: var(--accent); }
 .star-filter-count { margin: 0.65rem 0; color: var(--accent); font: 0.68rem ui-monospace, SFMono-Regular, Menlo, monospace; }
 
 .star-search { display: grid; gap: 0.35rem; color: #8995a7; font-size: 0.58rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; }
