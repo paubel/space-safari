@@ -956,7 +956,7 @@ export const STARS = [
   },
   {
     name: "Phecda",
-    ra: 183.856,
+    ra: 178.4577,
     dec: 53.695,
     magnitude: 2.44,
     constellation: "Ursa Major",

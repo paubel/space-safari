@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { STARS as interactiveStars } from '../data/astrophoto/interactive-stars.js';
+import { STARS as interactiveStars } from '../data/astrophoto/interactive-stars.js?v=phecda-fix-1';
 
 const observations = [
   {
