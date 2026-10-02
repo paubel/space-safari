@@ -320,7 +320,7 @@ interactiveStars.forEach(star => {
     const direction = position.clone().normalize();
     let tangent = new THREE.Vector3(0, 1, 0).cross(direction);
     if (tangent.lengthSq() < .01) tangent = new THREE.Vector3(1, 0, 0);
-    label.position.copy(position).add(tangent.normalize().multiplyScalar(2.1));
+    label.position.copy(position).add(tangent.normalize().multiplyScalar(4.5));
     label.renderOrder = 13;
     label.userData.star = star;
     interactiveStarLayer.add(label);
