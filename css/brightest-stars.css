@@ -24,10 +24,12 @@
 .bright-star-table thead { position: sticky; top: 0; z-index: 2; background: #101625; box-shadow: 0 1px 0 var(--border); }
 .bright-star-table th, .bright-star-table td { padding: .72rem .85rem; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, .065); white-space: nowrap; }
 .bright-star-table th button { display: flex; gap: .35rem; width: 100%; color: #aeb8c9; background: none; border: 0; font: inherit; font-weight: 750; cursor: pointer; }
-.bright-star-table th:nth-child(n+4), .bright-star-table td:nth-child(n+4) { text-align: right; }
+.bright-star-table th:nth-child(3), .bright-star-table td:nth-child(3), .bright-star-table th:nth-child(n+5), .bright-star-table td:nth-child(n+5) { text-align: right; }
 .bright-star-table tbody tr { cursor: pointer; transition: background .15s; }
 .bright-star-table tbody tr:hover, .bright-star-table tbody tr:focus-within { background: rgba(74, 158, 255, .08); }
-.bright-star-name { display: flex; align-items: center; gap: .6rem; color: var(--text); font-weight: 750; }
+.bright-star-name { display: grid; gap: .35rem; min-width: 150px; color: var(--text); font-weight: 750; }
+.star-system-visual { display: flex; align-items: end; gap: 4px; min-height: 48px; }
+.star-system-caption { color: #758095; font-size: .62rem; font-weight: 600; }
 .star-dot { display: inline-block; flex: 0 0 auto; width: var(--dot-size, 13px); height: var(--dot-size, 13px); background: var(--star-colour, #fff); border-radius: 50%; box-shadow: 0 0 10px var(--star-colour, #fff); }
 .bright-star-table .rank { color: #718096; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .bright-star-table .muted { color: var(--text-muted); }

@@ -14,6 +14,44 @@ const catalogueNames = [
 ];
 
 const catalogue = catalogueNames.map(name => STARS.find(star => star.name === name)).filter(Boolean);
+
+// Multiplicity and component spectra from the audited source catalogue. The
+// visual radii are deliberately compressed; component count is not inferred
+// from a system's display name or from a '+' in its spectrum.
+const systemComponents = {
+  Sirius: ['A1V', 'DA2'], 'Rigil Kent': ['G2V', 'K1V', 'M5V'], Capella: ['G8III', 'G0III', 'M0V', 'M2V'],
+  Rigel: ['B8Ia', 'B9V', 'B9V', 'B9V'], Procyon: ['F5IV-V', 'DQZ'], Achernar: ['B6V', 'A2V'],
+  'Hadar (Beta Centauri)': ['B1III', 'B1III', 'B1V'], Acrux: ['B0.5IV', 'B7V', 'B1V', 'B4V', 'G5V', 'M0V'],
+  Aldebaran: ['K5III', 'M2.5V'], Spica: ['B1III-IV', 'B2V'], Antares: ['M1.5Iab', 'B2.5V'],
+  Fomalhaut: ['A3V', 'K4V', 'M4V'], Adhara: ['B2II', 'A5V'], Shaula: ['B2IV', 'B3V', 'B5V'],
+  Castor: ['A1V', 'M1V', 'Am', 'M1V', 'M1V', 'M1V'], Alnitak: ['O9.5Iab', 'B1IV', 'B0III'],
+  Mintaka: ['O9.5II', 'B1V', 'B0IV', 'B5V', 'B5V'], Mizar: ['A2V', 'A2V', 'A7V', 'A7V'],
+  Dubhe: ['K0III', 'A5V', 'F8V', 'F8V'], Polaris: ['F7Ib', 'F6V', 'F3V'], Algol: ['B8V', 'K0IV', 'F1V'],
+  Algieba: ['K0III', 'G7III'], Menkalinan: ['A1IV', 'A1IV'], Peacock: ['B3V', '?'],
+  Alsephina: ['A2IV', 'A4V', 'F8V'], Dschubba: ['B0.3IV', '~B'], Ankaa: ['K0.5III', '?'],
+  Sabik: ['A2V', 'A2V'], 'Gienah (Epsilon Cygni)': ['K0III', '?'],
+  Acrab: ['B0.5IV', 'B1.5V', 'B2V', 'HgMn', '?', '?'], Markeb: ['B2IV', '~B'],
+  'Zeta Centauri': ['B2.5IV', '?'], Izar: ['K0II-III', 'A2V'], Alphecca: ['A0V', 'G5V'],
+  'Kappa Scorpii (Girtab)': ['B1.5III', 'B2III'], 'Beta Arietis (Sheratan)': ['A3V', 'G2V']
+};
+// Preserve the component sizes from the original Brightest Stars page. These
+// are display sizes for comparing members within a system, not a universal
+// physical scale across different systems.
+const systemComponentSizes = {
+  Sirius: [38, 12], 'Rigil Kent': [36, 30, 12], Capella: [36, 32, 12, 12], Rigel: [44, 18, 16, 16],
+  Procyon: [34, 12], Achernar: [40, 18], 'Hadar (Beta Centauri)': [18, 16, 14], Aldebaran: [36, 12],
+  Spica: [36, 28], Antares: [48, 22], Fomalhaut: [36, 14, 12], Adhara: [40, 12], Shaula: [20, 14, 12],
+  Castor: [36, 12, 30, 12, 12, 12], Alnitak: [40, 22, 18], Mintaka: [40, 30, 22, 16, 14],
+  Mizar: [30, 30, 26, 12], Dubhe: [36, 18, 12, 12], Polaris: [44, 16, 18], Algol: [30, 20, 22],
+  Algieba: [30, 22], Menkalinan: [30, 28], Alsephina: [30, 26, 14], Dschubba: [30, 14],
+  Ankaa: [30, 15], Acrab: [30, 25, 20, 15, 12, 12], Markeb: [30, 12], Izar: [30, 15],
+  Alphecca: [30, 16], 'Kappa Scorpii (Girtab)': [30, 27]
+};
+catalogue.forEach(star => {
+  star.components = systemComponents[star.name] || [star.spectralClass];
+  star.componentSizes = systemComponentSizes[star.name] || null;
+  star.componentCount = star.components.length;
+});
 const nightStars = catalogue.filter(star => !star.dynamicPosition).sort((a, b) => a.magnitude - b.magnitude);
 const nightRank = new Map(nightStars.map((star, index) => [star.name, index + 1]));
 catalogue.forEach(star => { star.catalogueRank = star.dynamicPosition ? 0 : nightRank.get(star.name); });
@@ -54,6 +92,10 @@ function starColour(temperature) {
   if (temperature >= 5000) return '#ffe09c';
   if (temperature >= 3800) return '#ffb36b';
   return '#ff8268';
+}
+
+function spectralColour(spectral) {
+  return { O: '#84a9ff', B: '#a8c4ff', A: '#eef4ff', F: '#fff4d0', G: '#ffe09c', K: '#ffb36b', M: '#ff8268', D: '#f5f7ff' }[(spectral || '').match(/[OBAFGKMD]/i)?.[0]?.toUpperCase()] || '#d9e2ef';
 }
 
 function formatNumber(value, maximumFractionDigits = 1) {
@@ -103,13 +145,25 @@ function starDot(star) {
   return `<span class="star-dot" style="--star-colour:${starColour(star.temperature)};--dot-size:${size}px" aria-hidden="true"></span>`;
 }
 
+function systemVisual(star) {
+  const primarySize = Math.max(12, Math.min(26, 12 + Math.log10(Math.max(1, star.radius || 1)) * 5));
+  const dots = star.components.map((spectral, index) => {
+    const relative = index === 0 ? 1 : index === 1 ? .72 : .48;
+    const size = star.componentSizes?.[index] || Math.max(7, primarySize * relative);
+    const colour = spectralColour(spectral);
+    return `<span class="star-dot" style="--star-colour:${colour};--dot-size:${size}px" title="Component ${index + 1}: ${spectral}" aria-label="Component ${index + 1}, spectral class ${spectral}"></span>`;
+  }).join('');
+  return `<span class="star-system-visual">${dots}</span><span class="star-system-caption">${star.componentCount} ${star.componentCount === 1 ? 'star' : 'stars'} · primary radius ${formatNumber(star.radius, 2)} R☉</span>`;
+}
+
 function render() {
   const stars = currentStars();
   elements.count.textContent = `${stars.length} of ${catalogue.length} systems shown`;
   elements.rows.innerHTML = stars.map(star => `
     <tr tabindex="0" data-star="${star.name}" aria-label="Open details for ${displayName(star.name)}">
       <td class="rank">${star.catalogueRank || 'Sun'}</td>
-      <td><span class="bright-star-name">${starDot(star)}<span>${displayName(star.name)}</span></span></td>
+      <td><span class="bright-star-name"><span>${displayName(star.name)}</span>${systemVisual(star)}</span></td>
+      <td>${star.componentCount}</td>
       <td class="muted">${star.constellation}</td>
       <td>${formatNumber(star.magnitude, 2)}</td>
       <td>${formatNumber(star.distance, 2)} ly</td>
@@ -119,7 +173,7 @@ function render() {
     </tr>`).join('');
   elements.cards.innerHTML = stars.map(star => `
     <button class="bright-star-card" type="button" data-star="${star.name}">
-      ${starDot(star)}<span><strong>${displayName(star.name)}</strong><small>${star.constellation} · ${star.spectralClass} · ${formatNumber(star.distance, 2)} ly</small></span><span>${formatNumber(star.magnitude, 2)}</span>
+      ${starDot(star)}<span><strong>${displayName(star.name)}</strong><small>${star.componentCount} ${star.componentCount === 1 ? 'star' : 'stars'} · ${star.constellation} · ${star.spectralClass}</small></span><span>${formatNumber(star.magnitude, 2)}</span>
     </button>`).join('');
   document.querySelectorAll('.bright-star-table th button').forEach(button => {
     button.querySelector('span').textContent = button.dataset.sort === sortKey ? (sortDirection === 1 ? '▲' : '▼') : '';
@@ -134,7 +188,7 @@ function openStar(starName) {
   document.querySelector('#bright-dialog-summary').textContent = star.description || 'A bright star in the Space Safari catalogue.';
   document.querySelector('#bright-dialog-orb').style.setProperty('--star-colour', starColour(star.temperature));
   const values = [
-    ['Constellation', star.constellation], ['Apparent magnitude', formatNumber(star.magnitude, 2)], ['Distance', `${formatNumber(star.distance, 3)} light-years`],
+    ['Constellation', star.constellation], ['Stars in system', star.componentCount], ['Apparent magnitude', formatNumber(star.magnitude, 2)], ['Distance', `${formatNumber(star.distance, 3)} light-years`],
     ['Spectral class', star.spectralClass], ['Temperature', `${formatNumber(star.temperature, 0)} K`], ['Luminosity', `${formatNumber(star.luminosity, 1)} L☉`],
     ['Mass', `${formatNumber(star.mass, 2)} M☉`], ['Radius', `${formatNumber(star.radius, 2)} R☉`], ['Age', `${formatNumber(star.age, 3)} billion years`],
     ['Right ascension', `${formatNumber(star.ra / 15, 3)} h`], ['Declination', `${star.dec >= 0 ? '+' : '−'}${formatNumber(Math.abs(star.dec), 3)}°`], ['Category', stellarCategory(star)]
