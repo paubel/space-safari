@@ -56,6 +56,7 @@ function renderExploreMenu() {
     { href: "gallery.html", icon: "✦", label: "Astrophotography Gallery" },
     { href: "planetarium.html", icon: "◎", label: "Interactive Planetarium" },
     { href: "hr-diagram.html", icon: "⋱", label: "Interactive H–R Diagram" },
+    { href: "brightest-stars.html", icon: "★", label: "Brightest Stars Catalogue" },
   ];
 
   const nav = document.createElement("nav");

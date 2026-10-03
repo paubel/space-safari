@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore 98 unique bright star systems with fact-checked positions, sortable physical data, filters, and links to the Space Safari stellar tools.">
+    <title>Brightest Stars Catalogue - Space Safari</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/brightest-stars.css">
+    <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
+</head>
+<body class="bright-stars-page">
+    <nav class="navbar">
+        <a href="index.html" class="logo"><img src="assets/images/cats-eye-icon.webp" class="site-icon" alt=""> Space Safari</a>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Open navigation">☰</button>
+    </nav>
+
+    <div class="side-menu" id="side-menu">
+        <a href="index.html" class="menu-close" id="menu-close">✕</a>
+        <h2>All Chapters</h2>
+        <nav class="chapter-menu" id="chapters-menu"></nav>
+    </div>
+
+    <div class="container bright-stars-container">
+        <header class="bright-stars-header">
+            <div>
+                <p class="section-label">Verified stellar reference</p>
+                <h1>The Brightest Stars</h1>
+                <p class="bright-stars-lead">Explore 98 unique bright star systems. Sort the catalogue, narrow it with filters, and open any star for a clear physical profile.</p>
+            </div>
+            <div class="catalogue-audit" aria-label="Catalogue verification summary">
+                <strong>Checked 3 October 2026</strong>
+                <span>97 stellar positions compared with CDS/SIMBAD</span>
+                <span>2 duplicate systems removed from the original list</span>
+            </div>
+        </header>
+
+        <main>
+            <section class="star-stat-grid" aria-label="Catalogue highlights">
+                <article><span>Unique systems</span><strong id="catalogue-total">98</strong></article>
+                <article><span>Brightest night star</span><strong>Sirius</strong><small>m −1.46</small></article>
+                <article><span>Nearest system</span><strong>Alpha Centauri</strong><small>4.37 light-years</small></article>
+                <article><span>Temperature span</span><strong id="temperature-span">Loading…</strong></article>
+            </section>
+
+            <section class="catalogue-shell" aria-labelledby="catalogue-heading">
+                <div class="catalogue-heading">
+                    <div><p class="overline">Interactive catalogue</p><h2 id="catalogue-heading">Compare the stars</h2></div>
+                    <p id="bright-star-count" aria-live="polite">Loading stars…</p>
+                </div>
+
+                <div class="bright-star-controls">
+                    <label class="bright-field bright-search" for="bright-search"><span>Find a star</span><input id="bright-search" type="search" placeholder="Try Sirius, Orion, supergiant…" autocomplete="off"></label>
+                    <label class="bright-field" for="bright-spectral"><span>Spectral class</span><select id="bright-spectral"><option value="all">All classes</option><option>O</option><option>B</option><option>A</option><option>F</option><option>G</option><option>K</option><option>M</option></select></label>
+                    <label class="bright-field" for="bright-constellation"><span>Constellation</span><select id="bright-constellation"><option value="all">All constellations</option></select></label>
+                    <label class="bright-field" for="bright-category"><span>Stellar category</span><select id="bright-category"><option value="all">All categories</option><option value="main sequence">Main sequence</option><option value="subgiant">Subgiants</option><option value="giant">Giants</option><option value="supergiant">Supergiants</option></select></label>
+                    <button id="bright-reset" type="button">Reset</button>
+                </div>
+
+                <div class="table-scroll">
+                    <table class="bright-star-table">
+                        <thead><tr>
+                            <th><button type="button" data-sort="rank">Rank <span></span></button></th>
+                            <th><button type="button" data-sort="name">Star <span></span></button></th>
+                            <th><button type="button" data-sort="constellation">Constellation <span></span></button></th>
+                            <th><button type="button" data-sort="magnitude">Magnitude <span></span></button></th>
+                            <th><button type="button" data-sort="distance">Distance <span></span></button></th>
+                            <th><button type="button" data-sort="spectralClass">Spectrum <span></span></button></th>
+                            <th><button type="button" data-sort="temperature">Temperature <span></span></button></th>
+                            <th><button type="button" data-sort="luminosity">Luminosity <span></span></button></th>
+                        </tr></thead>
+                        <tbody id="bright-star-rows"></tbody>
+                    </table>
+                </div>
+                <div class="bright-card-list" id="bright-card-list"></div>
+                <p class="catalogue-note">Apparent magnitude describes brightness as seen from Earth; smaller and negative numbers are brighter. Physical values are rounded educational estimates and can differ between studies, especially for distant supergiants and multiple-star systems.</p>
+            </section>
+
+            <section class="catalogue-method" aria-labelledby="method-heading">
+                <div><p class="overline">What was checked?</p><h2 id="method-heading">A cleaner catalogue than the original</h2></div>
+                <div>
+                    <p>The original list contained Shaula and Alphecca twice under alternate names. This version treats each as one system, giving 98 unique entries. Coordinates were resolved with the CDS Sesame service against SIMBAD; six incorrect positions in the shared Space Safari data were corrected.</p>
+                    <p>SIMBAD is authoritative for identification and sky position, but properties such as distance, mass, age, radius, and luminosity can be model-dependent. Those values are therefore presented as approximate rather than falsely exact.</p>
+                    <p><a href="https://simbad.cds.unistra.fr/simbad/" target="_blank" rel="noopener">About SIMBAD <span aria-hidden="true">↗</span></a></p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <dialog class="bright-star-dialog" id="bright-star-dialog" aria-labelledby="bright-dialog-name">
+        <button class="bright-dialog-close" type="button" aria-label="Close star details">×</button>
+        <div class="bright-dialog-identity"><span class="bright-star-orb" id="bright-dialog-orb" aria-hidden="true"></span><div><p class="overline" id="bright-dialog-rank"></p><h2 id="bright-dialog-name"></h2><p id="bright-dialog-summary"></p></div></div>
+        <dl id="bright-dialog-data"></dl>
+        <div class="bright-dialog-actions"><a id="bright-dialog-hr" href="hr-diagram.html">Find in H–R diagram</a><a id="bright-dialog-source" href="" target="_blank" rel="noopener">Open SIMBAD source ↗</a></div>
+    </dialog>
+
+    <script src="js/main.js"></script>
+    <script type="module" src="js/brightest-stars.js?v=verified-1"></script>
+</body>
+</html>
