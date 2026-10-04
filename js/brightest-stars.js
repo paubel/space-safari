@@ -192,7 +192,6 @@ function render() {
       <td><span class="bright-star-name"><span>${displayName(star.name)}</span>${systemVisual(star)}</span></td>
       <td>${star.componentCount}</td>
       <td class="muted">${star.constellation}</td>
-      <td>${star.visibility}</td>
       <td>${formatNumber(star.apparentMagnitude, 2)}</td>
       <td>${formatNumber(star.distance, 2)} ly</td>
       <td>${star.spectralClass}</td>
