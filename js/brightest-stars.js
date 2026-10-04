@@ -10,7 +10,8 @@ const catalogueNames = [
   'Sadr', 'Eltanin', 'Alnair', 'Wezen', 'Sargas', 'Menkalinan', 'Atria', 'Alhena', 'Peacock', 'Alsephina',
   'Mirzam', 'Naos', 'Alphard', 'Hamal', 'Diphda', 'Dschubba', 'Larawag', 'Ankaa', 'Enif', 'Scheat',
   'Sabik', 'Aludra', 'Alderamin', 'Gamma Cassiopeiae', 'Markab', 'Gienah (Epsilon Cygni)', 'Acrab', 'Markeb', 'Menkar', 'Zeta Centauri',
-  'Zosma', 'Arneb', 'Izar', 'Iota Aurigae (Hassaleh)', 'Kappa Scorpii (Girtab)', 'Delta Centauri (Ma Wei)', 'Alpha Lupi', 'Beta Arietis (Sheratan)'
+  'Zosma', 'Zeta Ophiuchi', 'Arneb', 'Gienah Corvi', 'Izar', 'Kappa Scorpii (Girtab)', 'Alpha Lupi',
+  'Gamma Velorum', 'Epsilon Centauri', 'Eta Centauri'
 ];
 
 const catalogue = catalogueNames.map(name => STARS.find(star => star.name === name)).filter(Boolean);
@@ -32,7 +33,8 @@ const systemComponents = {
   Sabik: ['A2V', 'A2V'], 'Gienah (Epsilon Cygni)': ['K0III', '?'],
   Acrab: ['B0.5IV', 'B1.5V', 'B2V', 'HgMn', '?', '?'], Markeb: ['B2IV', '~B'],
   'Zeta Centauri': ['B2.5IV', '?'], Izar: ['K0II-III', 'A2V'], Alphecca: ['A0V', 'G5V'],
-  'Kappa Scorpii (Girtab)': ['B1.5III', 'B2III'], 'Beta Arietis (Sheratan)': ['A3V', 'G2V']
+  'Kappa Scorpii (Girtab)': ['B1.5III', 'B2III'], 'Beta Arietis (Sheratan)': ['A3V', 'G2V'],
+  'Gamma Velorum': ['WC8', 'O7.5III', 'B2III', 'F'], 'Gienah Corvi': ['B8III', 'K-MV']
 };
 // Preserve the component sizes from the original Brightest Stars page. These
 // are display sizes for comparing members within a system, not a universal
@@ -45,14 +47,20 @@ const systemComponentSizes = {
   Mizar: [30, 30, 26, 12], Dubhe: [36, 18, 12, 12], Polaris: [44, 16, 18], Algol: [30, 20, 22],
   Algieba: [30, 22], Menkalinan: [30, 28], Alsephina: [30, 26, 14], Dschubba: [30, 14],
   Ankaa: [30, 15], Acrab: [30, 25, 20, 15, 12, 12], Markeb: [30, 12], Izar: [30, 15],
-  Alphecca: [30, 16], 'Kappa Scorpii (Girtab)': [30, 27]
+  Alphecca: [30, 16], 'Kappa Scorpii (Girtab)': [30, 27], 'Gamma Velorum': [38, 32, 18, 12],
+  'Gienah Corvi': [30, 12]
 };
+const combinedMagnitudes = { 'Rigil Kent': -0.27, Acrux: 0.76, Castor: 1.58, 'Gamma Velorum': 1.83 };
 catalogue.forEach(star => {
   star.components = systemComponents[star.name] || [star.spectralClass];
   star.componentSizes = systemComponentSizes[star.name] || null;
   star.componentCount = star.components.length;
+  star.apparentMagnitude = combinedMagnitudes[star.name] ?? star.magnitude;
+  const bothSkies = new Set(['Sun (Sol)', 'Sirius', 'Rigel', 'Betelgeuse', 'Spica', 'Adhara', 'Bellatrix', 'Alnilam', 'Alnitak', 'Mintaka', 'Saiph', 'Alphard', 'Diphda', 'Menkar']);
+  star.visibility = bothSkies.has(star.name) ? 'Both' : star.dec >= 0 ? 'Northern' : 'Southern';
+  star.starType = stellarCategory(star).replace(/\b\w/g, letter => letter.toUpperCase());
 });
-const nightStars = catalogue.filter(star => !star.dynamicPosition).sort((a, b) => a.magnitude - b.magnitude);
+const nightStars = catalogue.filter(star => !star.dynamicPosition).sort((a, b) => a.apparentMagnitude - b.apparentMagnitude);
 const nightRank = new Map(nightStars.map((star, index) => [star.name, index + 1]));
 catalogue.forEach(star => { star.catalogueRank = star.dynamicPosition ? 0 : nightRank.get(star.name); });
 
@@ -61,6 +69,8 @@ const elements = {
   spectral: document.querySelector('#bright-spectral'),
   constellation: document.querySelector('#bright-constellation'),
   category: document.querySelector('#bright-category'),
+  north: document.querySelector('#bright-north'),
+  south: document.querySelector('#bright-south'),
   reset: document.querySelector('#bright-reset'),
   count: document.querySelector('#bright-star-count'),
   total: document.querySelector('#catalogue-total'),
@@ -98,6 +108,23 @@ function spectralColour(spectral) {
   return { O: '#84a9ff', B: '#a8c4ff', A: '#eef4ff', F: '#fff4d0', G: '#ffe09c', K: '#ffb36b', M: '#ff8268', D: '#f5f7ff' }[(spectral || '').match(/[OBAFGKMD]/i)?.[0]?.toUpperCase()] || '#d9e2ef';
 }
 
+function spectralDisplaySize(spectral) {
+  return { O: 18, B: 16, A: 14, F: 13, G: 12, K: 11, M: 10 }[(spectral || '').match(/[OBAFGKM]/i)?.[0]?.toUpperCase()] || 10;
+}
+
+function luminositySizeMultiplier(spectral, starType) {
+  const spec = String(spectral || '').toUpperCase();
+  const type = String(starType || '').toUpperCase();
+  if (/SUPERGIANT/.test(type) || /IAB|IA|IB/.test(spec)) return 2;
+  if (/BRIGHT GIANT/.test(type) || /(^|[^I])II([^I]|$)/.test(spec)) return 1.8;
+  if (/GIANT/.test(type) || /III/.test(spec)) return 1.4;
+  if (/SUBGIANT/.test(type) || /IV/.test(spec)) return 1.15;
+  if (/WHITE\s*-?DWARF/.test(type) || /D[A-Z]/.test(spec)) return .6;
+  if (/MAIN/.test(type) || /V/.test(spec)) return 1;
+  if (/[OB]/.test(spec)) return 1.2;
+  return 1;
+}
+
 function formatNumber(value, maximumFractionDigits = 1) {
   if (value == null || !Number.isFinite(Number(value))) return '—';
   const number = Number(value);
@@ -131,10 +158,12 @@ function currentStars() {
     return (!query || haystack.includes(query)) &&
       (spectral === 'all' || spectralLetter(star) === spectral) &&
       (constellation === 'all' || star.constellation === constellation) &&
-      (category === 'all' || stellarCategory(star) === category);
+      (category === 'all' || stellarCategory(star) === category) &&
+      ((elements.north.checked && (star.visibility === 'Northern' || star.visibility === 'Both')) ||
+       (elements.south.checked && (star.visibility === 'Southern' || star.visibility === 'Both')));
   }).sort((a, b) => {
-    const left = sortKey === 'rank' ? a.catalogueRank : a[sortKey];
-    const right = sortKey === 'rank' ? b.catalogueRank : b[sortKey];
+    const left = sortKey === 'rank' ? a.catalogueRank : sortKey === 'magnitude' ? a.apparentMagnitude : a[sortKey];
+    const right = sortKey === 'rank' ? b.catalogueRank : sortKey === 'magnitude' ? b.apparentMagnitude : b[sortKey];
     if (typeof left === 'number' && typeof right === 'number') return (left - right) * sortDirection;
     return String(left || '').localeCompare(String(right || '')) * sortDirection;
   });
@@ -146,10 +175,11 @@ function starDot(star) {
 }
 
 function systemVisual(star) {
-  const primarySize = Math.max(12, Math.min(26, 12 + Math.log10(Math.max(1, star.radius || 1)) * 5));
+  const radiusScore = 8 + 9 * Math.log10(Math.max(1, Math.min(Number(star.radius) || 1, 3000)));
   const dots = star.components.map((spectral, index) => {
-    const relative = index === 0 ? 1 : index === 1 ? .72 : .48;
-    const size = star.componentSizes?.[index] || Math.max(7, primarySize * relative);
+    const baseSize = star.componentSizes?.[index] || spectralDisplaySize(spectral);
+    const pictorialSize = baseSize * luminositySizeMultiplier(spectral, star.starType);
+    const size = Math.min(44, Math.max(8, Math.round(.4 * pictorialSize + .6 * radiusScore)));
     const colour = spectralColour(spectral);
     return `<span class="star-dot" style="--star-colour:${colour};--dot-size:${size}px" title="Component ${index + 1}: ${spectral}" aria-label="Component ${index + 1}, spectral class ${spectral}"></span>`;
   }).join('');
@@ -165,15 +195,21 @@ function render() {
       <td><span class="bright-star-name"><span>${displayName(star.name)}</span>${systemVisual(star)}</span></td>
       <td>${star.componentCount}</td>
       <td class="muted">${star.constellation}</td>
-      <td>${formatNumber(star.magnitude, 2)}</td>
+      <td>${star.visibility}</td>
+      <td>${formatNumber(star.apparentMagnitude, 2)}</td>
       <td>${formatNumber(star.distance, 2)} ly</td>
       <td>${star.spectralClass}</td>
-      <td>${formatNumber(star.temperature, 0)} K</td>
-      <td>${formatNumber(star.luminosity, 1)} L☉</td>
+      <td class="col-medium">${formatNumber(star.temperature, 0)} K</td>
+      <td class="col-medium">${formatNumber(star.luminosity, 1)} L☉</td>
+      <td class="col-wide">${formatNumber(star.radius, 2)} R☉</td>
+      <td class="col-wide">${formatNumber(star.mass, 2)} M☉</td>
+      <td class="col-wide">${formatNumber(star.age, 3)} Gyr</td>
+      <td class="col-wide">${star.starType}</td>
+      <td class="col-wide notes-column">${star.description || '—'}</td>
     </tr>`).join('');
   elements.cards.innerHTML = stars.map(star => `
     <button class="bright-star-card" type="button" data-star="${star.name}">
-      ${starDot(star)}<span><strong>${displayName(star.name)}</strong><small>${star.componentCount} ${star.componentCount === 1 ? 'star' : 'stars'} · ${star.constellation} · ${star.spectralClass}</small></span><span>${formatNumber(star.magnitude, 2)}</span>
+      ${starDot(star)}<span><strong>${displayName(star.name)}</strong><small>${star.componentCount} ${star.componentCount === 1 ? 'star' : 'stars'} · ${star.constellation} · ${star.visibility} · ${star.spectralClass}</small></span><span>${formatNumber(star.apparentMagnitude, 2)}</span>
     </button>`).join('');
   document.querySelectorAll('.bright-star-table th button').forEach(button => {
     button.querySelector('span').textContent = button.dataset.sort === sortKey ? (sortDirection === 1 ? '▲' : '▼') : '';
@@ -188,7 +224,7 @@ function openStar(starName) {
   document.querySelector('#bright-dialog-summary').textContent = star.description || 'A bright star in the Space Safari catalogue.';
   document.querySelector('#bright-dialog-orb').style.setProperty('--star-colour', starColour(star.temperature));
   const values = [
-    ['Constellation', star.constellation], ['Stars in system', star.componentCount], ['Apparent magnitude', formatNumber(star.magnitude, 2)], ['Distance', `${formatNumber(star.distance, 3)} light-years`],
+    ['Constellation', star.constellation], ['Visibility', star.visibility], ['Stars in system', star.componentCount], ['Apparent magnitude', formatNumber(star.apparentMagnitude, 2)], ['Distance', `${formatNumber(star.distance, 3)} light-years`],
     ['Spectral class', star.spectralClass], ['Temperature', `${formatNumber(star.temperature, 0)} K`], ['Luminosity', `${formatNumber(star.luminosity, 1)} L☉`],
     ['Mass', `${formatNumber(star.mass, 2)} M☉`], ['Radius', `${formatNumber(star.radius, 2)} R☉`], ['Age', `${formatNumber(star.age, 3)} billion years`],
     ['Right ascension', `${formatNumber(star.ra / 15, 3)} h`], ['Declination', `${star.dec >= 0 ? '+' : '−'}${formatNumber(Math.abs(star.dec), 3)}°`], ['Category', stellarCategory(star)]
@@ -208,8 +244,8 @@ elements.total.textContent = catalogue.length;
 const temperatures = catalogue.map(star => star.temperature).filter(Number.isFinite);
 elements.temperatureSpan.textContent = `${formatNumber(Math.min(...temperatures), 0)}–${formatNumber(Math.max(...temperatures), 0)} K`;
 
-[elements.search, elements.spectral, elements.constellation, elements.category].forEach(control => control.addEventListener('input', render));
-elements.reset.addEventListener('click', () => { elements.search.value = ''; elements.spectral.value = 'all'; elements.constellation.value = 'all'; elements.category.value = 'all'; sortKey = 'rank'; sortDirection = 1; render(); });
+[elements.search, elements.spectral, elements.constellation, elements.category, elements.north, elements.south].forEach(control => control.addEventListener('input', render));
+elements.reset.addEventListener('click', () => { elements.search.value = ''; elements.spectral.value = 'all'; elements.constellation.value = 'all'; elements.category.value = 'all'; elements.north.checked = true; elements.south.checked = true; sortKey = 'rank'; sortDirection = 1; render(); });
 document.querySelectorAll('.bright-star-table th button').forEach(button => button.addEventListener('click', () => {
   if (sortKey === button.dataset.sort) sortDirection *= -1; else { sortKey = button.dataset.sort; sortDirection = 1; }
   render();
