@@ -73,10 +73,7 @@ const elements = {
   south: document.querySelector('#bright-south'),
   reset: document.querySelector('#bright-reset'),
   count: document.querySelector('#bright-star-count'),
-  total: document.querySelector('#catalogue-total'),
-  temperatureSpan: document.querySelector('#temperature-span'),
   rows: document.querySelector('#bright-star-rows'),
-  cards: document.querySelector('#bright-card-list'),
   dialog: document.querySelector('#bright-star-dialog')
 };
 
@@ -207,10 +204,6 @@ function render() {
       <td class="col-wide">${star.starType}</td>
       <td class="col-wide notes-column">${star.description || '—'}</td>
     </tr>`).join('');
-  elements.cards.innerHTML = stars.map(star => `
-    <button class="bright-star-card" type="button" data-star="${star.name}">
-      ${starDot(star)}<span><strong>${displayName(star.name)}</strong><small>${star.componentCount} ${star.componentCount === 1 ? 'star' : 'stars'} · ${star.constellation} · ${star.visibility} · ${star.spectralClass}</small></span><span>${formatNumber(star.apparentMagnitude, 2)}</span>
-    </button>`).join('');
   document.querySelectorAll('.bright-star-table th button').forEach(button => {
     button.querySelector('span').textContent = button.dataset.sort === sortKey ? (sortDirection === 1 ? '▲' : '▼') : '';
   });
@@ -240,9 +233,6 @@ const constellations = [...new Set(catalogue.map(star => star.constellation))].s
 elements.constellation.append(...constellations.map(name => {
   const option = document.createElement('option'); option.value = name; option.textContent = name; return option;
 }));
-elements.total.textContent = catalogue.length;
-const temperatures = catalogue.map(star => star.temperature).filter(Number.isFinite);
-elements.temperatureSpan.textContent = `${formatNumber(Math.min(...temperatures), 0)}–${formatNumber(Math.max(...temperatures), 0)} K`;
 
 [elements.search, elements.spectral, elements.constellation, elements.category, elements.north, elements.south].forEach(control => control.addEventListener('input', render));
 elements.reset.addEventListener('click', () => { elements.search.value = ''; elements.spectral.value = 'all'; elements.constellation.value = 'all'; elements.category.value = 'all'; elements.north.checked = true; elements.south.checked = true; sortKey = 'rank'; sortDirection = 1; render(); });
@@ -252,7 +242,6 @@ document.querySelectorAll('.bright-star-table th button').forEach(button => butt
 }));
 document.querySelector('.bright-star-table').addEventListener('click', event => { const row = event.target.closest('[data-star]'); if (row) openStar(row.dataset.star); });
 document.querySelector('.bright-star-table').addEventListener('keydown', event => { const row = event.target.closest('[data-star]'); if (row && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); openStar(row.dataset.star); } });
-elements.cards.addEventListener('click', event => { const card = event.target.closest('[data-star]'); if (card) openStar(card.dataset.star); });
 document.querySelector('.bright-dialog-close').addEventListener('click', () => elements.dialog.close());
 elements.dialog.addEventListener('click', event => { if (event.target === elements.dialog) elements.dialog.close(); });
 
