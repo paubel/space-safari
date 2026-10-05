@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore a curated catalogue of nebulae, star clusters, galaxies, and galaxy systems with externally hosted astronomical imagery.">
+    <title>Deep-Sky Atlas - Space Safari</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/deep-sky-atlas.css">
+    <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SL7KJ6J4ZZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || []
+        function gtag() { dataLayer.push(arguments) }
+        gtag('js', new Date())
+        gtag('config', 'G-SL7KJ6J4ZZ');
+    </script>
+</head>
+<body class="deep-sky-page">
+    <nav class="navbar">
+        <a href="index.html" class="logo"><img src="assets/images/cats-eye-icon.webp" class="site-icon" alt=""> Space Safari</a>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Open navigation">☰</button>
+    </nav>
+
+    <div class="side-menu" id="side-menu">
+        <a href="index.html" class="menu-close" id="menu-close">✕</a>
+        <h2>All Chapters</h2>
+        <nav class="chapter-menu" id="chapters-menu"></nav>
+    </div>
+
+    <div class="container deep-sky-container">
+        <header class="deep-sky-hero">
+            <p class="section-label">A visual catalogue of the universe</p>
+            <h1>Deep-Sky Atlas</h1>
+            <p>Explore nebulae, star clusters, galaxies, and galaxy systems. Search by name or catalogue number, then refine the collection by object type, constellation, catalogue, or distance.</p>
+        </header>
+
+        <main>
+            <section class="atlas-explainer" aria-labelledby="atlas-explainer-title">
+                <button type="button" id="atlas-explainer-toggle" aria-expanded="false" aria-controls="atlas-explainer-content">
+                    <span><strong id="atlas-explainer-title">What am I looking at?</strong><small>A quick guide to the four groups</small></span><span aria-hidden="true">＋</span>
+                </button>
+                <div id="atlas-explainer-content" hidden>
+                    <article><h2>Nebulae</h2><p>Clouds of gas and dust shaped by newborn stars, dying stars, or stellar explosions.</p></article>
+                    <article><h2>Star clusters</h2><p>Groups of stars born together or held in dense, ancient systems by gravity.</p></article>
+                    <article><h2>Galaxies</h2><p>Vast systems of stars, gas, dust, dark matter, and often a central black hole.</p></article>
+                    <article><h2>Galaxy systems</h2><p>Groups and clusters in which many galaxies interact through gravity.</p></article>
+                </div>
+            </section>
+
+            <section class="atlas-catalogue" aria-labelledby="atlas-heading">
+                <div class="atlas-heading-row">
+                    <div><p class="overline">Curated first edition</p><h2 id="atlas-heading">Explore the catalogue</h2></div>
+                    <p id="atlas-result-count" aria-live="polite">Loading objects…</p>
+                </div>
+
+                <form class="atlas-controls" id="atlas-controls">
+                    <label class="atlas-field atlas-search"><span>Search</span><input id="atlas-search" type="search" placeholder="Orion, M31, NGC 7000…" autocomplete="off"></label>
+                    <label class="atlas-field"><span>Group</span><select id="atlas-group"><option value="all">All groups</option></select></label>
+                    <label class="atlas-field"><span>Subtype</span><select id="atlas-subtype"><option value="all">All subtypes</option></select></label>
+                    <label class="atlas-field"><span>Constellation</span><select id="atlas-constellation"><option value="all">All constellations</option></select></label>
+                    <label class="atlas-field"><span>Catalogue</span><select id="atlas-catalogue-filter"><option value="all">All catalogues</option></select></label>
+                    <label class="atlas-field"><span>Distance</span><select id="atlas-distance"><option value="all">All distances</option><option value="local">Under 10,000 ly</option><option value="milky-way">10,000–100,000 ly</option><option value="nearby">100,000–10 million ly</option><option value="far">10–500 million ly</option><option value="deep">Over 500 million ly</option></select></label>
+                    <label class="atlas-field"><span>Sort</span><select id="atlas-sort"><option value="recommended">Recommended</option><option value="name">Name</option><option value="nearest">Nearest first</option><option value="farthest">Farthest first</option><option value="constellation">Constellation</option><option value="type">Object type</option></select></label>
+                    <button type="reset" id="atlas-reset">Clear all</button>
+                </form>
+
+                <div class="atlas-active-filters" id="atlas-active-filters" aria-live="polite"></div>
+                <div class="atlas-grid" id="atlas-grid"></div>
+                <button class="atlas-load-more" id="atlas-load-more" type="button" hidden>Show more objects</button>
+            </section>
+        </main>
+    </div>
+
+    <dialog class="atlas-dialog" id="atlas-dialog" aria-labelledby="atlas-dialog-title">
+        <button class="atlas-dialog-close" type="button" aria-label="Close object details">×</button>
+        <div class="atlas-dialog-image-wrap">
+            <img id="atlas-dialog-image" alt="">
+            <span id="atlas-dialog-wavelength"></span>
+        </div>
+        <div class="atlas-dialog-content">
+            <p class="overline" id="atlas-dialog-type"></p>
+            <h2 id="atlas-dialog-title"></h2>
+            <p class="atlas-dialog-designation" id="atlas-dialog-designation"></p>
+            <p id="atlas-dialog-description"></p>
+            <dl id="atlas-dialog-data"></dl>
+            <p class="atlas-image-credit" id="atlas-dialog-credit"></p>
+            <div class="atlas-dialog-actions"><a id="atlas-dialog-source" target="_blank" rel="noopener">Image source ↗</a><a id="atlas-dialog-facts" target="_blank" rel="noopener">Read factual source ↗</a></div>
+        </div>
+    </dialog>
+
+    <script src="js/main.js"></script>
+    <script type="module" src="js/deep-sky-atlas.js?v=draft-2"></script>
+</body>
+</html>

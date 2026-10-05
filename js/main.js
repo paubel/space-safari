@@ -57,6 +57,7 @@ function renderExploreMenu() {
     { href: "planetarium.html", icon: "◎", label: "Interactive Planetarium" },
     { href: "hr-diagram.html", icon: "⋱", label: "Interactive H–R Diagram" },
     { href: "brightest-stars.html", icon: "★", label: "Brightest Stars Catalogue" },
+    { href: "deep-sky-atlas.html", icon: "◉", label: "Deep-Sky Atlas" },
   ];
 
   const nav = document.createElement("nav");
