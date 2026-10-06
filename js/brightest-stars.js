@@ -167,16 +167,24 @@ function currentStars() {
 }
 
 function starDot(star) {
-  const size = Math.max(10, Math.min(22, 11 + Math.log10(Math.max(1, star.radius || 1)) * 3));
+  const size = radiusDisplaySize(star.radius);
   return `<span class="star-dot" style="--star-colour:${starColour(star.temperature)};--dot-size:${size}px" aria-hidden="true"></span>`;
 }
 
+function radiusDisplaySize(radius) {
+  const safeRadius = Math.max(0.1, Number(radius) || 1);
+  return Math.min(50, Math.max(7, 10 + 13 * Math.log10(safeRadius)));
+}
+
 function systemVisual(star) {
-  const radiusScore = 8 + 9 * Math.log10(Math.max(1, Math.min(Number(star.radius) || 1, 3000)));
+  const primarySize = radiusDisplaySize(star.radius);
+  const primaryReference = star.componentSizes?.[0] ||
+    spectralDisplaySize(star.components[0]) * luminositySizeMultiplier(star.components[0], star.starType);
   const dots = star.components.map((spectral, index) => {
     const baseSize = star.componentSizes?.[index] || spectralDisplaySize(spectral);
-    const pictorialSize = baseSize * luminositySizeMultiplier(spectral, star.starType);
-    const size = Math.min(44, Math.max(8, Math.round(.4 * pictorialSize + .6 * radiusScore)));
+    const componentReference = baseSize * (star.componentSizes ? 1 : luminositySizeMultiplier(spectral, index === 0 ? star.starType : ''));
+    const relativeSize = Math.min(.92, Math.max(.22, componentReference / primaryReference));
+    const size = Math.round(index === 0 ? primarySize : Math.max(7, primarySize * relativeSize));
     const colour = spectralColour(spectral);
     return `<span class="star-dot" style="--star-colour:${colour};--dot-size:${size}px" title="Component ${index + 1}: ${spectral}" aria-label="Component ${index + 1}, spectral class ${spectral}"></span>`;
   }).join('');
