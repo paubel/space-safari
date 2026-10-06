@@ -1,4 +1,4 @@
-import { DEEP_SKY_OBJECTS } from '../data/deep-sky-objects.js?v=272';
+import { DEEP_SKY_OBJECTS } from '../data/deep-sky-objects.js?v=images-2';
 
 const PAGE_SIZE = 32;
 const OBJECT_OVERRIDES = {
@@ -101,7 +101,7 @@ function cardMarkup(object) {
 function stableImageUrl(url) {
   if (!/upload\.wikimedia\.org/i.test(url)) return url;
   const path = decodeURIComponent(new URL(url).pathname);
-  const thumbMatch = path.match(/\/thumb\/[a-f0-9]\/[^/]+\/([^/]+)\/[0-9]+px-/i);
+  const thumbMatch = path.match(/\/thumb\/[a-f0-9]\/[^/]+\/([^/]+)\//i);
   const originalMatch = path.match(/\/[a-f0-9]\/[^/]+\/([^/]+)$/i);
   const filename = thumbMatch?.[1] || originalMatch?.[1];
   return filename ? `https://commons.wikimedia.org/wiki/Special:Redirect/file/${encodeURIComponent(filename)}?width=800` : url;
@@ -110,7 +110,7 @@ function stableImageUrl(url) {
 function imageSourcePage(object) {
   if (!/upload\.wikimedia\.org/i.test(object.image)) return object.imageSource;
   const path = decodeURIComponent(new URL(object.image).pathname);
-  const thumbMatch = path.match(/\/thumb\/[a-f0-9]\/[^/]+\/([^/]+)\/[0-9]+px-/i);
+  const thumbMatch = path.match(/\/thumb\/[a-f0-9]\/[^/]+\/([^/]+)\//i);
   const originalMatch = path.match(/\/[a-f0-9]\/[^/]+\/([^/]+)$/i);
   const filename = thumbMatch?.[1] || originalMatch?.[1];
   return filename ? `https://commons.wikimedia.org/wiki/File:${encodeURIComponent(filename)}` : object.imageSource;
