@@ -38,9 +38,12 @@
 
         <main>
             <section class="atlas-explainer" aria-labelledby="atlas-explainer-title">
-                <button type="button" id="atlas-explainer-toggle" aria-expanded="false" aria-controls="atlas-explainer-content">
-                    <span><strong id="atlas-explainer-title">What am I looking at?</strong><small>A quick guide to the four groups</small></span><span aria-hidden="true">＋</span>
-                </button>
+                <div class="atlas-explainer-bar">
+                    <button type="button" id="atlas-explainer-toggle" aria-expanded="false" aria-controls="atlas-explainer-content">
+                        <span><strong id="atlas-explainer-title">What am I looking at?</strong><small>A quick guide to the four groups</small></span><span aria-hidden="true">＋</span>
+                    </button>
+                    <a href="deep-sky-guide.html">Open the complete guide →</a>
+                </div>
                 <div id="atlas-explainer-content" hidden>
                     <article><h2>Nebulae</h2><p>Clouds of gas and dust shaped by newborn stars, dying stars, or stellar explosions.</p></article>
                     <article><h2>Star clusters</h2><p>Groups of stars born together or held in dense, ancient systems by gravity.</p></article>
@@ -51,7 +54,7 @@
 
             <section class="atlas-catalogue" aria-labelledby="atlas-heading">
                 <div class="atlas-heading-row">
-                    <div><p class="overline">Curated first edition</p><h2 id="atlas-heading">Explore the catalogue</h2></div>
+                    <div><h2 id="atlas-heading">Explore the catalogue</h2></div>
                     <p id="atlas-result-count" aria-live="polite">Loading objects…</p>
                 </div>
 
