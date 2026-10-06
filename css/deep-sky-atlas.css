@@ -23,6 +23,8 @@
 .atlas-controls { display: grid; grid-template-columns: minmax(210px, 1.5fr) repeat(6, minmax(125px, 1fr)) auto; gap: .55rem; padding: .8rem; background: rgba(26,31,53,.72); border: 1px solid var(--border); border-radius: 8px; }
 .atlas-field { display: grid; gap: .28rem; min-width: 0; color: var(--text-muted); font-size: .61rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
 .atlas-field input, .atlas-field select { width: 100%; min-width: 0; height: 39px; padding: 0 .62rem; color: var(--text); background: #0a0f1b; border: 1px solid #30384d; border-radius: 5px; font: .75rem system-ui, sans-serif; }
+.atlas-field select optgroup { color: #7f8da5; font-weight: 800; }
+.atlas-field select option { color: var(--text); font-weight: 500; }
 #atlas-reset { align-self: end; height: 39px; padding: 0 .75rem; color: var(--accent); background: transparent; border: 1px solid #39445d; border-radius: 5px; font-weight: 750; cursor: pointer; }
 .atlas-active-filters { min-height: 2.2rem; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; padding: .5rem 0; }
 .atlas-active-filters button { padding: .3rem .55rem; color: #cfe6ff; background: rgba(74,158,255,.1); border: 1px solid rgba(74,158,255,.35); border-radius: 999px; font-size: .68rem; cursor: pointer; }

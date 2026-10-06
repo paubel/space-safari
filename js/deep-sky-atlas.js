@@ -1,6 +1,7 @@
 import { DEEP_SKY_OBJECTS } from '../data/deep-sky-objects.js?v=images-2';
 
 const PAGE_SIZE = 32;
+const SUBTYPE_GROUP_ORDER = ['Galaxies', 'Galaxy systems', 'Star clusters', 'Nebulae'];
 const OBJECT_OVERRIDES = {
   'M 34': { name: 'Messier 34', description: 'A young open cluster in Perseus, approximately 1,500 light-years from Earth.' },
   'M 47': { name: 'Messier 47' },
@@ -40,6 +41,30 @@ function populate(select, values) {
   const first = select.options[0];
   select.replaceChildren(first, ...values.map(value => new Option(value, value)));
   if ([...select.options].some(option => option.value === current)) select.value = current;
+}
+
+function populateSubtypes(records) {
+  const current = controls.subtype.value;
+  const allOption = controls.subtype.options[0];
+  const available = new Set(records.map(record => record.subtype).filter(Boolean));
+  const groups = SUBTYPE_GROUP_ORDER.map(group => {
+    const values = unique('subtype', records.filter(record => record.group === group));
+    if (!values.length) return null;
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = group;
+    optgroup.append(...values.map(value => new Option(value, value)));
+    return optgroup;
+  }).filter(Boolean);
+  const groupedValues = new Set(groups.flatMap(group => [...group.children].map(option => option.value)));
+  const remaining = [...available].filter(value => !groupedValues.has(value)).sort((a, b) => a.localeCompare(b));
+  if (remaining.length) {
+    const other = document.createElement('optgroup');
+    other.label = 'Other';
+    other.append(...remaining.map(value => new Option(value, value)));
+    groups.push(other);
+  }
+  controls.subtype.replaceChildren(allOption, ...groups);
+  if ([...controls.subtype.options].some(option => option.value === current)) controls.subtype.value = current;
 }
 
 function formatDistance(distance) {
@@ -146,7 +171,7 @@ function render() {
 
 function refreshSubtypeOptions() {
   const records = controls.group.value === 'all' ? OBJECTS : OBJECTS.filter(object => object.group === controls.group.value);
-  populate(controls.subtype, unique('subtype', records));
+  populateSubtypes(records);
 }
 
 function openObject(object) {
