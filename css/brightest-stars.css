@@ -20,6 +20,7 @@
 .bright-star-table thead { background: #101625; }
 .bright-star-table thead th { position: sticky; top: var(--bright-sticky-top); z-index: 5; background: #101625; box-shadow: 0 1px 0 var(--border); }
 .bright-star-table th, .bright-star-table td { padding: .72rem .85rem; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, .065); white-space: nowrap; }
+.bright-star-table :is(th, td):first-child { width: 4.25rem; padding-right: .35rem; }
 .bright-star-table th button { display: flex; gap: .35rem; width: 100%; color: #aeb8c9; background: none; border: 0; font: inherit; font-weight: 750; cursor: pointer; }
 .bright-star-table th:nth-child(3), .bright-star-table td:nth-child(3), .bright-star-table th:nth-child(n+5):not(.notes-column), .bright-star-table td:nth-child(n+5):not(.notes-column) { text-align: right; }
 .bright-star-table .notes-column { min-width: 280px; max-width: 380px; white-space: normal; line-height: 1.35; }
@@ -104,6 +105,7 @@
   .bright-star-controls { grid-template-columns: 1fr; }
   .bright-star-table { min-width: 0; font-size: .7rem; }
   .bright-star-table th, .bright-star-table td { padding: .6rem .45rem; }
+  .bright-star-table :is(th, td):first-child { width: 3.5rem; padding-right: .2rem; }
   .bright-star-name { min-width: 120px; }
   .bright-star-dialog dl { grid-template-columns: 1fr 1fr; }
 }
