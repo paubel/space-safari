@@ -257,7 +257,7 @@
 
 .hr-range-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.8rem;
 }
 
@@ -737,6 +737,8 @@
   stroke-width: 3px;
   pointer-events: none;
 }
+
+.hr-star-label.is-priority { fill: #b9d9ff; font-weight: 750; }
 
 .hr-sun-ring {
   fill: none;

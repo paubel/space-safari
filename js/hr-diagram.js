@@ -40,6 +40,10 @@ if (chartElement && window.d3) {
     radius: {
       min: document.querySelector('#hr-radius-min'), max: document.querySelector('#hr-radius-max'),
       output: document.querySelector('#hr-radius-output'), defaults: [-2.25, 3.25]
+    },
+    age: {
+      min: document.querySelector('#hr-age-min'), max: document.querySelector('#hr-age-max'),
+      output: document.querySelector('#hr-age-output'), defaults: [6, 10.1]
     }
   };
 
@@ -52,6 +56,7 @@ if (chartElement && window.d3) {
     luminosity: document.querySelector('#hr-star-luminosity'),
     radius: document.querySelector('#hr-star-radius'),
     distance: document.querySelector('#hr-star-distance-detail'),
+    age: document.querySelector('#hr-star-age'),
     constellation: document.querySelector('#hr-star-constellation')
   };
 
@@ -89,6 +94,19 @@ if (chartElement && window.d3) {
     return value.replace(/\b\w/g, character => character.toUpperCase());
   }
 
+  function displayName(star) {
+    return star.name === 'Eta Carinae A' ? 'Eta Carinae' : star.name;
+  }
+
+  function formatAge(years) {
+    const value = Number(years);
+    if (!Number.isFinite(value)) return 'Unknown';
+    if (value >= 1e9) return `${numberFormat.format(value / 1e9)} Gyr`;
+    if (value >= 1e6) return `${numberFormat.format(value / 1e6)} Myr`;
+    if (value >= 1e3) return `${numberFormat.format(value / 1e3)} kyr`;
+    return `${numberFormat.format(value)} years`;
+  }
+
   function summaryFor(star) {
     const spectral = star.spectralClass ? `${star.spectralClass} ` : '';
     const location = star.constellation ? ` in ${star.constellation}` : '';
@@ -97,7 +115,7 @@ if (chartElement && window.d3) {
 
   function selectStar(star) {
     selectedStar = star;
-    details.name.textContent = star.name || 'Unnamed star';
+    details.name.textContent = displayName(star) || 'Unnamed star';
     details.summary.textContent = summaryFor(star);
     details.type.textContent = typeLabel(star.type);
     details.spectral.textContent = star.spectralClass || 'Unknown';
@@ -105,13 +123,14 @@ if (chartElement && window.d3) {
     details.luminosity.textContent = finite(star.luminosity) ? `${formatScientific(star.luminosity)} L☉` : 'Unknown';
     details.radius.textContent = finite(star.radius) ? `${formatScientific(star.radius)} R☉` : 'Unknown';
     details.distance.textContent = finite(star.distance) ? (Number(star.distance) === 0 ? 'Earth’s star' : `${integerFormat.format(star.distance)} ly`) : 'Unknown';
+    details.age.textContent = finite(star.age) ? formatAge(star.age) : 'Unknown';
     details.constellation.textContent = star.constellation || 'Not applicable';
     chart.selectAll('.hr-star').classed('is-selected', datum => datum === star);
   }
 
   function showTooltip(event, star) {
     tooltip.hidden = false;
-    tooltip.innerHTML = `<strong>${star.name}</strong><span>${typeLabel(star.type)} · ${star.spectralClass || 'No spectral class'}</span><br>${integerFormat.format(star.temperature)} K · ${formatScientific(star.luminosity)} L☉`;
+    tooltip.innerHTML = `<strong>${displayName(star)}</strong><span>${typeLabel(star.type)} · ${star.spectralClass || 'No spectral class'}</span><br>${integerFormat.format(star.temperature)} K · ${formatScientific(star.luminosity)} L☉`;
     const wrapRect = chartWrap.getBoundingClientRect();
     const left = Math.min(event.clientX - wrapRect.left + 14, wrapRect.width - tooltip.offsetWidth - 12);
     const top = Math.max(10, Math.min(event.clientY - wrapRect.top - tooltip.offsetHeight - 12, wrapRect.height - tooltip.offsetHeight - 10));
@@ -170,10 +189,12 @@ if (chartElement && window.d3) {
       range.output.textContent = `${integerFormat.format(minimum)}–${integerFormat.format(maximum)} ly`;
     } else if (name === 'magnitude') {
       range.output.textContent = `${values[0].toFixed(1).replace('-', '−')}–${values[1].toFixed(1).replace('-', '−')}`;
-    } else {
+    } else if (name === 'radius') {
       const minimum = 10 ** values[0];
       const maximum = 10 ** values[1];
       range.output.textContent = `${formatScientific(minimum)}–${formatScientific(maximum)} R☉`;
+    } else {
+      range.output.textContent = `${formatAge(10 ** values[0])}–${formatAge(10 ** values[1])}`;
     }
   }
 
@@ -223,11 +244,13 @@ if (chartElement && window.d3) {
     const distanceLog = rangeValues('distance');
     const magnitude = rangeValues('magnitude');
     const radiusLog = rangeValues('radius');
+    const ageLog = rangeValues('age');
     const distance = [distanceLog[0] === 0 ? 0 : 10 ** distanceLog[0], 10 ** distanceLog[1]];
     const radius = [10 ** radiusLog[0], 10 ** radiusLog[1]];
+    const age = [10 ** ageLog[0], 10 ** ageLog[1]];
 
     filteredStars = stars.filter(star => {
-      const nameMatches = !query || (star.name || '').toLowerCase().includes(query);
+      const nameMatches = !query || `${star.name || ''} ${displayName(star) || ''}`.toLowerCase().includes(query);
       const typeMatches = activeTypes.has((star.type || '').toLowerCase());
       const spectralClass = (star.spectralClass || '').charAt(0).toUpperCase();
       const spectralMatches = activeSpectral.has(spectralClass);
@@ -240,7 +263,10 @@ if (chartElement && window.d3) {
       const radiusMatches = !finite(star.radius)
         ? isDefaultRange('radius')
         : Number(star.radius) >= radius[0] && Number(star.radius) <= radius[1];
-      return nameMatches && typeMatches && spectralMatches && constellationMatches && temperatureMatches && distanceMatches && magnitudeMatches && radiusMatches;
+      const ageMatches = !finite(star.age)
+        ? isDefaultRange('age')
+        : Number(star.age) >= age[0] && Number(star.age) <= age[1];
+      return nameMatches && typeMatches && spectralMatches && constellationMatches && temperatureMatches && distanceMatches && magnitudeMatches && radiusMatches && ageMatches;
     });
 
     Object.keys(ranges).forEach(updateRangeDisplay);
@@ -355,7 +381,7 @@ if (chartElement && window.d3) {
       .attr('fill', star => colorScale(star.temperature))
       .attr('tabindex', 0)
       .attr('role', 'button')
-      .attr('aria-label', star => `${star.name}, ${typeLabel(star.type)}, ${integerFormat.format(star.temperature)} kelvin`)
+      .attr('aria-label', star => `${displayName(star)}, ${typeLabel(star.type)}, ${integerFormat.format(star.temperature)} kelvin`)
       .on('pointerenter pointermove', showTooltip)
       .on('pointerleave', hideTooltip)
       .on('click', (event, star) => selectStar(star))
@@ -367,7 +393,7 @@ if (chartElement && window.d3) {
         }
       });
 
-    circles.append('title').text(star => `${star.name}: ${integerFormat.format(star.temperature)} K, ${formatScientific(star.luminosity)} L☉`);
+    circles.append('title').text(star => `${displayName(star)}: ${integerFormat.format(star.temperature)} K, ${formatScientific(star.luminosity)} L☉`);
 
     const sun = filteredStars.find(star => /^(sol|sun)$/i.test(star.name || ''));
     if (sun) {
@@ -378,16 +404,17 @@ if (chartElement && window.d3) {
         .attr('r', (sizeMode.value === 'equal' ? 4.2 : radius(1)) + 6);
     }
 
-    if (labelsInput.checked) {
-      const labelData = [...filteredStars]
+    {
+      const labelData = (labelsInput.checked ? [...filteredStars] : filteredStars.filter(star => star.type === 'hypergiant'))
         .sort((a, b) => (a.name === selectedStar?.name ? -1 : b.luminosity - a.luminosity));
       const labels = chart.append('g').selectAll('text')
         .data(labelData, star => star.name)
         .join('text')
         .attr('class', 'hr-star-label')
+        .classed('is-priority', star => star.type === 'hypergiant')
         .attr('x', star => x(star.temperature) + 7)
         .attr('y', star => y(star.luminosity) - 5)
-        .text(star => star.name);
+        .text(star => displayName(star));
       declutterLabels(labels);
     }
   }

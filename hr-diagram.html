@@ -7,7 +7,7 @@
     <meta name="description" content="Explore how temperature, luminosity, radius, spectral class, and stellar evolution connect in an interactive Hertzsprung–Russell diagram.">
     <title>Interactive H–R Diagram - Space Safari</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/hr-diagram.css">
+    <link rel="stylesheet" href="css/hr-diagram.css?v=age-hypergiants-1">
     <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SL7KJ6J4ZZ"></script>
@@ -18,7 +18,7 @@
         gtag('config', 'G-SL7KJ6J4ZZ');
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
-    <script defer src="js/hr-diagram.js"></script>
+    <script defer src="js/hr-diagram.js?v=age-hypergiants-1"></script>
 </head>
 
 <body class="hr-diagram-page">
@@ -69,7 +69,7 @@
 
                 <details class="hr-advanced" id="hr-advanced-panel">
                     <summary>
-                        <span><strong>Advanced filters</strong><small>Temperature, distance, magnitude, radius, stellar type, spectral class, and constellation</small></span>
+                        <span><strong>Advanced filters</strong><small>Temperature, distance, magnitude, radius, age, stellar type, spectral class, and constellation</small></span>
                         <span id="hr-advanced-status">Optional · currently showing all stars</span>
                     </summary>
                     <div class="hr-advanced-content">
@@ -104,6 +104,14 @@
                                     <span class="hr-range-track" aria-hidden="true"></span>
                                     <input id="hr-radius-min" type="range" min="-2.25" max="3.25" step="0.05" value="-2.25" aria-label="Minimum radius on a logarithmic scale">
                                     <input id="hr-radius-max" type="range" min="-2.25" max="3.25" step="0.05" value="3.25" aria-label="Maximum radius on a logarithmic scale">
+                                </div>
+                            </section>
+                            <section class="hr-range-section" aria-labelledby="hr-age-heading">
+                                <div class="hr-range-heading"><h3 id="hr-age-heading">Age</h3><output id="hr-age-output">1 Myr–12.6 Gyr</output></div>
+                                <div class="hr-dual-range" data-range="age">
+                                    <span class="hr-range-track" aria-hidden="true"></span>
+                                    <input id="hr-age-min" type="range" min="6" max="10.1" step="0.05" value="6" aria-label="Minimum stellar age on a logarithmic scale">
+                                    <input id="hr-age-max" type="range" min="6" max="10.1" step="0.05" value="10.1" aria-label="Maximum stellar age on a logarithmic scale">
                                 </div>
                             </section>
                         </div>
@@ -167,6 +175,7 @@
                             <div><dt>Luminosity</dt><dd id="hr-star-luminosity">—</dd></div>
                             <div><dt>Radius</dt><dd id="hr-star-radius">—</dd></div>
                             <div><dt>Distance</dt><dd id="hr-star-distance-detail">—</dd></div>
+                            <div><dt>Age</dt><dd id="hr-star-age">—</dd></div>
                             <div><dt>Constellation</dt><dd id="hr-star-constellation">—</dd></div>
                         </dl>
                     </aside>

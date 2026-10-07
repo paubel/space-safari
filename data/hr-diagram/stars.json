@@ -1869,7 +1869,7 @@
     "constellation": "Sagittarius",
     "distance": 228,
     "apparentMagnitude": 2.05,
-    "age": 31.4,
+    "age": 31400000,
     "mass": 7.8,
     "type": "main sequence"
   },
@@ -2270,7 +2270,7 @@
     "constellation": "Ursa Minor",
     "distance": 130.9,
     "apparentMagnitude": 2.08,
-    "age": 2.95,
+    "age": 2950000000,
     "mass": 2.2,
     "type": "giant"
   },
