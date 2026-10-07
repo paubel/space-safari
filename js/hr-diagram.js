@@ -514,7 +514,8 @@ if (chartElement && window.d3) {
         applyFilters();
         if (!requestedName) return;
         const normalizedName = requestedName.toLowerCase();
-        const requestedStar = stars.find(star => star.name.toLowerCase() === normalizedName) ||
+        const requestedStar = stars.find(star => displayName(star).toLowerCase() === normalizedName) ||
+          stars.find(star => star.name.toLowerCase() === normalizedName) ||
           stars.find(star => star.name.toLowerCase().startsWith(normalizedName));
         if (requestedStar) selectStar(requestedStar);
       }));
