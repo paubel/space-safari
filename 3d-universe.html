@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore the three-dimensional positions of nearby and famous stars in the Space Safari stellar catalogue.">
+    <title>3D Universe - Space Safari</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/3d-universe.css?v=1">
+    <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SL7KJ6J4ZZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-SL7KJ6J4ZZ');
+    </script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body class="universe-3d-page">
+    <nav class="navbar">
+        <a href="index.html" class="logo"><img src="assets/images/cats-eye-icon.webp" class="site-icon" alt=""> Space Safari</a>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Open navigation">☰</button>
+    </nav>
+
+    <div class="side-menu" id="side-menu">
+        <a href="index.html" class="menu-close" id="menu-close">✕</a>
+        <h2>All Chapters</h2>
+        <nav class="chapter-menu" id="chapters-menu"></nav>
+    </div>
+
+    <main class="universe-shell">
+        <header class="universe-header">
+            <div>
+                <p class="section-label">Interactive stellar map</p>
+                <h1>3D Universe</h1>
+                <p>Explore 117 stars—including all 100 brightest stellar systems seen from Earth. Rotate the view, zoom through the stellar neighbourhood, and select any star for details.</p>
+            </div>
+            <div class="universe-scale-note" id="universe-scale-note">
+                <strong>Compressed distance</strong>
+                <span>Direction and distance order are preserved; separation is logarithmically compressed.</span>
+            </div>
+        </header>
+
+        <section class="universe-workspace" aria-label="Interactive three-dimensional star map">
+            <aside class="universe-controls" aria-label="3D Universe controls">
+                <div class="universe-control-heading">
+                    <div><p class="overline">View controls</p><h2>Stellar neighbourhood</h2></div>
+                    <button id="universe-reset" type="button">Reset</button>
+                </div>
+
+                <label class="universe-field" for="universe-search">
+                    <span>Find a star</span>
+                    <div class="universe-search-row">
+                        <input id="universe-search" type="search" list="universe-star-list" placeholder="Sirius, Vega, Betelgeuse…" autocomplete="off">
+                        <datalist id="universe-star-list"></datalist>
+                        <button id="universe-find" type="button">Find</button>
+                    </div>
+                </label>
+
+                <fieldset class="universe-segmented">
+                    <legend>Distance scale</legend>
+                    <label><input type="radio" name="distance-scale" value="compressed" checked><span>Compressed</span></label>
+                    <label><input type="radio" name="distance-scale" value="linear"><span>Linear</span></label>
+                </fieldset>
+
+                <label class="universe-field" for="universe-distance">
+                    <span>Maximum distance <output id="universe-distance-output">2,630 ly</output></span>
+                    <input id="universe-distance" type="range" min="0.7" max="3.42" step="0.01" value="3.42">
+                </label>
+
+                <label class="universe-field" for="universe-spectral">
+                    <span>Spectral class</span>
+                    <select id="universe-spectral">
+                        <option value="all">All spectral classes</option>
+                        <option value="O">O — blue</option>
+                        <option value="B">B — blue-white</option>
+                        <option value="A">A — white</option>
+                        <option value="F">F — yellow-white</option>
+                        <option value="G">G — yellow</option>
+                        <option value="K">K — orange</option>
+                        <option value="M">M — red</option>
+                        <option value="D">D — white dwarf</option>
+                    </select>
+                </label>
+
+                <label class="universe-check"><input id="universe-labels" type="checkbox" checked><span>Show star names</span></label>
+                <label class="universe-field universe-label-limit" for="universe-label-magnitude">
+                    <span>Names down to apparent magnitude <output id="universe-label-magnitude-output">+1.5</output></span>
+                    <input id="universe-label-magnitude" type="range" min="-1.5" max="6" step="0.5" value="1.5">
+                    <small>Move right to reveal progressively fainter stars as seen from Earth.</small>
+                </label>
+                <label class="universe-check"><input id="universe-plane" type="checkbox" checked><span>Show celestial equatorial plane</span></label>
+                <label class="universe-check"><input id="universe-directions" type="checkbox" checked><span>Show Milky Way directions</span></label>
+
+                <div class="universe-button-row">
+                    <button id="universe-home" type="button">Return to the Sun</button>
+                    <button id="universe-fullscreen" type="button">Full screen</button>
+                </div>
+
+                <p class="universe-count" id="universe-count" aria-live="polite">Loading stars…</p>
+                <p class="universe-help">Drag to rotate · scroll or pinch to zoom · right-drag to move sideways · select a star for details</p>
+            </aside>
+
+            <div class="universe-stage-wrap" id="universe-stage-wrap">
+                <div class="universe-stage" id="universe-stage" role="application" aria-label="Rotatable three-dimensional map of stars"></div>
+                <div class="universe-loading" id="universe-loading">Building the stellar neighbourhood…</div>
+                <div class="universe-error" id="universe-error" hidden>
+                    <strong>The 3D view could not start.</strong>
+                    <span>Your browser may not support WebGL 2, or the external Three.js library could not be loaded.</span>
+                </div>
+            </div>
+
+            <aside class="universe-details" aria-live="polite">
+                <p class="overline">Selected object</p>
+                <h2 id="universe-object-name">The Sun</h2>
+                <p id="universe-object-description">Our star and the origin of this three-dimensional view.</p>
+                <dl>
+                    <div><dt>Distance</dt><dd id="universe-object-distance">0 ly</dd></div>
+                    <div><dt>Constellation</dt><dd id="universe-object-constellation">Not applicable</dd></div>
+                    <div><dt>Spectral class</dt><dd id="universe-object-spectral">G2V</dd></div>
+                    <div><dt>Temperature</dt><dd id="universe-object-temperature">5,778 K</dd></div>
+                    <div><dt>Luminosity</dt><dd id="universe-object-luminosity">1 L☉</dd></div>
+                    <div><dt>Radius</dt><dd id="universe-object-radius">1 R☉</dd></div>
+                </dl>
+                <button id="universe-fly" type="button">Fly to selected star</button>
+                <a id="universe-hr-link" href="hr-diagram.html?star=Sol">Find in the H–R diagram →</a>
+            </aside>
+        </section>
+
+        <section class="universe-prototype-note">
+            <p class="section-label">How to read the map</p>
+            <h2>Why the two distance modes look different</h2>
+            <p><strong>Linear</strong> preserves proportional distances: a star twice as distant is placed twice as far from the Sun. Because the catalogue spans thousands of light-years while many familiar stars are comparatively nearby, they naturally gather around the centre when the full range is shown. Reduce the maximum distance to open up the solar neighbourhood.</p>
+            <p><strong>Compressed</strong> uses a logarithmic distance scale so nearby and distant stars can be explored together. Direction and distance order remain meaningful, but spacing is no longer proportional.</p>
+            <p>The glowing markers are navigation symbols, not scale models of stellar diameters. Real star radii are far too small compared with the distances between stars to remain visible at this scale; colour reflects approximate surface temperature and marker prominence follows apparent brightness.</p>
+        </section>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script type="module" src="js/3d-universe.js?v=1"></script>
+</body>
+</html>
