@@ -32,6 +32,12 @@
 .universe-segmented input:checked + span { color: #fff; background: rgba(74, 158, 255, .24); border-color: var(--accent); }
 .universe-check { display: flex; align-items: center; gap: .5rem; margin-top: .8rem; color: #c2ccdc; font-size: .72rem; }
 .universe-check input { accent-color: var(--accent); }
+.universe-model-toggle { margin-top: 1rem; padding-top: .8rem; border-top: 1px solid rgba(255, 255, 255, .08); }
+.universe-model-status { margin: .3rem 0 0 1.25rem; color: #758197; font-size: .59rem; line-height: 1.35; }
+.universe-nebula-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .25rem; margin-top: .55rem; }
+.universe-nebula-list[hidden] { display: none; }
+.universe-nebula-list button { min-width: 0; padding: .38rem .2rem; color: #dcecff; background: rgba(137, 106, 255, .12); border: 1px solid rgba(153, 127, 255, .36); border-radius: 4px; font-size: .57rem; cursor: pointer; overflow: hidden; text-overflow: ellipsis; }
+.universe-nebula-list button:disabled { opacity: .42; cursor: wait; }
 .universe-button-row { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; margin-top: 1rem; }
 .universe-count { margin-top: 1rem; color: #b9d9ff; font: .7rem ui-monospace, monospace; }
 .universe-help { margin-top: .7rem; color: #758197; font-size: .66rem; line-height: 1.45; }
@@ -45,6 +51,7 @@
 .universe-star-label.is-selected { color: #fff; background: rgba(36, 104, 180, .84); }
 .universe-direction-label { display: grid; gap: .08rem; padding: .3rem .42rem; color: #fff; background: rgba(3, 7, 15, .82); border-left: 2px solid #79c9ff; border-radius: 2px; font: 600 .65rem system-ui, sans-serif; text-shadow: 0 1px 3px #000; transform: translate(8px, -50%); white-space: nowrap; }
 .universe-direction-label small { color: #9eabc0; font-size: .54rem; font-weight: 500; }
+.universe-nebula-label { padding: .2rem .36rem; color: #fff; background: rgba(55, 24, 83, .82); border: 1px solid rgba(192, 146, 255, .65); border-radius: 999px; font: 700 .61rem system-ui, sans-serif; text-shadow: 0 1px 3px #000; transform: translate(-50%, -50%); white-space: nowrap; }
 .universe-loading, .universe-error { position: absolute; z-index: 5; inset: 0; display: grid; place-content: center; padding: 2rem; color: #cfe4ff; background: #030711; text-align: center; }
 .universe-error { gap: .4rem; color: #ffd4c4; }
 .universe-error span { max-width: 460px; color: var(--text-muted); font-size: .8rem; }
@@ -57,6 +64,8 @@
 .universe-details dd { margin: 0; color: #dce7f5; font-size: .7rem; font-weight: 700; text-align: right; }
 #universe-fly { width: 100%; }
 #universe-hr-link { display: block; margin-top: .6rem; padding: .55rem; color: var(--accent); border: 1px solid rgba(74, 158, 255, .28); border-radius: 5px; text-align: center; text-decoration: none; font-size: .7rem; }
+.universe-source-link { display: block; margin-top: .6rem; padding: .55rem; color: #c4adff; border: 1px solid rgba(166, 126, 255, .32); border-radius: 5px; text-align: center; text-decoration: none; font-size: .7rem; }
+.universe-source-link[hidden], #universe-hr-link[hidden] { display: none; }
 .universe-prototype-note { max-width: 900px; padding: 2rem .25rem 3rem; }
 .universe-prototype-note h2 { margin: .2rem 0 .5rem; font-size: 1.5rem; }
 .universe-prototype-note p:not(.section-label) { color: var(--text-muted); line-height: 1.65; }

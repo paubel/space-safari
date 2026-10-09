@@ -6,7 +6,7 @@
     <meta name="description" content="Explore the three-dimensional positions of nearby and famous stars in the Space Safari stellar catalogue.">
     <title>3D Universe - Space Safari</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/3d-universe.css?v=2">
+    <link rel="stylesheet" href="css/3d-universe.css?v=3">
     <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SL7KJ6J4ZZ"></script>
     <script>
@@ -73,7 +73,7 @@
 
                 <label class="universe-field" for="universe-distance">
                     <span>Maximum distance <output id="universe-distance-output">2,630 ly</output></span>
-                    <input id="universe-distance" type="range" min="0.7" max="3.42" step="0.01" value="3.42">
+                    <input id="universe-distance" type="range" min="0.7" max="4.35" step="0.01" value="3.42">
                 </label>
 
                 <label class="universe-field" for="universe-spectral">
@@ -99,6 +99,9 @@
                 </label>
                 <label class="universe-check"><input id="universe-plane" type="checkbox" checked><span>Show celestial equatorial plane</span></label>
                 <label class="universe-check"><input id="universe-directions" type="checkbox" checked><span>Show Milky Way directions</span></label>
+                <label class="universe-check universe-model-toggle"><input id="universe-nebulae" type="checkbox"><span>Load three NASA 3D nebula/remnant models</span></label>
+                <p class="universe-model-status" id="universe-model-status">Optional external download · about 5 MB</p>
+                <div class="universe-nebula-list" id="universe-nebula-list" hidden></div>
 
                 <div class="universe-button-row">
                     <button id="universe-home" type="button">Return to the Sun</button>
@@ -123,15 +126,16 @@
                 <h2 id="universe-object-name">The Sun</h2>
                 <p id="universe-object-description">Our star and the origin of this three-dimensional view.</p>
                 <dl>
-                    <div><dt>Distance</dt><dd id="universe-object-distance">0 ly</dd></div>
-                    <div><dt>Constellation</dt><dd id="universe-object-constellation">Not applicable</dd></div>
-                    <div><dt>Spectral class</dt><dd id="universe-object-spectral">G2V</dd></div>
-                    <div><dt>Temperature</dt><dd id="universe-object-temperature">5,778 K</dd></div>
-                    <div><dt>Luminosity</dt><dd id="universe-object-luminosity">1 L☉</dd></div>
-                    <div><dt>Radius</dt><dd id="universe-object-radius">1 R☉</dd></div>
+                    <div><dt id="universe-label-distance">Distance</dt><dd id="universe-object-distance">0 ly</dd></div>
+                    <div><dt id="universe-label-constellation">Constellation</dt><dd id="universe-object-constellation">Not applicable</dd></div>
+                    <div><dt id="universe-label-spectral">Spectral class</dt><dd id="universe-object-spectral">G2V</dd></div>
+                    <div><dt id="universe-label-temperature">Temperature</dt><dd id="universe-object-temperature">5,778 K</dd></div>
+                    <div><dt id="universe-label-luminosity">Luminosity</dt><dd id="universe-object-luminosity">1 L☉</dd></div>
+                    <div><dt id="universe-label-radius">Radius</dt><dd id="universe-object-radius">1 R☉</dd></div>
                 </dl>
                 <button id="universe-fly" type="button">Fly to selected star</button>
                 <a id="universe-hr-link" href="hr-diagram.html?star=Sol">Find in the H–R diagram →</a>
+                <a id="universe-source-link" class="universe-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Open NASA model source →</a>
             </aside>
         </section>
 
@@ -145,6 +149,6 @@
     </main>
 
     <script src="js/main.js"></script>
-    <script type="module" src="js/3d-universe.js?v=1"></script>
+    <script type="module" src="js/3d-universe.js?v=2"></script>
 </body>
 </html>
