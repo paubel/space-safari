@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { STLLoader } from 'three/addons/loaders/STLLoader.js';
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { STARS } from '../data/astrophoto/interactive-stars.js?v=3d-prototype-1';
 
 const stage = document.querySelector('#universe-stage');
@@ -58,32 +55,38 @@ const details = {
 
 const NEBULAE = [
   {
-    name: 'Crab Nebula', shortName: 'Crab', ra: 83.6333, dec: 22.0144, distance: 6500,
-    constellation: 'Taurus', type: 'Supernova remnant and pulsar', format: 'glb', colour: 0x79b8ff,
-    description: 'The expanding remains of the supernova observed in 1054. NASA’s model uses Chandra X-ray data to show the pulsar, energetic disc, and opposing particle jets.',
-    modelUrl: 'https://raw.githubusercontent.com/nasa/NASA-3D-Resources/master/3D%20Printing/Crab%20Nebula/Crab%20Nebula.glb',
-    sourceUrl: 'https://science.nasa.gov/3d-resources/crab-nebula/'
+    name: 'Orion Nebula (M42)', shortName: 'Orion Nebula (M42)', ra: 83.8221, dec: -5.3911, distance: 1344,
+    constellation: 'Orion', type: 'Diffuse emission and reflection nebula', format: 'volume', colour: 0x73b9ff,
+    description: 'A diffuse, freely rotatable volume inspired by the Orion Nebula’s glowing cavity and dusty clouds. This is a science-informed visual interpretation—not a measured three-dimensional density map.',
+    sourceUrl: 'https://svs.gsfc.nasa.gov/30957/', representation: 'Science-informed procedural volume', volumeShape: 'cloud', displayScale: [11.5, 8.3, 9.5]
   },
   {
-    name: 'Eta Carinae Homunculus Nebula', shortName: 'Eta Carinae', ra: 161.26496, dec: -59.68452, distance: 7500,
-    constellation: 'Carina', type: 'Bipolar emission and reflection nebula', format: 'stl', colour: 0xffa05f,
-    description: 'A bipolar cloud expelled during Eta Carinae’s nineteenth-century Great Eruption. The scientific surface model reconstructs the expanding lobes from observations.',
-    modelUrl: 'https://raw.githubusercontent.com/nasa/NASA-3D-Resources/master/3D%20Printing/Eta%20Carinae%20Homunculus%20Nebula/Eta%20Carinae%20Homunculus%20Nebula.stl',
-    sourceUrl: 'https://science.nasa.gov/3d-resources/eta-carinae-homunculus-nebula/'
+    name: 'Ring Nebula (M57)', shortName: 'Ring Nebula (M57)', ra: 283.39613, dec: 33.02918, distance: 2300,
+    constellation: 'Lyra', type: 'Planetary nebula', format: 'volume', colour: 0x61e0d0,
+    description: 'A diffuse volumetric interpretation of M57’s ionised central ring, fainter outer gas, and hollow bipolar structure. Its position and distance follow NASA data; the enlarged gas distribution is a science-informed visualisation, not a measured three-dimensional density map.',
+    sourceUrl: 'https://science.nasa.gov/asset/hubble/compass-and-scale-image-for-ring-nebula-hst-only/', representation: 'Science-informed procedural volume', volumeShape: 'ring', displayScale: [7.8, 7.8, 6.2]
   },
   {
-    name: 'G292.0+1.8', shortName: 'G292.0+1.8', ra: 171.15, dec: -59.2667, distance: 20000,
-    constellation: 'Centaurus', type: 'Oxygen-rich supernova remnant', format: 'glb', colour: 0xa882ff,
-    description: 'An oxygen-rich debris field from a massive stellar explosion. The model reveals an asymmetric remnant shaped in part by a reverse shock moving back toward the explosion site.',
-    modelUrl: 'https://raw.githubusercontent.com/nasa/NASA-3D-Resources/master/3D%20Models/G292.0%2B1.8%20Supernova%20Remnant/G292.0%2B1.8%20Supernova%20Remnant.glb',
-    sourceUrl: 'https://science.nasa.gov/3d-resources/g292-01-8-supernova-remnant/'
+    name: 'The Pleiades (M45)', shortName: 'The Pleiades (M45)', ra: 56.75, dec: 24.1167, distance: 445,
+    constellation: 'Taurus', type: 'Open star cluster and reflection nebulosity', format: 'volume', colour: 0x83b9ff,
+    description: 'The Seven Sisters embedded in wisps of blue reflection nebulosity. The bright stars are arranged to evoke the familiar cluster, while the dust is a science-informed procedural interpretation rather than a measured three-dimensional density map.',
+    sourceUrl: 'https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-45/', representation: 'Procedural reflection nebulosity and cluster stars', volumeShape: 'cluster', displayScale: [10.5, 8.5, 7.5]
+  },
+  {
+    name: 'Dumbbell Nebula (M27)', shortName: 'Dumbbell Nebula (M27)', ra: 299.90108, dec: 22.721, distance: 1240,
+    constellation: 'Vulpecula', type: 'Planetary nebula', format: 'volume', colour: 0x63e2e0,
+    description: 'A translucent interpretation of M27’s bright double-lobed body, central cavity, clumpy gas, and fainter outer envelope. Its sky position and distance follow NASA data; the enlarged volume is a science-informed visualisation, not a measured three-dimensional density map.',
+    sourceUrl: 'https://science.nasa.gov/asset/hubble/the-dumbbell-nebula-m27/', representation: 'Science-informed procedural bipolar volume', volumeShape: 'dumbbell', displayScale: [4.2, 5.2, 3.9]
+  },
+  {
+    name: 'Rho Ophiuchi Cloud Complex', shortName: 'Rho Ophiuchi', ra: 246.62733, dec: -24.38449, distance: 440,
+    constellation: 'Ophiuchus', type: 'Dark, reflection, and star-forming molecular clouds', format: 'volume', colour: 0xe5b06c,
+    description: 'A layered interpretation of the nearby Rho Ophiuchi star-forming complex, combining blue reflection nebulosity, warm illuminated dust, dark molecular lanes, and embedded young stars. Position and approximate distance follow NASA and ESA data; the volume is an artistic, science-informed reconstruction.',
+    sourceUrl: 'https://science.nasa.gov/asset/webb/rho-ophiuchi-nircam-image/', representation: 'Procedural multi-cloud star-forming region', volumeShape: 'rho', displayScale: [8.8, 6.6, 7.0]
   }
 ];
 
-const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/libs/draco/gltf/');
-const gltfLoader = new GLTFLoader();
-gltfLoader.setDRACOLoader(dracoLoader);
+const volumeMaterials = [];
 
 const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 const integer = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
@@ -324,26 +327,185 @@ function normaliseModel(model, targetSize = 9) {
   return model;
 }
 
-async function loadNebulaModel(nebula) {
-  let model;
-  if (nebula.format === 'glb') {
-    const result = await gltfLoader.loadAsync(nebula.modelUrl);
-    model = result.scene;
-  } else {
-    const geometry = await new STLLoader().loadAsync(nebula.modelUrl);
-    geometry.computeVertexNormals();
-    model = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
-      color: nebula.colour,
-      emissive: new THREE.Color(nebula.colour).multiplyScalar(.16),
-      transparent: true,
-      opacity: .82,
-      side: THREE.DoubleSide,
-      shininess: 24
+function createDiffuseNebulaVolume(nebula) {
+  const uniforms = {
+    uTime: { value: 0 },
+    uCameraLocal: { value: new THREE.Vector3() },
+    uShape: { value: nebula.volumeShape === 'ring' ? 1 : nebula.volumeShape === 'cluster' ? 2 : nebula.volumeShape === 'dumbbell' ? 3 : nebula.volumeShape === 'rho' ? 4 : 0 }
+  };
+  const material = new THREE.ShaderMaterial({
+    uniforms,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.FrontSide,
+    blending: THREE.NormalBlending,
+    vertexShader: `
+      varying vec3 vLocalPosition;
+      void main() {
+        vLocalPosition = position;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      precision highp float;
+      varying vec3 vLocalPosition;
+      uniform vec3 uCameraLocal;
+      uniform float uTime;
+      uniform int uShape;
+
+      float hash(vec3 p) {
+        p = fract(p * .1031);
+        p += dot(p, p.yzx + 33.33);
+        return fract((p.x + p.y) * p.z);
+      }
+      float noise(vec3 p) {
+        vec3 i = floor(p), f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(mix(hash(i), hash(i + vec3(1,0,0)), f.x),
+                       mix(hash(i + vec3(0,1,0)), hash(i + vec3(1,1,0)), f.x), f.y),
+                   mix(mix(hash(i + vec3(0,0,1)), hash(i + vec3(1,0,1)), f.x),
+                       mix(hash(i + vec3(0,1,1)), hash(i + vec3(1,1,1)), f.x), f.y), f.z);
+      }
+      float fbm(vec3 p) {
+        float value = 0.0, amplitude = .55;
+        for (int i = 0; i < 5; i++) {
+          value += amplitude * noise(p);
+          p = p * 2.03 + vec3(7.1, 3.4, 5.8);
+          amplitude *= .5;
+        }
+        return value;
+      }
+      float densityAt(vec3 p) {
+        if (uShape == 1) {
+          float majorRadius = .52;
+          float torusDistance = length(vec2(length(p.xy) - majorRadius, p.z * 1.35));
+          float brokenRing = fbm(p * 8.5 + vec3(1.7, 4.2, 2.3));
+          float ring = smoothstep(.25, .035, torusDistance) * smoothstep(.24, .62, brokenRing);
+          float innerGas = smoothstep(.72, .08, length(p * vec3(.9, .9, 1.5))) * .17;
+          float halo = smoothstep(1.0, .48, length(p)) * smoothstep(.48, .78, fbm(p * 4.2)) * .18;
+          return ring + innerGas + halo;
+        }
+        if (uShape == 2) {
+          vec3 stretched = p * vec3(.72, 1.25, 1.05);
+          float broadCloud = smoothstep(1.0, .2, length(stretched));
+          float wisps = smoothstep(.47, .76, fbm(p * 5.1 + vec3(p.y * 1.8, 1.2, p.x * 1.4)));
+          float lanes = .55 + .45 * sin((p.x + p.y * .38) * 15.0 + fbm(p * 6.0) * 5.0);
+          return broadCloud * wisps * lanes * .72;
+        }
+        if (uShape == 3) {
+          float upper = length((p - vec3(0.0,.34,0.0)) * vec3(1.28,.76,1.18));
+          float lower = length((p + vec3(0.0,.34,0.0)) * vec3(1.28,.76,1.18));
+          float lobes = max(smoothstep(.76,.2,upper), smoothstep(.76,.2,lower));
+          float hollow = smoothstep(.12,.4,length(p * vec3(1.15,.72,1.15)));
+          float knots = smoothstep(.33,.73,fbm(p * 7.4 + vec3(4.1,1.3,6.2)));
+          float envelope = smoothstep(1.0,.46,length(p * vec3(.92,.72,1.05))) * .2;
+          return lobes * hollow * (.42 + knots * .8) + envelope;
+        }
+        if (uShape == 4) {
+          float blueCloud = smoothstep(.72,.13,length((p - vec3(-.3,.12,.03)) * vec3(.92,1.35,1.05)));
+          float amberCloud = smoothstep(.78,.16,length((p - vec3(.34,-.08,.06)) * vec3(.78,1.2,1.0)));
+          float streamer = smoothstep(.3,.045,abs(p.y + p.x * .34 + .06)) * smoothstep(.95,.1,length(p.xz));
+          float textureNoise = smoothstep(.34,.74,fbm(p * 6.2 + vec3(5.2,1.1,3.7)));
+          float darkLane = smoothstep(.13,.34,abs(p.y - p.x * .18 + .04));
+          float envelope = smoothstep(1.0,.28,length(p * vec3(.72,1.18,1.0)));
+          return (blueCloud * .68 + amberCloud * .72 + streamer * .36) * textureNoise * darkLane * envelope;
+        }
+        vec3 q = vec3(p.x * .78, p.y * 1.12, p.z * .9);
+        float envelope = smoothstep(1.0, .18, length(q));
+        float cavity = smoothstep(.12, .55, length((p - vec3(-.18,.08,.04)) * vec3(1.0,1.35,1.0)));
+        float folds = fbm(p * 3.15 + vec3(0.0, 0.0, uTime * .006));
+        float filament = fbm(p * 7.0 - vec3(2.0, 1.0, 3.0));
+        return envelope * cavity * smoothstep(.37, .82, folds * .78 + filament * .34);
+      }
+      void main() {
+        vec3 rayDirection = normalize(vLocalPosition - uCameraLocal);
+        vec3 samplePoint = vLocalPosition;
+        vec4 accumulated = vec4(0.0);
+        const float stepSize = .037;
+        for (int i = 0; i < 58; i++) {
+          if (length(samplePoint) > 1.03 && i > 2) break;
+          float density = densityAt(samplePoint);
+          float warm = smoothstep(-.45, .65, samplePoint.y + noise(samplePoint * 2.2));
+          vec3 colour = uShape == 1
+            ? mix(vec3(.08,.72,.78), vec3(1.0,.24,.18), smoothstep(.42,.82,length(samplePoint.xy)))
+            : uShape == 2
+              ? mix(vec3(.08,.22,.72), vec3(.56,.82,1.0), warm)
+              : uShape == 3
+                ? mix(vec3(.12,.78,.84), vec3(.95,.2,.18), smoothstep(.38,.9,length(samplePoint)))
+                : uShape == 4
+                  ? mix(vec3(.18,.38,.92), vec3(1.0,.48,.12), smoothstep(-.3,.45,samplePoint.x + noise(samplePoint * 3.0) * .24))
+                  : mix(vec3(.12,.28,.82), vec3(1.0,.28,.18), warm);
+          colour = mix(colour, vec3(.76,.91,1.0), pow(density, 2.2) * .55);
+          float alpha = density * (uShape == 4 ? .16 : .095) * (1.0 - accumulated.a);
+          accumulated.rgb += colour * alpha;
+          accumulated.a += alpha;
+          samplePoint += rayDirection * stepSize;
+        }
+        accumulated.rgb += vec3(.16,.3,.75) * pow(max(0.0, 1.0 - length(vLocalPosition)), 3.0) * .12;
+        if (accumulated.a < .012) discard;
+        gl_FragColor = vec4(accumulated.rgb, min(accumulated.a, .82));
+      }
+    `
+  });
+  const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 72, 48), material);
+  mesh.scale.fromArray(nebula.displayScale || [9, 9, 9]);
+  mesh.rotation.set(
+    nebula.volumeShape === 'ring' ? -.48 : -.24,
+    nebula.volumeShape === 'ring' ? .22 : .38,
+    nebula.volumeShape === 'ring' ? 1.05 : -.18
+  );
+  mesh.userData.volumeUniforms = uniforms;
+  volumeMaterials.push({ mesh, uniforms });
+  if (nebula.volumeShape === 'dumbbell') {
+    const group = new THREE.Group();
+    group.add(mesh);
+    const centralStar = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: createStarTexture(), color: 0xd9efff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
     }));
+    centralStar.scale.setScalar(.75);
+    group.add(centralStar);
+    return group;
   }
+  if (nebula.volumeShape === 'rho') {
+    const group = new THREE.Group();
+    group.add(mesh);
+    const starTexture = createStarTexture();
+    const youngStars = [[-1.8,.7,.15,.66],[-.85,1.05,-.2,.5],[.1,.35,.35,.74],[1.15,-.35,-.15,.48],[2.0,.25,.22,.58],[-.2,-1.0,.1,.42]];
+    youngStars.forEach(([x,y,z,size]) => {
+      const star = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: starTexture, color: 0xffe8bd, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+      }));
+      star.position.set(x,y,z);
+      star.scale.setScalar(size);
+      group.add(star);
+    });
+    return group;
+  }
+  if (nebula.volumeShape !== 'cluster') return mesh;
+
+  const group = new THREE.Group();
+  group.add(mesh);
+  const starTexture = createStarTexture();
+  const sisters = [
+    [-3.1, 1.1, .2, 1.25], [-1.5, 2.4, -.4, 1.05], [.15, 1.35, .3, 1.2],
+    [1.65, 2.15, -.15, 1.0], [2.7, .45, .35, 1.15], [.7, -.65, -.5, .95], [-1.55, -.9, .45, .9]
+  ];
+  sisters.forEach(([x, y, z, size]) => {
+    const star = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: starTexture, color: 0xc5dcff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+    }));
+    star.position.set(x, y, z);
+    star.scale.setScalar(size);
+    group.add(star);
+  });
+  return group;
+}
+
+async function loadNebulaModel(nebula) {
+  const model = createDiffuseNebulaVolume(nebula);
 
   const pivot = new THREE.Group();
-  pivot.add(normaliseModel(model));
+  pivot.add(model);
   pivot.position.copy(displayPositionForObject(nebula));
   pivot.userData.nebula = nebula;
   pivot.traverse(child => { child.userData.nebula = nebula; });
@@ -368,7 +530,7 @@ async function loadNebulaModel(nebula) {
 let nebulaLoadPromise;
 async function loadNebulae() {
   if (nebulaLoadPromise) return nebulaLoadPromise;
-  controlsUi.nebulaStatus.textContent = 'Loading three scientific models from NASA…';
+  controlsUi.nebulaStatus.textContent = 'Building five diffuse objects…';
   controlsUi.nebulae.disabled = true;
   nebulaLoadPromise = Promise.allSettled(NEBULAE.map(async nebula => {
     nebula.physicalPosition = physicalPositionForCoordinates(nebula.ra, nebula.dec, nebula.distance);
@@ -377,8 +539,8 @@ async function loadNebulae() {
     const loaded = results.filter(result => result.status === 'fulfilled').length;
     controlsUi.nebulae.disabled = false;
     controlsUi.nebulaStatus.textContent = loaded === NEBULAE.length
-      ? 'Three NASA scientific models loaded'
-      : `${loaded} of ${NEBULAE.length} NASA models loaded`;
+      ? 'Five diffuse objects loaded'
+      : `${loaded} of ${NEBULAE.length} nebula models loaded`;
     controlsUi.nebulaList.hidden = loaded === 0;
     updatePositions();
     return results;
@@ -520,8 +682,8 @@ function selectNebula(nebula, fly = false) {
   details.distance.textContent = formatValue(nebula.distance, 'ly', 0);
   details.constellation.textContent = nebula.constellation;
   details.spectral.textContent = nebula.type;
-  details.temperature.textContent = 'NASA 3D Resources';
-  details.luminosity.textContent = 'Scientific reconstruction';
+  details.temperature.textContent = nebula.format === 'volume' ? 'NASA visualization reference' : 'NASA 3D Resources';
+  details.luminosity.textContent = nebula.representation || 'Scientific reconstruction';
   details.radius.textContent = 'Enlarged for navigation';
   details.hr.hidden = true;
   details.source.href = nebula.sourceUrl;
@@ -593,6 +755,10 @@ function animate(time) {
   animationFrame = requestAnimationFrame(animate);
   updateFlight(time);
   orbit.update();
+  volumeMaterials.forEach(({ mesh, uniforms }) => {
+    uniforms.uTime.value = time * .001;
+    uniforms.uCameraLocal.value.copy(mesh.worldToLocal(camera.position.clone()));
+  });
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
 }
@@ -634,7 +800,6 @@ function bindEvents() {
   controlsUi.search.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); findStar(); } });
   controlsUi.scale.forEach(input => input.addEventListener('change', () => {
     scaleMode = input.value;
-    controlsUi.distance.value = scaleMode === 'linear' ? '2' : controlsUi.nebulae.checked ? '4.31' : '3.42';
     updatePositions();
   }));
   controlsUi.distance.addEventListener('input', () => {
@@ -648,7 +813,7 @@ function bindEvents() {
   controlsUi.directions.addEventListener('change', () => { directionGroup.visible = controlsUi.directions.checked; });
   controlsUi.nebulae.addEventListener('change', async () => {
     if (controlsUi.nebulae.checked) {
-      controlsUi.distance.value = '4.31';
+      controlsUi.distance.value = '3.42';
       await loadNebulae();
     }
     updatePositions();
