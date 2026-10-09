@@ -58,31 +58,31 @@ const NEBULAE = [
     name: 'Orion Nebula (M42)', shortName: 'Orion Nebula (M42)', ra: 83.8221, dec: -5.3911, distance: 1344,
     constellation: 'Orion', type: 'Diffuse emission and reflection nebula', format: 'volume', colour: 0x73b9ff,
     description: 'A diffuse, freely rotatable volume inspired by the Orion Nebula’s glowing cavity and dusty clouds. This is a science-informed visual interpretation—not a measured three-dimensional density map.',
-    sourceUrl: 'https://svs.gsfc.nasa.gov/30957/', representation: 'Science-informed procedural volume', volumeShape: 'cloud', displayScale: [11.5, 8.3, 9.5]
+    sourceUrl: 'https://svs.gsfc.nasa.gov/30957/', representation: 'Science-informed procedural volume', volumeShape: 'cloud', displayScale: [11.5, 8.3, 9.5], physicalSizeLy: 2.5
   },
   {
     name: 'Ring Nebula (M57)', shortName: 'Ring Nebula (M57)', ra: 283.39613, dec: 33.02918, distance: 2300,
     constellation: 'Lyra', type: 'Planetary nebula', format: 'volume', colour: 0x61e0d0,
     description: 'A diffuse volumetric interpretation of M57’s ionised central ring, fainter outer gas, and hollow bipolar structure. Its position and distance follow NASA data; the enlarged gas distribution is a science-informed visualisation, not a measured three-dimensional density map.',
-    sourceUrl: 'https://science.nasa.gov/asset/hubble/compass-and-scale-image-for-ring-nebula-hst-only/', representation: 'Science-informed procedural volume', volumeShape: 'ring', displayScale: [7.8, 7.8, 6.2]
+    sourceUrl: 'https://science.nasa.gov/asset/hubble/compass-and-scale-image-for-ring-nebula-hst-only/', representation: 'Science-informed procedural volume', volumeShape: 'ring', displayScale: [7.8, 7.8, 6.2], physicalSizeLy: 1
   },
   {
     name: 'The Pleiades (M45)', shortName: 'The Pleiades (M45)', ra: 56.75, dec: 24.1167, distance: 445,
     constellation: 'Taurus', type: 'Open star cluster and reflection nebulosity', format: 'volume', colour: 0x83b9ff,
     description: 'The Seven Sisters embedded in wisps of blue reflection nebulosity. The bright stars are arranged to evoke the familiar cluster, while the dust is a science-informed procedural interpretation rather than a measured three-dimensional density map.',
-    sourceUrl: 'https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-45/', representation: 'Procedural reflection nebulosity and cluster stars', volumeShape: 'cluster', displayScale: [10.5, 8.5, 7.5]
+    sourceUrl: 'https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-45/', representation: 'Procedural reflection nebulosity and cluster stars', volumeShape: 'cluster', displayScale: [10.5, 8.5, 7.5], physicalSizeLy: 13
   },
   {
     name: 'Dumbbell Nebula (M27)', shortName: 'Dumbbell Nebula (M27)', ra: 299.90108, dec: 22.721, distance: 1240,
     constellation: 'Vulpecula', type: 'Planetary nebula', format: 'volume', colour: 0x63e2e0,
     description: 'A translucent interpretation of M27’s bright double-lobed body, central cavity, clumpy gas, and fainter outer envelope. Its sky position and distance follow NASA data; the enlarged volume is a science-informed visualisation, not a measured three-dimensional density map.',
-    sourceUrl: 'https://science.nasa.gov/asset/hubble/the-dumbbell-nebula-m27/', representation: 'Science-informed procedural bipolar volume', volumeShape: 'dumbbell', displayScale: [4.2, 5.2, 3.9]
+    sourceUrl: 'https://science.nasa.gov/asset/hubble/the-dumbbell-nebula-m27/', representation: 'Science-informed procedural bipolar volume', volumeShape: 'dumbbell', displayScale: [4.2, 5.2, 3.9], physicalSizeLy: 4.5
   },
   {
     name: 'Rho Ophiuchi Cloud Complex', shortName: 'Rho Ophiuchi', ra: 246.62733, dec: -24.38449, distance: 440,
     constellation: 'Ophiuchus', type: 'Dark, reflection, and star-forming molecular clouds', format: 'volume', colour: 0xe5b06c,
     description: 'A layered interpretation of the nearby Rho Ophiuchi star-forming complex, combining blue reflection nebulosity, warm illuminated dust, dark molecular lanes, and embedded young stars. Position and approximate distance follow NASA and ESA data; the volume is an artistic, science-informed reconstruction.',
-    sourceUrl: 'https://science.nasa.gov/asset/webb/rho-ophiuchi-nircam-image/', representation: 'Procedural multi-cloud star-forming region', volumeShape: 'rho', displayScale: [8.8, 6.6, 7.0]
+    sourceUrl: 'https://science.nasa.gov/asset/webb/rho-ophiuchi-nircam-image/', representation: 'Procedural multi-cloud star-forming region', volumeShape: 'rho', displayScale: [8.8, 6.6, 7.0], physicalSizeLy: 30
   }
 ];
 
@@ -513,13 +513,33 @@ async function loadNebulaModel(nebula) {
   const labelElement = document.createElement('span');
   labelElement.className = 'universe-nebula-label';
   labelElement.textContent = nebula.shortName;
+  labelElement.role = 'button';
+  labelElement.tabIndex = 0;
+  labelElement.title = `Select ${nebula.name}`;
+  labelElement.addEventListener('click', event => {
+    event.stopPropagation();
+    selectNebula(nebula);
+  });
+  labelElement.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      selectNebula(nebula);
+    }
+  });
   const label = new CSS2DObject(labelElement);
   label.position.set(0, 6, 0);
   pivot.add(label);
 
   nebula.physicalPosition = physicalPositionForCoordinates(nebula.ra, nebula.dec, nebula.distance);
   scene.add(pivot);
-  const item = { nebula, model: pivot, label, labelElement };
+  const hitTarget = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 12, 8),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+  );
+  hitTarget.position.copy(pivot.position);
+  hitTarget.userData.nebula = nebula;
+  scene.add(hitTarget);
+  const item = { nebula, model: pivot, hitTarget, label, labelElement };
   nebulaObjects.push(item);
   const button = controlsUi.nebulaList.querySelector(`[data-nebula="${nebula.shortName}"]`);
   if (button) button.disabled = false;
@@ -553,6 +573,7 @@ function updateVisibleNebulae() {
   nebulaObjects.forEach(item => {
     const visible = controlsUi.nebulae.checked && item.nebula.distance <= maximum;
     item.model.visible = visible;
+    item.hitTarget.visible = visible;
     item.label.visible = visible;
   });
 }
@@ -590,12 +611,23 @@ function updatePositions() {
     item.sprite.scale.setScalar(markerSize(item.star));
     item.sprite.material.opacity = scaleMode === 'linear' ? .78 : 1;
   });
-  nebulaObjects.forEach(item => item.model.position.copy(displayPositionForObject(item.nebula)));
+  nebulaObjects.forEach(item => {
+    item.model.position.copy(displayPositionForObject(item.nebula));
+    item.hitTarget.position.copy(item.model.position);
+    item.hitTarget.scale.setScalar(scaleMode === 'linear' ? 2.2 : 5);
+    if (scaleMode === 'linear') {
+      const physicalDisplayDiameter = Number(item.nebula.physicalSizeLy) * (80 / maximumDistance());
+      const navigationDiameter = Math.max(...item.nebula.displayScale) * 2;
+      item.model.scale.setScalar(Math.max(.03, physicalDisplayDiameter / navigationDiameter));
+    } else {
+      item.model.scale.setScalar(1);
+    }
+  });
   if (selected) updateSelectionLine();
   updateVisibleStars();
   controlsUi.scaleNote.innerHTML = scaleMode === 'linear'
-    ? `<strong>Linear distance · ${integer.format(Math.round(maximumDistance()))} ly volume</strong><span>Distances remain proportional inside the selected volume. Reduce the range to separate the solar neighbourhood.</span>`
-    : '<strong>Compressed distance</strong><span>Direction and distance order are preserved; separation is logarithmically compressed.</span>';
+    ? `<strong>Linear distance · ${integer.format(Math.round(maximumDistance()))} ly volume</strong><span>Distances and deep-sky spans are proportional. A tiny minimum marker keeps the smallest nebulae selectable.</span>`
+    : '<strong>Compressed distance</strong><span>Direction and distance order are preserved; spacing is logarithmically compressed and deep-sky objects are enlarged for exploration.</span>';
 }
 
 let selectionLine;
@@ -675,7 +707,7 @@ function selectNebula(nebula, fly = false) {
   selected = nebula;
   setDetailLabels({
     distance: 'Distance', constellation: 'Constellation', spectral: 'Object type',
-    temperature: '3D source', luminosity: 'Representation', radius: 'Display scale'
+    temperature: '3D source', luminosity: 'Representation', radius: 'Approx. physical span'
   });
   details.name.textContent = nebula.name;
   details.description.textContent = nebula.description;
@@ -684,7 +716,7 @@ function selectNebula(nebula, fly = false) {
   details.spectral.textContent = nebula.type;
   details.temperature.textContent = nebula.format === 'volume' ? 'NASA visualization reference' : 'NASA 3D Resources';
   details.luminosity.textContent = nebula.representation || 'Scientific reconstruction';
-  details.radius.textContent = 'Enlarged for navigation';
+  details.radius.textContent = `≈ ${number.format(nebula.physicalSizeLy)} ly`;
   details.hr.hidden = true;
   details.source.href = nebula.sourceUrl;
   details.source.hidden = false;
@@ -700,7 +732,7 @@ function flyToStar(star) {
   if (!targetObject) return;
   const destinationTarget = targetObject.position.clone();
   const direction = camera.position.clone().sub(orbit.target).normalize();
-  const offset = /^(sun|sol)/i.test(star.name) ? 105 : nebulaItem ? 28 : 22;
+  const offset = /^(sun|sol)/i.test(star.name) ? 105 : nebulaItem ? (scaleMode === 'linear' ? 5 : 28) : 22;
   flight = {
     started: performance.now(),
     duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 900,
@@ -734,7 +766,7 @@ function pointerSelection(event) {
   pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
   raycaster.setFromCamera(pointer, camera);
   const starCandidates = starObjects.filter(item => item.sprite.visible).map(item => item.sprite);
-  const nebulaCandidates = nebulaObjects.filter(item => item.model.visible).map(item => item.model);
+  const nebulaCandidates = nebulaObjects.filter(item => item.model.visible).flatMap(item => [item.hitTarget, item.model]);
   const hit = raycaster.intersectObjects([...starCandidates, ...nebulaCandidates], true)[0];
   if (hit?.object?.userData?.star) selectStar(hit.object.userData.star);
   else if (hit?.object?.userData?.nebula) selectNebula(hit.object.userData.nebula);
@@ -772,7 +804,7 @@ function resetView() {
   controlsUi.labelMagnitude.value = '1.5';
   controlsUi.plane.checked = true;
   controlsUi.directions.checked = true;
-  controlsUi.nebulae.checked = false;
+  controlsUi.nebulae.checked = true;
   planeGrid.visible = true;
   directionGroup.visible = true;
   camera.position.set(70, 48, 105);
@@ -793,7 +825,7 @@ function bindEvents() {
     button.textContent = nebula.shortName;
     button.dataset.nebula = nebula.shortName;
     button.disabled = true;
-    button.addEventListener('click', () => selectNebula(nebula, true));
+    button.addEventListener('click', () => selectNebula(nebula));
     return button;
   }));
   controlsUi.find.addEventListener('click', findStar);
@@ -843,6 +875,7 @@ try {
   bindEvents();
   resize();
   resetView();
+  loadNebulae();
   loading.hidden = true;
   animate(performance.now());
 } catch (error) {
