@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { STARS } from '../data/astrophoto/interactive-stars.js?v=3d-prototype-1';
 
 const stage = document.querySelector('#universe-stage');
@@ -85,10 +86,28 @@ const NEBULAE = [
     sourceUrl: 'https://science.nasa.gov/asset/webb/rho-ophiuchi-nircam-image/', representation: 'Procedural multi-cloud star-forming region', volumeShape: 'rho', displayScale: [8.8, 6.6, 7.0], physicalSizeLy: 30
   },
   {
+    name: 'North America Nebula (NGC 7000)', shortName: 'North America Nebula (NGC 7000)', ra: 314.695833, dec: 44.33, distance: 1800,
+    constellation: 'Cygnus', type: 'H II emission nebula and star-forming region', format: 'volume', colour: 0xe96d66,
+    description: 'A broad, relatively shallow interpretation of NGC 7000’s glowing hydrogen clouds, eroded ionisation fronts, and opaque molecular dust. The dark Gulf of Mexico region is represented as a foreground lane cutting into the brighter gas. Position, approximate distance, and 50-light-year span follow SIMBAD and NASA data; the depth structure is science-informed rather than a measured three-dimensional density map.',
+    sourceUrl: 'https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-caldwell-catalog/caldwell-20/', representation: 'Procedural flattened H II-region volume', volumeShape: 'northamerica', displayScale: [10.5, 12.0, 4.8], physicalSizeLy: 50
+  },
+  {
     name: 'Crab Nebula (M1)', shortName: 'Crab Nebula (M1)', ra: 83.63308, dec: 22.0145, distance: 6500,
     constellation: 'Taurus', type: 'Supernova remnant and pulsar wind nebula', format: 'volume', colour: 0xff855f,
     description: 'A filament-rich interpretation of the expanding remnant of the supernova observed in 1054, with warm outer ejecta, a blue energetic interior, and its central pulsar. Position, distance, and physical span follow NASA data; the internal volume is a science-informed visualisation.',
     sourceUrl: 'https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-1/', representation: 'Procedural filamentary supernova-remnant volume', volumeShape: 'crab', displayScale: [7.0, 5.3, 5.0], physicalSizeLy: 10
+  },
+  {
+    name: 'Carina Nebula (NGC 3372)', shortName: 'Carina Nebula (NGC 3372)', ra: 161.2854, dec: -59.8678, distance: 7500,
+    constellation: 'Carina', type: 'Giant emission nebula and star-forming complex', format: 'volume', colour: 0xd87a67,
+    description: 'NGC 3372 is a vast, turbulent stellar nursery more than 300 light-years across. This layered volume evokes its ionised cavities, illuminated cloud walls, embedded clusters, and obscuring molecular dust. The much smaller Homunculus Nebula and Eta Carinae A/B are positioned separately within this volume.',
+    sourceUrl: 'https://science.nasa.gov/missions/hubble/dark-clouds-of-the-carina-nebula/', representation: 'Procedural large-scale star-forming complex', volumeShape: 'carina', displayScale: [15.0, 11.5, 10.0], physicalSizeLy: 300
+  },
+  {
+    name: 'Homunculus Nebula and Eta Carinae A/B', shortName: 'Homunculus + Eta Car A/B', ra: 161.265, dec: -59.684167, distance: 7500,
+    constellation: 'Carina · inside NGC 3372', type: 'Bipolar ejecta nebula and massive binary system', format: 'volume', colour: 0xffad62,
+    description: 'The roughly 0.7-light-year Homunculus lies inside the much larger Carina Nebula and surrounds the highly eccentric 5.5-year binary Eta Carinae. Its shell uses the observation-based ESO/VLT reconstruction by Steffen and collaborators, including asymmetric polar trenches, openings, and equatorial protrusions. Eta Carinae A is about 90 solar masses and its hot companion, Eta Carinae B, about 30 solar masses. Their true orbital separation is far below the scale of this map, so only their navigation markers are deliberately separated and enlarged.',
+    sourceUrl: 'https://www.eso.org/public/products/models3d/3dmodel_004/', modelSource: 'ESO VLT/X-Shooter observations', representation: 'Observation-based ESO/VLT 3D shell with enlarged binary markers', volumeShape: 'eta', displayScale: [4.25, 8.0, 3.8], physicalSizeLy: 0.7
   }
 ];
 
@@ -237,7 +256,7 @@ function buildScene() {
   const modelLight = new THREE.DirectionalLight(0xffffff, 2.8);
   modelLight.position.set(80, 110, 60);
   scene.add(modelLight);
-  camera = new THREE.PerspectiveCamera(50, 1, .1, 2000);
+  camera = new THREE.PerspectiveCamera(50, 1, .001, 2000);
   camera.position.set(70, 48, 105);
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
@@ -253,7 +272,7 @@ function buildScene() {
   orbit = new OrbitControls(camera, renderer.domElement);
   orbit.enableDamping = true;
   orbit.dampingFactor = .075;
-  orbit.minDistance = 2;
+  orbit.minDistance = .004;
   orbit.maxDistance = 700;
   orbit.target.set(0, 0, 0);
 
@@ -339,7 +358,7 @@ function createDiffuseNebulaVolume(nebula) {
   const uniforms = {
     uTime: { value: 0 },
     uCameraLocal: { value: new THREE.Vector3() },
-    uShape: { value: nebula.volumeShape === 'ring' ? 1 : nebula.volumeShape === 'cluster' ? 2 : nebula.volumeShape === 'dumbbell' ? 3 : nebula.volumeShape === 'rho' ? 4 : nebula.volumeShape === 'crab' ? 5 : 0 }
+    uShape: { value: nebula.volumeShape === 'ring' ? 1 : nebula.volumeShape === 'cluster' ? 2 : nebula.volumeShape === 'dumbbell' ? 3 : nebula.volumeShape === 'rho' ? 4 : nebula.volumeShape === 'crab' ? 5 : nebula.volumeShape === 'carina' ? 7 : nebula.volumeShape === 'northamerica' ? 8 : 0 }
   };
   const material = new THREE.ShaderMaterial({
     uniforms,
@@ -428,6 +447,30 @@ function createDiffuseNebulaVolume(nebula) {
           float core = smoothstep(.52,.05,length(p * vec3(.9,1.2,1.2))) * .32;
           return envelope * shell * filaments + core;
         }
+        if (uShape == 7) {
+          vec3 broad = p * vec3(.72,1.0,1.16);
+          float envelope = smoothstep(1.0,.14,length(broad));
+          float cavityA = smoothstep(.42,.12,length((p - vec3(-.24,.08,.08)) * vec3(.8,1.1,1.0)));
+          float cavityB = smoothstep(.35,.1,length((p - vec3(.3,-.18,-.04)) * vec3(1.0,.8,1.2)));
+          float billows = smoothstep(.28,.72,fbm(p * 4.6 + vec3(2.2,5.4,1.1)));
+          float fineClouds = smoothstep(.38,.74,fbm(p * 10.5 - vec3(4.0,1.7,3.3)));
+          float dustLane = smoothstep(.07,.24,abs(p.y + p.x * .22 - .03));
+          return envelope * (billows * .7 + fineClouds * .4) * dustLane * (1.0 - cavityA * .35 - cavityB * .25);
+        }
+        if (uShape == 8) {
+          vec3 q = p * vec3(.78,.68,1.72);
+          float mainCloud = smoothstep(1.0,.16,length(q));
+          float northernCloud = smoothstep(.7,.12,length((p - vec3(-.08,.34,.0)) * vec3(.82,1.02,1.75)));
+          float easternCloud = smoothstep(.58,.1,length((p - vec3(.34,.04,.02)) * vec3(1.0,.88,1.8)));
+          float southernCloud = smoothstep(.48,.08,length((p - vec3(.18,-.48,-.02)) * vec3(1.25,.72,1.9)));
+          float continentalBody = max(mainCloud * .72, max(northernCloud, max(easternCloud, southernCloud * .72)));
+          float gulf = smoothstep(.42,.09,length((p - vec3(-.08,-.28,.12)) * vec3(.82,1.1,1.6)));
+          float atlanticEdge = smoothstep(.16,.035,abs(p.x + .47 + p.y * .18)) * smoothstep(.82,.12,length(p.yz));
+          float textureNoise = smoothstep(.3,.74,fbm(p * 6.4 + vec3(2.6,5.0,1.7)));
+          float fine = smoothstep(.4,.72,fbm(p * 12.0 - vec3(4.1,1.2,3.6)));
+          float depthFade = smoothstep(.64,.05,abs(p.z));
+          return max(0.0, continentalBody - gulf * .78) * (textureNoise * .8 + fine * .32) * depthFade + atlanticEdge * .08;
+        }
         vec3 q = vec3(p.x * .78, p.y * 1.12, p.z * .9);
         float envelope = smoothstep(1.0, .18, length(q));
         float cavity = smoothstep(.12, .55, length((p - vec3(-.18,.08,.04)) * vec3(1.0,1.35,1.0)));
@@ -454,7 +497,11 @@ function createDiffuseNebulaVolume(nebula) {
                   ? mix(vec3(.18,.38,.92), vec3(1.0,.48,.12), smoothstep(-.3,.45,samplePoint.x + noise(samplePoint * 3.0) * .24))
                   : uShape == 5
                     ? mix(vec3(.15,.45,.95), vec3(1.0,.3,.12), smoothstep(.18,.82,length(samplePoint)))
-                    : mix(vec3(.12,.28,.82), vec3(1.0,.28,.18), warm);
+                    : uShape == 7
+                      ? mix(vec3(.12,.42,.72), vec3(.95,.25,.16), smoothstep(-.45,.55,samplePoint.x + noise(samplePoint * 2.4) * .35))
+                      : uShape == 8
+                        ? mix(vec3(.18,.58,.75), vec3(1.0,.2,.18), smoothstep(-.55,.48,samplePoint.x + noise(samplePoint * 3.0) * .3))
+                        : mix(vec3(.12,.28,.82), vec3(1.0,.28,.18), warm);
           colour = mix(colour, vec3(.76,.91,1.0), pow(density, 2.2) * .55);
           float alpha = density * (uShape == 4 ? .16 : .095) * (1.0 - accumulated.a);
           accumulated.rgb += colour * alpha;
@@ -501,6 +548,21 @@ function createDiffuseNebulaVolume(nebula) {
     });
     return group;
   }
+  if (nebula.volumeShape === 'northamerica') {
+    const group = new THREE.Group();
+    group.add(mesh);
+    const starTexture = createStarTexture();
+    const youngStars = [[-1.9,1.35,.18,.42],[-.7,2.1,-.12,.34],[.65,.95,.1,.48],[1.45,-.25,-.08,.38],[-.2,-1.6,.14,.31]];
+    youngStars.forEach(([x,y,z,size]) => {
+      const star = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: starTexture, color: 0xc8dcff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+      }));
+      star.position.set(x,y,z);
+      star.scale.setScalar(size);
+      group.add(star);
+    });
+    return group;
+  }
   if (nebula.volumeShape === 'crab') {
     const group = new THREE.Group();
     group.add(mesh);
@@ -531,8 +593,94 @@ function createDiffuseNebulaVolume(nebula) {
   return group;
 }
 
+async function createHomunculusModel(nebula) {
+  const shell = await new OBJLoader().loadAsync('assets/models/eta-carinae-homunculus-eso.obj');
+  const bounds = new THREE.Box3().setFromObject(shell);
+  const centre = bounds.getCenter(new THREE.Vector3());
+  const longestDimension = Math.max(...bounds.getSize(new THREE.Vector3()).toArray());
+  shell.position.sub(centre);
+  shell.scale.setScalar(16 / longestDimension);
+
+  shell.traverse(child => {
+    if (!child.isMesh) return;
+    child.geometry.computeVertexNormals();
+    child.material = new THREE.MeshPhysicalMaterial({
+      color: 0xf0a05d,
+      emissive: 0x6d2415,
+      emissiveIntensity: .48,
+      transparent: true,
+      opacity: .42,
+      roughness: .72,
+      metalness: 0,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      blending: THREE.NormalBlending
+    });
+  });
+
+  const group = new THREE.Group();
+  group.add(shell);
+  const innerShell = shell.clone(true);
+  innerShell.scale.multiplyScalar(.965);
+  innerShell.traverse(child => {
+    if (!child.isMesh) return;
+    child.material = new THREE.MeshBasicMaterial({
+      color: 0x83aaff,
+      transparent: true,
+      opacity: .12,
+      side: THREE.BackSide,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+  });
+  group.add(innerShell);
+
+  const starTexture = createStarTexture();
+  const components = [
+    { name: 'Eta Carinae A', x: -.16, size: .72, colour: 0xffe0a8 },
+    { name: 'Eta Carinae B', x: .18, size: .5, colour: 0xb9d8ff }
+  ];
+  components.forEach(component => {
+    const star = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: starTexture, color: component.colour, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+    }));
+    star.position.set(component.x, 0, .08);
+    star.scale.setScalar(component.size);
+    group.add(star);
+
+    const labelElement = document.createElement('span');
+    labelElement.className = 'universe-component-label';
+    labelElement.textContent = component.name;
+    const label = new CSS2DObject(labelElement);
+    label.position.set(component.x, component.name.endsWith('A') ? .28 : -.28, .08);
+    group.add(label);
+  });
+
+  // Orient the reconstructed polar axis (the OBJ's local +Z axis) on the sky.
+  // Position angle is measured east of north; the south-east lobe points toward Earth.
+  const ra = THREE.MathUtils.degToRad(nebula.ra);
+  const dec = THREE.MathUtils.degToRad(nebula.dec);
+  const lineOfSight = directionFromRaDec(nebula.ra, nebula.dec);
+  const north = new THREE.Vector3(
+    -Math.sin(dec) * Math.cos(ra),
+    Math.cos(dec),
+    Math.sin(dec) * Math.sin(ra)
+  ).normalize();
+  const east = new THREE.Vector3(-Math.sin(ra), 0, -Math.cos(ra)).normalize();
+  const positionAngle = THREE.MathUtils.degToRad(132);
+  const skyAxis = north.multiplyScalar(Math.cos(positionAngle)).add(east.multiplyScalar(Math.sin(positionAngle))).normalize();
+  const tiltFromSky = THREE.MathUtils.degToRad(49);
+  const polarAxis = skyAxis.multiplyScalar(Math.cos(tiltFromSky))
+    .add(lineOfSight.multiplyScalar(-Math.sin(tiltFromSky)))
+    .normalize();
+  group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), polarAxis);
+  return group;
+}
+
 async function loadNebulaModel(nebula) {
-  const model = createDiffuseNebulaVolume(nebula);
+  const model = nebula.volumeShape === 'eta'
+    ? await createHomunculusModel(nebula)
+    : createDiffuseNebulaVolume(nebula);
 
   const pivot = new THREE.Group();
   pivot.add(model);
@@ -580,7 +728,7 @@ async function loadNebulaModel(nebula) {
 let nebulaLoadPromise;
 async function loadNebulae() {
   if (nebulaLoadPromise) return nebulaLoadPromise;
-  controlsUi.nebulaStatus.textContent = 'Building six diffuse objects…';
+  controlsUi.nebulaStatus.textContent = 'Building nine diffuse objects…';
   controlsUi.nebulae.disabled = true;
   nebulaLoadPromise = Promise.allSettled(NEBULAE.map(async nebula => {
     nebula.physicalPosition = physicalPositionForCoordinates(nebula.ra, nebula.dec, nebula.distance);
@@ -589,7 +737,7 @@ async function loadNebulae() {
     const loaded = results.filter(result => result.status === 'fulfilled').length;
     controlsUi.nebulae.disabled = false;
     controlsUi.nebulaStatus.textContent = loaded === NEBULAE.length
-      ? 'Six diffuse objects loaded'
+      ? 'Nine diffuse objects loaded'
       : `${loaded} of ${NEBULAE.length} nebula models loaded`;
     controlsUi.nebulaList.hidden = loaded === 0;
     updatePositions();
@@ -648,16 +796,17 @@ function updatePositions() {
     if (scaleMode === 'linear') {
       const physicalDisplayDiameter = Number(item.nebula.physicalSizeLy) * (80 / maximumDistance());
       const navigationDiameter = Math.max(...item.nebula.displayScale) * 2;
-      item.model.scale.setScalar(Math.max(.03, physicalDisplayDiameter / navigationDiameter));
+      item.model.scale.setScalar(Math.max(.0005, physicalDisplayDiameter / navigationDiameter));
     } else {
-      item.model.scale.setScalar(1);
+      // The embedded Homunculus keeps its measured scale relative to the 300 ly Carina volume.
+      item.model.scale.setScalar(item.nebula.volumeShape === 'eta' ? .004375 : 1);
     }
   });
   if (selected) updateSelectionLine();
   updateVisibleStars();
   controlsUi.scaleNote.innerHTML = scaleMode === 'linear'
-    ? `<strong>Linear distance · ${integer.format(Math.round(maximumDistance()))} ly volume</strong><span>Distances and deep-sky spans are proportional. A tiny minimum marker keeps the smallest nebulae selectable.</span>`
-    : '<strong>Logarithmic distance</strong><span>Direction and distance order are preserved; spacing follows a logarithmic scale and deep-sky objects are enlarged for exploration.</span>';
+    ? `<strong>Linear distance · ${integer.format(Math.round(maximumDistance()))} ly volume</strong><span>Distances and deep-sky spans are proportional. Invisible hit areas and labels keep physically tiny objects selectable.</span>`
+    : '<strong>Logarithmic distance</strong><span>Direction and distance order are preserved. Isolated deep-sky objects are enlarged; nested structures retain their relative scale.</span>';
 }
 
 let selectionLine;
@@ -744,13 +893,16 @@ function selectNebula(nebula, fly = false) {
   details.distance.textContent = formatValue(nebula.distance, 'ly', 0);
   details.constellation.textContent = nebula.constellation;
   details.spectral.textContent = nebula.type;
-  details.temperature.textContent = nebula.format === 'volume' ? 'NASA visualization reference' : 'NASA 3D Resources';
+  details.temperature.textContent = nebula.modelSource || (nebula.format === 'volume' ? 'NASA visualization reference' : 'NASA 3D Resources');
   details.luminosity.textContent = nebula.representation || 'Scientific reconstruction';
   details.radius.textContent = `≈ ${number.format(nebula.physicalSizeLy)} ly`;
   details.hr.hidden = true;
   details.source.href = nebula.sourceUrl;
+  details.source.textContent = nebula.volumeShape === 'eta' ? 'Open ESO 3D model source →' : 'Open NASA model source →';
   details.source.hidden = false;
-  controlsUi.fly.textContent = 'Fly to selected object';
+  controlsUi.fly.textContent = nebula.volumeShape === 'eta'
+    ? 'Zoom in on Homunculus and Eta A/B'
+    : 'Fly to selected object';
   updatePositions();
   if (fly) flyToStar(nebula);
 }
@@ -762,7 +914,14 @@ function flyToStar(star) {
   if (!targetObject) return;
   const destinationTarget = targetObject.position.clone();
   const direction = camera.position.clone().sub(orbit.target).normalize();
-  const offset = /^(sun|sol)/i.test(star.name) ? 105 : nebulaItem ? (scaleMode === 'linear' ? 5 : 28) : 22;
+  const etaDiameter = nebulaItem?.nebula.volumeShape === 'eta'
+    ? Math.max(...nebulaItem.nebula.displayScale) * 2 * nebulaItem.model.scale.x
+    : 0;
+  const offset = /^(sun|sol)/i.test(star.name)
+    ? 105
+    : nebulaItem
+      ? (nebulaItem.nebula.volumeShape === 'eta' ? Math.max(.012, etaDiameter * 1.7) : scaleMode === 'linear' ? 5 : 28)
+      : 22;
   flight = {
     started: performance.now(),
     duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 900,
@@ -828,7 +987,7 @@ function animate(time) {
 function resetView() {
   scaleMode = 'compressed';
   controlsUi.scale.find(input => input.value === 'compressed').checked = true;
-  controlsUi.distance.value = '3.85';
+  controlsUi.distance.value = '3.90';
   controlsUi.spectral.value = 'all';
   controlsUi.labels.checked = true;
   controlsUi.labelMagnitude.value = '1.5';
@@ -875,7 +1034,7 @@ function bindEvents() {
   controlsUi.directions.addEventListener('change', () => { directionGroup.visible = controlsUi.directions.checked; });
   controlsUi.nebulae.addEventListener('change', async () => {
     if (controlsUi.nebulae.checked) {
-      controlsUi.distance.value = '3.85';
+      controlsUi.distance.value = '3.90';
       await loadNebulae();
     }
     updatePositions();

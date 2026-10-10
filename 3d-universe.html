@@ -45,7 +45,7 @@
             </div>
             <div class="universe-scale-note" id="universe-scale-note">
                 <strong>Logarithmic distance</strong>
-                <span>Direction and distance order are preserved; separation follows a logarithmic scale.</span>
+                <span>Direction and distance order are preserved. Isolated deep-sky objects are enlarged; nested structures retain their relative scale.</span>
             </div>
         </header>
 
@@ -72,8 +72,8 @@
                 </fieldset>
 
                 <label class="universe-field" for="universe-distance">
-                    <span>Maximum distance <output id="universe-distance-output">7,079 ly</output></span>
-                    <input id="universe-distance" type="range" min="0.7" max="4.35" step="0.01" value="3.85">
+                    <span>Maximum distance <output id="universe-distance-output">7,943 ly</output></span>
+                    <input id="universe-distance" type="range" min="0.7" max="4.35" step="0.01" value="3.90">
                 </label>
 
                 <label class="universe-field" for="universe-spectral">
@@ -99,7 +99,7 @@
                 </label>
                 <label class="universe-check"><input id="universe-plane" type="checkbox" checked><span>Show celestial equatorial plane</span></label>
                 <label class="universe-check"><input id="universe-directions" type="checkbox" checked><span>Show Milky Way directions</span></label>
-                <label class="universe-check universe-model-toggle"><input id="universe-nebulae" type="checkbox" checked><span>Show six diffuse deep-sky objects</span></label>
+                <label class="universe-check universe-model-toggle"><input id="universe-nebulae" type="checkbox" checked><span>Show nine diffuse deep-sky objects</span></label>
                 <p class="universe-model-status" id="universe-model-status">Building diffuse visualisations in your browser…</p>
                 <div class="universe-nebula-list" id="universe-nebula-list" hidden></div>
 
@@ -149,6 +149,6 @@
     </main>
 
     <script src="js/main.js"></script>
-    <script type="module" src="js/3d-universe.js?v=12"></script>
+    <script type="module" src="js/3d-universe.js?v=17"></script>
 </body>
 </html>

@@ -53,6 +53,7 @@
 .universe-direction-label small { color: #9eabc0; font-size: .54rem; font-weight: 500; }
 .universe-nebula-label { padding: .2rem .36rem; color: #fff; background: rgba(55, 24, 83, .82); border: 1px solid rgba(192, 146, 255, .65); border-radius: 999px; font: 700 .61rem system-ui, sans-serif; text-shadow: 0 1px 3px #000; transform: translate(-50%, -50%); white-space: nowrap; pointer-events: auto; cursor: pointer; }
 .universe-nebula-label:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.universe-component-label { color: #fff; font: 700 .55rem system-ui, sans-serif; text-shadow: 0 1px 4px #000, 0 0 5px #000; transform: translate(6px, -50%); white-space: nowrap; }
 .universe-loading, .universe-error { position: absolute; z-index: 5; inset: 0; display: grid; place-content: center; padding: 2rem; color: #cfe4ff; background: #030711; text-align: center; }
 .universe-error { gap: .4rem; color: #ffd4c4; }
 .universe-error span { max-width: 460px; color: var(--text-muted); font-size: .8rem; }
