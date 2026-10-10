@@ -891,6 +891,21 @@
   }
 }
 
+@media (min-width: 2200px) {
+  .hr-container {
+    max-width: calc(100vw - 304px);
+  }
+
+  .hr-workspace {
+    height: max(820px, calc(100vh - 330px));
+    min-height: 820px;
+  }
+
+  #hr-chart {
+    height: 100%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hr-star {
     transition: none;

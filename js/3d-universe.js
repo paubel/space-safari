@@ -226,27 +226,28 @@ function displayPositionForObject(object) {
 
 function createStarTexture() {
   const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 96;
+  canvas.width = canvas.height = 128;
   const context = canvas.getContext('2d');
-  const gradient = context.createRadialGradient(48, 48, 0, 48, 48, 48);
+  const gradient = context.createRadialGradient(64, 64, 0, 64, 64, 64);
   gradient.addColorStop(0, 'rgba(255,255,255,1)');
-  gradient.addColorStop(.1, 'rgba(255,255,255,.98)');
-  gradient.addColorStop(.24, 'rgba(255,255,255,.72)');
-  gradient.addColorStop(.42, 'rgba(255,255,255,.2)');
-  gradient.addColorStop(.64, 'rgba(255,255,255,0)');
+  gradient.addColorStop(.14, 'rgba(255,255,255,1)');
+  gradient.addColorStop(.28, 'rgba(255,255,255,.93)');
+  gradient.addColorStop(.38, 'rgba(255,255,255,.34)');
+  gradient.addColorStop(.47, 'rgba(255,255,255,.06)');
+  gradient.addColorStop(.54, 'rgba(255,255,255,0)');
   gradient.addColorStop(1, 'rgba(255,255,255,0)');
   context.fillStyle = gradient;
-  context.fillRect(0, 0, 96, 96);
+  context.fillRect(0, 0, 128, 128);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
 }
 
 function markerSize(star) {
-  if (/^(sun|sol)/i.test(star.name)) return scaleMode === 'linear' ? .72 : 5.2;
+  if (/^(sun|sol)/i.test(star.name)) return scaleMode === 'linear' ? .2 : 5.2;
   const magnitude = Number.isFinite(Number(star.magnitude)) ? Number(star.magnitude) : 5;
   const size = THREE.MathUtils.clamp(3.5 + (3 - magnitude) * .35, 2.4, 5.4);
-  return scaleMode === 'linear' ? size * .18 : size;
+  return scaleMode === 'linear' ? size * .055 : size;
 }
 
 function buildScene() {
@@ -787,7 +788,7 @@ function updatePositions() {
   starObjects.forEach(item => {
     item.sprite.position.copy(displayPosition(item.star));
     item.sprite.scale.setScalar(markerSize(item.star));
-    item.sprite.material.opacity = scaleMode === 'linear' ? .9 : 1;
+    item.sprite.material.opacity = scaleMode === 'linear' ? .92 : 1;
   });
   nebulaObjects.forEach(item => {
     item.model.position.copy(displayPositionForObject(item.nebula));

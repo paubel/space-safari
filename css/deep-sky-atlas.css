@@ -1,5 +1,6 @@
 .deep-sky-page { background: radial-gradient(circle at 80% 4%, rgba(74, 158, 255, .16), transparent 34rem), var(--bg); }
 .deep-sky-container { width: 100%; min-width: 0; max-width: 1540px; }
+
 .deep-sky-hero { max-width: 900px; padding: 1.4rem 0 1rem; }
 .deep-sky-hero h1 { margin: .15rem 0 .55rem; font-size: clamp(2.3rem, 6vw, 5rem); line-height: .95; letter-spacing: -.05em; }
 .deep-sky-hero > p:last-child { color: var(--text-muted); font-size: clamp(.92rem, 1.5vw, 1.1rem); }
@@ -79,4 +80,5 @@
 @media (max-width: 1280px) { .atlas-controls { grid-template-columns: repeat(4, 1fr); } .atlas-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 900px) { #atlas-explainer-content { grid-template-columns: 1fr 1fr; } .atlas-controls { grid-template-columns: 1fr 1fr; } .atlas-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .atlas-dialog dl { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .deep-sky-container { padding-inline: .75rem; } .deep-sky-hero { padding-top: .8rem; } .atlas-heading-row { align-items: start; } .atlas-controls { grid-template-columns: 1fr; } .atlas-grid { grid-template-columns: 1fr; } #atlas-explainer-content { grid-template-columns: 1fr; } .atlas-card-description { min-height: auto; } .atlas-explainer-bar { grid-template-columns: 1fr; } .atlas-explainer-bar > a { margin: 0 .75rem .75rem; text-align: center; } }
+@media (min-width: 2200px) { .deep-sky-container { max-width: calc(100vw - 304px); } .atlas-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
 @media (prefers-reduced-motion: reduce) { .atlas-card, .atlas-card img { transition: none; } }

@@ -1,5 +1,6 @@
 .universe-3d-page { --universe-panel: rgba(7, 12, 24, .94); background: radial-gradient(circle at 75% 8%, rgba(74, 158, 255, .17), transparent 32rem), #04070e; }
 .universe-shell { width: 100%; min-width: 0; max-width: 1800px; margin: 0 auto; padding: 1rem; }
+
 .universe-header { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 310px); align-items: center; gap: 1rem; padding: .25rem .2rem .6rem; }
 .universe-header .section-label { margin: 0 0 .08rem; font-size: .58rem; }
 .universe-header h1 { margin: 0 0 .18rem; font-size: clamp(2rem, 3.3vw, 3rem); line-height: .94; letter-spacing: -.04em; }
@@ -102,5 +103,16 @@
   .universe-stage-wrap { min-height: 66vh; order: 2; }
   .universe-details { display: block; order: 3; }
   .universe-details dl { margin: 1rem 0; }
+}
+@media (min-width: 2200px) {
+  .universe-shell { max-width: calc(100vw - 280px); }
+  .universe-workspace {
+    height: max(860px, calc(100vh - 176px));
+    min-height: 860px;
+  }
+  .universe-stage-wrap {
+    height: 100%;
+    min-height: 0;
+  }
 }
 @media (prefers-reduced-motion: reduce) { .universe-stage { scroll-behavior: auto; } }

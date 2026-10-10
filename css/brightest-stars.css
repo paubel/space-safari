@@ -1,5 +1,9 @@
 .bright-stars-page { --bright-sticky-top: 0px; background: radial-gradient(circle at 82% 7%, rgba(74, 158, 255, .14), transparent 30rem), var(--bg); }
 .bright-stars-container { width: 100%; min-width: 0; max-width: 1840px; }
+
+@media (min-width: 2200px) {
+  .bright-stars-container { max-width: calc(100vw - 304px); }
+}
 .bright-stars-header { padding: 2.25rem 0 1.5rem; }
 .bright-stars-header h1 { margin: .3rem 0 .65rem; font-size: clamp(2.2rem, 5vw, 4.5rem); line-height: .95; letter-spacing: -.045em; }
 .bright-stars-lead { max-width: 760px; color: var(--text-muted); font-size: clamp(.95rem, 1.4vw, 1.12rem); }
