@@ -59,6 +59,7 @@ function renderExploreMenu() {
     { href: "brightest-stars.html", icon: "★", label: "Brightest Stars Catalogue" },
     { href: "3d-universe.html", icon: "✧", label: "3D Universe" },
     { href: "deep-sky-atlas.html", icon: "◉", label: "Deep-Sky Atlas" },
+    { href: "advent-calendar.html", icon: "✦", label: "Advent Calendar" },
   ];
 
   const nav = document.createElement("nav");

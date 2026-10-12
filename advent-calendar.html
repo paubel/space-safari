@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Open one new astronomical discovery each day in the Space Safari Advent Calendar.">
+    <title>Space Safari Advent Calendar</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/advent-calendar.css?v=1">
+    <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SL7KJ6J4ZZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || []
+        function gtag() { dataLayer.push(arguments) }
+        gtag('js', new Date())
+        gtag('config', 'G-SL7KJ6J4ZZ');
+    </script>
+</head>
+
+<body class="advent-page">
+    <nav class="navbar">
+        <a href="index.html" class="logo"><img src="assets/images/cats-eye-icon.webp" class="site-icon" alt=""> Space
+            Safari</a>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Open navigation">☰</button>
+    </nav>
+
+    <aside class="side-menu" id="side-menu">
+        <a href="index.html" class="menu-close" id="menu-close">✕</a>
+        <h2>All Chapters</h2>
+        <nav class="chapter-menu" id="chapters-menu"></nav>
+    </aside>
+
+    <main class="advent-shell">
+        <header class="advent-hero">
+            <a class="advent-home" href="index.html">✦ Space Safari</a>
+            <p class="advent-kicker">A December journey across the universe</p>
+            <h1>Space Safari <br>Advent Calendar</h1>
+            <div class="advent-hero-copy">
+                <p>24 Days of Cosmic Discovery</p>
+                <p>Open one new cosmic discovery each day, December 1–24. Every door unlocks at midnight in your local time.</p>
+            </div>
+            <div class="advent-countdown" aria-live="polite">
+                <span>Countdown to December 1</span>
+                <strong id="advent-countdown">Calculating…</strong>
+                <small id="advent-countdown-zone">Midnight in your local time</small>
+            </div>
+        </header>
+
+        <section class="advent-calendar" aria-label="Space Safari Advent Calendar doors">
+            <p id="advent-status" class="visually-hidden" aria-live="polite"></p>
+            <div class="advent-grid" id="advent-grid"></div>
+        </section>
+
+    </main>
+
+    <dialog class="advent-dialog" id="advent-dialog" aria-labelledby="advent-dialog-title">
+        <button class="advent-dialog-close" id="advent-dialog-close" type="button"
+            aria-label="Close discovery">×</button>
+        <div class="advent-dialog-visual" id="advent-dialog-visual"></div>
+        <article class="advent-dialog-copy">
+            <p class="advent-kicker" id="advent-dialog-day"></p>
+            <h2 id="advent-dialog-title"></h2>
+            <p class="advent-dialog-question" id="advent-dialog-question"></p>
+            <p id="advent-dialog-body"></p>
+            <div class="advent-chapter-link">
+                <span>From the book</span>
+                <strong id="advent-dialog-chapter"></strong>
+            </div>
+            <nav class="amazon-market-links advent-dialog-amazon" aria-label="Buy Space Safari on Amazon">
+                <span class="advent-order-label">Order the book here:</span>
+                <strong>Amazon</strong>
+                <a class="amazon-primary" href="https://www.amazon.com/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon United States">US</a>
+                <a href="https://www.amazon.se/Space-Safari-Journey-Through-Neighborhood/dp/B0HCC73MGX/" target="_blank" rel="noopener" title="Amazon Sweden">SE</a>
+                <a href="https://www.amazon.co.uk/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon United Kingdom">UK</a>
+                <a href="https://www.amazon.de/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon Germany">DE</a>
+                <a href="https://www.amazon.fr/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon France">FR</a>
+                <a href="https://www.amazon.es/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon Spain">ES</a>
+                <a href="https://www.amazon.it/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon Italy">IT</a>
+                <a href="https://www.amazon.nl/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon Netherlands">NL</a>
+                <a href="https://www.amazon.ca/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon Canada">CA</a>
+                <a href="https://www.amazon.com.mx/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon Mexico">MX</a>
+                <a href="https://www.amazon.com.br/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon Brazil">BR</a>
+                <a href="https://www.amazon.com.au/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon Australia">AU</a>
+                <a href="https://www.amazon.co.jp/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon Japan">JP</a>
+                <a href="https://www.amazon.in/dp/B0HCC73MGX" target="_blank" rel="noopener" title="Amazon India">IN</a>
+            </nav>
+            <p class="advent-credit"><span id="advent-dialog-credit"></span> <a id="advent-dialog-source" href="#" target="_blank" rel="noopener">Image source and licence ↗</a></p>
+            <a class="advent-related-link" id="advent-dialog-link" href="#">Explore further →</a>
+        </article>
+    </dialog>
+
+    <script src="js/main.js"></script>
+    <script type="module" src="js/advent-calendar.js?v=1"></script>
+</body>
+
+</html>
