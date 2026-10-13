@@ -68,6 +68,18 @@ const NEBULAE = [
     sourceUrl: 'https://science.nasa.gov/asset/hubble/compass-and-scale-image-for-ring-nebula-hst-only/', representation: 'Science-informed procedural volume', volumeShape: 'ring', displayScale: [7.8, 7.8, 6.2], physicalSizeLy: 1
   },
   {
+    name: 'Owl Nebula (M97 · NGC 3587)', shortName: 'Owl Nebula (M97)', ra: 168.698801, dec: 55.019023, distance: 2030,
+    constellation: 'Ursa Major', type: 'Planetary nebula', format: 'volume', colour: 0x72d8cb,
+    description: 'A science-informed volumetric interpretation of M97’s roughly spherical, multi-shell structure. Two lower-density bipolar cavities create the famous “owl eyes”, while a faint outer halo surrounds the brighter inner shell. Its position follows SIMBAD; the approximately two-light-year span is derived from its angular diameter and adopted distance. The internal depth remains interpretive rather than a measured three-dimensional density map.',
+    sourceUrl: 'https://simbad.u-strasbg.fr/simbad/sim-basic?Ident=M97&submit=SIMBAD+search', sourceLabel: 'Open SIMBAD reference →', modelSource: 'SIMBAD position and angular size', representation: 'Procedural multi-shell volume with bipolar cavities', volumeShape: 'owl', displayScale: [6.8, 6.5, 6.2], physicalSizeLy: 2
+  },
+  {
+    name: 'Helix Nebula (NGC 7293 · Caldwell 63)', shortName: 'Helix Nebula (NGC 7293)', ra: 337.450792, dec: -20.823886, distance: 650,
+    constellation: 'Aquarius', type: 'Planetary nebula', format: 'volume', colour: 0x65d7d2,
+    description: 'A volumetric interpretation of the nearby Helix Nebula as a thick, knotty barrel or tunnel of ionised gas—not a flat ring. Its axis is aimed close to the Sun, with the inner structure tilted about 23° from our line of sight, so the first view resembles the familiar “cosmic eye”; orbiting around it reveals the tunnel depth. A blue-green inner wall surrounds the hot white dwarf, redder filamentary gas traces the outer rim, and a faint extended envelope reaches beyond the bright main structure.',
+    sourceUrl: 'https://science.nasa.gov/asset/hubble/helix-nebula-model/', sourceLabel: 'Open NASA 3D reference →', modelSource: 'NASA/Hubble observation-based 3D reference', representation: 'Sun-facing knotty barrel tilted 23°, with filaments and outer envelope', volumeShape: 'helix', displayScale: [8.2, 8.2, 7.2], physicalSizeLy: 2.5, viewTiltDeg: 23, viewPositionAngleDeg: 303
+  },
+  {
     name: 'The Pleiades (M45)', shortName: 'The Pleiades (M45)', ra: 56.75, dec: 24.1167, distance: 445,
     constellation: 'Taurus', type: 'Open star cluster and reflection nebulosity', format: 'volume', colour: 0x83b9ff,
     description: 'The Seven Sisters embedded in wisps of blue reflection nebulosity. The bright stars are arranged to evoke the familiar cluster, while the dust is a science-informed procedural interpretation rather than a measured three-dimensional density map.',
@@ -359,7 +371,7 @@ function createDiffuseNebulaVolume(nebula) {
   const uniforms = {
     uTime: { value: 0 },
     uCameraLocal: { value: new THREE.Vector3() },
-    uShape: { value: nebula.volumeShape === 'ring' ? 1 : nebula.volumeShape === 'cluster' ? 2 : nebula.volumeShape === 'dumbbell' ? 3 : nebula.volumeShape === 'rho' ? 4 : nebula.volumeShape === 'crab' ? 5 : nebula.volumeShape === 'carina' ? 7 : nebula.volumeShape === 'northamerica' ? 8 : 0 }
+    uShape: { value: nebula.volumeShape === 'ring' ? 1 : nebula.volumeShape === 'cluster' ? 2 : nebula.volumeShape === 'dumbbell' ? 3 : nebula.volumeShape === 'rho' ? 4 : nebula.volumeShape === 'crab' ? 5 : nebula.volumeShape === 'carina' ? 7 : nebula.volumeShape === 'northamerica' ? 8 : nebula.volumeShape === 'owl' ? 9 : nebula.volumeShape === 'helix' ? 10 : 0 }
   };
   const material = new THREE.ShaderMaterial({
     uniforms,
@@ -472,6 +484,30 @@ function createDiffuseNebulaVolume(nebula) {
           float depthFade = smoothstep(.64,.05,abs(p.z));
           return max(0.0, continentalBody - gulf * .78) * (textureNoise * .8 + fine * .32) * depthFade + atlanticEdge * .08;
         }
+        if (uShape == 9) {
+          vec3 q = p * vec3(.94,1.0,1.08);
+          float radius = length(q);
+          float innerShell = smoothstep(.82,.48,radius) * smoothstep(.24,.5,radius);
+          float outerShell = smoothstep(1.0,.77,radius) * smoothstep(.58,.8,radius) * .42;
+          float halo = smoothstep(1.03,.72,radius) * .12;
+          float eyeA = smoothstep(.3,.13,length((p - vec3(-.27,.08,.0)) * vec3(1.0,1.0,.48)));
+          float eyeB = smoothstep(.3,.13,length((p - vec3(.27,.08,.0)) * vec3(1.0,1.0,.48)));
+          float eyes = max(eyeA, eyeB);
+          float mottling = .48 + .68 * smoothstep(.25,.78,fbm(p * 7.2 + vec3(3.2,1.7,5.1)));
+          float rimKnots = smoothstep(.4,.75,fbm(p * 12.0 - vec3(1.4,4.8,2.2)));
+          return max(0.0, (innerShell * mottling + outerShell * (.55 + rimKnots * .45) + halo) * (1.0 - eyes * .88));
+        }
+        if (uShape == 10) {
+          float radial = length(p.xy);
+          float barrelWall = smoothstep(.27,.08,abs(radial - .55)) * smoothstep(.8,.22,abs(p.z));
+          float flaredEnds = smoothstep(.3,.07,abs(radial - (.58 + abs(p.z) * .22))) * smoothstep(.92,.3,abs(p.z)) * .52;
+          float outerEnvelope = smoothstep(1.02,.68,length(p * vec3(.92,.92,.72))) * smoothstep(.58,.82,radial) * .22;
+          float angle = atan(p.y,p.x);
+          float spokes = .45 + .55 * smoothstep(.18,.78,noise(vec3(angle * 3.2,radial * 13.0,p.z * 5.0)));
+          float knots = .48 + .72 * smoothstep(.4,.76,fbm(p * 12.5 + vec3(2.0,5.1,1.4)));
+          float hollowCore = smoothstep(.18,.34,radial);
+          return (barrelWall * spokes * knots + flaredEnds * knots + outerEnvelope) * hollowCore;
+        }
         vec3 q = vec3(p.x * .78, p.y * 1.12, p.z * .9);
         float envelope = smoothstep(1.0, .18, length(q));
         float cavity = smoothstep(.12, .55, length((p - vec3(-.18,.08,.04)) * vec3(1.0,1.35,1.0)));
@@ -502,7 +538,11 @@ function createDiffuseNebulaVolume(nebula) {
                       ? mix(vec3(.12,.42,.72), vec3(.95,.25,.16), smoothstep(-.45,.55,samplePoint.x + noise(samplePoint * 2.4) * .35))
                       : uShape == 8
                         ? mix(vec3(.18,.58,.75), vec3(1.0,.2,.18), smoothstep(-.55,.48,samplePoint.x + noise(samplePoint * 3.0) * .3))
-                        : mix(vec3(.12,.28,.82), vec3(1.0,.28,.18), warm);
+                        : uShape == 9
+                          ? mix(vec3(.12,.68,.7), vec3(.62,.9,.72), smoothstep(.28,.9,length(samplePoint)))
+                          : uShape == 10
+                            ? mix(vec3(.08,.67,.78), vec3(1.0,.24,.16), smoothstep(.43,.88,length(samplePoint.xy)))
+                            : mix(vec3(.12,.28,.82), vec3(1.0,.28,.18), warm);
           colour = mix(colour, vec3(.76,.91,1.0), pow(density, 2.2) * .55);
           float alpha = density * (uShape == 4 ? .16 : .095) * (1.0 - accumulated.a);
           accumulated.rgb += colour * alpha;
@@ -518,9 +558,9 @@ function createDiffuseNebulaVolume(nebula) {
   const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 72, 48), material);
   mesh.scale.fromArray(nebula.displayScale || [9, 9, 9]);
   mesh.rotation.set(
-    nebula.volumeShape === 'ring' ? -.48 : -.24,
-    nebula.volumeShape === 'ring' ? .22 : .38,
-    nebula.volumeShape === 'ring' ? 1.05 : -.18
+    nebula.volumeShape === 'ring' ? -.48 : nebula.volumeShape === 'helix' ? 0 : -.24,
+    nebula.volumeShape === 'ring' ? .22 : nebula.volumeShape === 'helix' ? 0 : .38,
+    nebula.volumeShape === 'ring' ? 1.05 : nebula.volumeShape === 'helix' ? 0 : -.18
   );
   mesh.userData.volumeUniforms = uniforms;
   volumeMaterials.push({ mesh, uniforms });
@@ -532,6 +572,27 @@ function createDiffuseNebulaVolume(nebula) {
     }));
     centralStar.scale.setScalar(.75);
     group.add(centralStar);
+    return group;
+  }
+  if (nebula.volumeShape === 'owl') {
+    const group = new THREE.Group();
+    group.add(mesh);
+    const centralStar = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: createStarTexture(), color: 0xbdeaff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+    }));
+    centralStar.scale.setScalar(.5);
+    centralStar.position.set(0, -.04, .12);
+    group.add(centralStar);
+    return group;
+  }
+  if (nebula.volumeShape === 'helix') {
+    const group = new THREE.Group();
+    group.add(mesh);
+    const whiteDwarf = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: createStarTexture(), color: 0xc9e9ff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+    }));
+    whiteDwarf.scale.setScalar(.55);
+    group.add(whiteDwarf);
     return group;
   }
   if (nebula.volumeShape === 'rho') {
@@ -683,6 +744,30 @@ async function loadNebulaModel(nebula) {
     ? await createHomunculusModel(nebula)
     : createDiffuseNebulaVolume(nebula);
 
+  if (nebula.volumeShape === 'helix') {
+    // The barrel's local +Z axis points almost back toward the Sun. The small
+    // observed tilt preserves the familiar Earth-facing oval while still
+    // revealing that this is a deep tunnel when the user orbits around it.
+    const ra = THREE.MathUtils.degToRad(nebula.ra);
+    const dec = THREE.MathUtils.degToRad(nebula.dec);
+    const towardSun = directionFromRaDec(nebula.ra, nebula.dec).negate();
+    const north = new THREE.Vector3(
+      -Math.sin(dec) * Math.cos(ra),
+      Math.cos(dec),
+      Math.sin(dec) * Math.sin(ra)
+    ).normalize();
+    const east = new THREE.Vector3(-Math.sin(ra), 0, -Math.cos(ra)).normalize();
+    const positionAngle = THREE.MathUtils.degToRad(nebula.viewPositionAngleDeg);
+    const skyTiltDirection = north.multiplyScalar(Math.cos(positionAngle))
+      .add(east.multiplyScalar(Math.sin(positionAngle)))
+      .normalize();
+    const tilt = THREE.MathUtils.degToRad(nebula.viewTiltDeg);
+    const helixAxis = towardSun.multiplyScalar(Math.cos(tilt))
+      .add(skyTiltDirection.multiplyScalar(Math.sin(tilt)))
+      .normalize();
+    model.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), helixAxis);
+  }
+
   const pivot = new THREE.Group();
   pivot.add(model);
   pivot.position.copy(displayPositionForObject(nebula));
@@ -729,7 +814,7 @@ async function loadNebulaModel(nebula) {
 let nebulaLoadPromise;
 async function loadNebulae() {
   if (nebulaLoadPromise) return nebulaLoadPromise;
-  controlsUi.nebulaStatus.textContent = 'Building nine diffuse objects…';
+  controlsUi.nebulaStatus.textContent = `Building ${NEBULAE.length} diffuse objects…`;
   controlsUi.nebulae.disabled = true;
   nebulaLoadPromise = Promise.allSettled(NEBULAE.map(async nebula => {
     nebula.physicalPosition = physicalPositionForCoordinates(nebula.ra, nebula.dec, nebula.distance);
@@ -738,7 +823,7 @@ async function loadNebulae() {
     const loaded = results.filter(result => result.status === 'fulfilled').length;
     controlsUi.nebulae.disabled = false;
     controlsUi.nebulaStatus.textContent = loaded === NEBULAE.length
-      ? 'Nine diffuse objects loaded'
+      ? `${NEBULAE.length} diffuse objects loaded`
       : `${loaded} of ${NEBULAE.length} nebula models loaded`;
     controlsUi.nebulaList.hidden = loaded === 0;
     updatePositions();
@@ -899,7 +984,7 @@ function selectNebula(nebula, fly = false) {
   details.radius.textContent = `≈ ${number.format(nebula.physicalSizeLy)} ly`;
   details.hr.hidden = true;
   details.source.href = nebula.sourceUrl;
-  details.source.textContent = nebula.volumeShape === 'eta' ? 'Open ESO 3D model source →' : 'Open NASA model source →';
+  details.source.textContent = nebula.sourceLabel || (nebula.volumeShape === 'eta' ? 'Open ESO 3D model source →' : 'Open NASA reference →');
   details.source.hidden = false;
   controlsUi.fly.textContent = nebula.volumeShape === 'eta'
     ? 'Zoom in on Homunculus and Eta A/B'
@@ -914,7 +999,10 @@ function flyToStar(star) {
   const targetObject = starItem?.sprite || nebulaItem?.model;
   if (!targetObject) return;
   const destinationTarget = targetObject.position.clone();
-  const direction = camera.position.clone().sub(orbit.target).normalize();
+  const currentViewDirection = camera.position.clone().sub(orbit.target).normalize();
+  const direction = nebulaItem?.nebula.volumeShape === 'helix'
+    ? destinationTarget.clone().negate().normalize()
+    : currentViewDirection;
   const etaDiameter = nebulaItem?.nebula.volumeShape === 'eta'
     ? Math.max(...nebulaItem.nebula.displayScale) * 2 * nebulaItem.model.scale.x
     : 0;
