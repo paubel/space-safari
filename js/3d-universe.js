@@ -21,6 +21,7 @@ const controlsUi = {
   labelMagnitude: document.querySelector('#universe-label-magnitude'),
   labelMagnitudeOutput: document.querySelector('#universe-label-magnitude-output'),
   plane: document.querySelector('#universe-plane'),
+  earthGuide: document.querySelector('#universe-earth-guide'),
   directions: document.querySelector('#universe-directions'),
   nebulae: document.querySelector('#universe-nebulae'),
   nebulaStatus: document.querySelector('#universe-model-status'),
@@ -116,6 +117,18 @@ const NEBULAE = [
     sourceUrl: 'https://academic.oup.com/mnras/article/430/4/2864/1104514', sourceLabel: 'Open scientific reference →', modelSource: 'SIMBAD position · 250 pc distance model', representation: 'Procedural fragmented shock shell, filaments, and central pulsar', volumeShape: 'vela', displayScale: [12.5, 12.0, 11.5], physicalSizeLy: 114
   },
   {
+    name: 'The Crescent Nebula (NGC 6888 · Caldwell 27)', shortName: 'Crescent Nebula (NGC 6888)', ra: 303.027258, dec: 38.35494, distance: 5000,
+    constellation: 'Cygnus', type: 'Wolf–Rayet wind-blown bubble', format: 'volume', colour: 0x63d3dc,
+    description: 'A three-dimensional interpretation of the turbulent bubble blown by the powerful wind of WR 136 into material shed during an earlier red-supergiant phase. An asymmetric blue-green skin encloses hotter diffuse gas, while compressed red filaments and dense knots form the familiar broken crescent. Position follows WR 136 in SIMBAD; the adopted distance and roughly 25-light-year span follow NASA references. Fine depth and filament placement are science-informed rather than directly measured.',
+    sourceUrl: 'https://science.nasa.gov/image-article/apod-2021-june-17-ngc-6888-the-crescent-nebula/', sourceLabel: 'Open NASA reference →', modelSource: 'NASA size · SIMBAD WR 136 position', representation: 'Procedural asymmetric wind bubble, thin skin, filaments, and WR 136', volumeShape: 'crescent', displayScale: [9.8, 7.4, 7.8], physicalSizeLy: 25
+  },
+  {
+    name: "The Elephant's Trunk Nebula (IC 1396 · IC 1396A)", shortName: "Elephant's Trunk (IC 1396)", ra: 324.745, dec: 57.513889, distance: 2450,
+    constellation: 'Cepheus', type: 'H II region with a dark star-forming globule', format: 'volume', colour: 0xd98772,
+    description: "A broad ionised cloud surrounds the long, dense IC 1396A globule. The model cuts a crooked, dark trunk through the glowing H II region and outlines its irradiated rim, with knots and embedded young stars near the compressed head. NASA measurements place the complex about 2,450 light-years away, more than 100 light-years across, while the trunk itself is roughly 20–30 light-years long. Its depth is a science-informed interpretation rather than a measured density reconstruction.",
+    sourceUrl: 'https://www.jpl.nasa.gov/images/pia14103-blowin-in-the-stellar-wind/', sourceLabel: 'Open NASA/JPL reference →', modelSource: 'NASA/JPL distance and size · SIMBAD IC 1396 position', representation: 'Procedural face-on H II complex with IC 1396A as an offset hooked globule', volumeShape: 'elephant', displayScale: [12.5, 12.0, 4.8], physicalSizeLy: 105
+  },
+  {
     name: 'Carina Nebula (NGC 3372)', shortName: 'Carina Nebula (NGC 3372)', ra: 161.2854, dec: -59.8678, distance: 7500,
     constellation: 'Carina', type: 'Giant emission nebula and star-forming complex', format: 'volume', colour: 0xd87a67,
     description: 'NGC 3372 is a vast, turbulent stellar nursery more than 300 light-years across. This layered volume evokes its ionised cavities, illuminated cloud walls, embedded clusters, and obscuring molecular dust. The much smaller Homunculus Nebula and Eta Carinae A/B are positioned separately within this volume.',
@@ -145,6 +158,7 @@ let camera;
 let orbit;
 let planeGrid;
 let directionGroup;
+let earthGuideGroup;
 let selected = catalogue.find(star => /^(sun|sol)/i.test(star.name)) || catalogue[0];
 let scaleMode = 'compressed';
 let animationFrame;
@@ -202,9 +216,8 @@ function directionFromRaDec(raDegrees, decDegrees) {
   ).normalize();
 }
 
-function createDirectionArrow(name, detail, ra, dec, colour) {
+function createDirectionArrow(name, detail, ra, dec, colour, parent = directionGroup, length = 72) {
   const direction = directionFromRaDec(ra, dec);
-  const length = 72;
   const arrow = new THREE.ArrowHelper(direction, new THREE.Vector3(), length, colour, 4, 2);
   arrow.line.material.transparent = true;
   arrow.line.material.opacity = .58;
@@ -212,14 +225,95 @@ function createDirectionArrow(name, detail, ra, dec, colour) {
   arrow.cone.material.transparent = true;
   arrow.cone.material.opacity = .8;
   arrow.cone.material.depthWrite = false;
-  directionGroup.add(arrow);
+  parent.add(arrow);
 
   const labelElement = document.createElement('span');
   labelElement.className = 'universe-direction-label';
   labelElement.innerHTML = `<strong>${name}</strong><small>${detail}</small>`;
   const label = new CSS2DObject(labelElement);
   label.position.copy(direction.clone().multiplyScalar(length + 4));
-  directionGroup.add(label);
+  parent.add(label);
+}
+
+function linearGuideDistances(maximum) {
+  // Preserve a genuinely useful ruler around the Sun instead of only dividing
+  // the full (often several-thousand-light-year) volume into four broad rings.
+  const candidates = [1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2000, 4000, 6000, 10000];
+  const visible = candidates.filter(distance => distance < maximum * .96);
+  if (visible.length <= 10) return visible;
+
+  // Keep the fine inner ruler and thin only the largest, outermost values.
+  const inner = visible.filter(distance => distance <= 1000);
+  const outer = visible.filter(distance => distance > 1000);
+  return [...inner, ...outer.slice(-3)];
+}
+
+function clearEarthGuide() {
+  if (!earthGuideGroup) return;
+  earthGuideGroup.traverse(child => {
+    child.geometry?.dispose?.();
+    if (Array.isArray(child.material)) child.material.forEach(material => material.dispose?.());
+    else child.material?.dispose?.();
+  });
+  earthGuideGroup.clear();
+}
+
+function createDistanceRing(distance, colour = 0x4d91c9, labelAngle = 0) {
+  const radius = displayDistance(distance);
+  const points = [];
+  for (let index = 0; index < 128; index++) {
+    const angle = index / 128 * Math.PI * 2;
+    points.push(new THREE.Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius));
+  }
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({ color: colour, transparent: true, opacity: .38, depthWrite: false });
+  earthGuideGroup.add(new THREE.LineLoop(geometry, material));
+
+  const labelElement = document.createElement('span');
+  labelElement.className = 'universe-scale-label';
+  labelElement.textContent = `${integer.format(Math.round(distance))} ly`;
+  const label = new CSS2DObject(labelElement);
+  label.position.set(Math.cos(labelAngle) * radius, .12, Math.sin(labelAngle) * radius);
+  earthGuideGroup.add(label);
+}
+
+function updateEarthGuide() {
+  if (!earthGuideGroup) return;
+  clearEarthGuide();
+  const maximum = maximumDistance();
+  const outerRadius = displayDistance(maximum);
+  const disk = new THREE.Mesh(
+    new THREE.CircleGeometry(outerRadius, 128),
+    new THREE.MeshBasicMaterial({ color: 0x367bb6, transparent: true, opacity: .025, side: THREE.DoubleSide, depthWrite: false })
+  );
+  disk.rotation.x = -Math.PI / 2;
+  earthGuideGroup.add(disk);
+
+  const ringDistances = scaleMode === 'linear'
+    ? linearGuideDistances(maximum)
+    : [1, 10, 100, 1000, 5000, 10000].filter(distance => distance < maximum * .98);
+  ringDistances.forEach((distance, index) => {
+    const labelAngle = scaleMode === 'linear' ? (index % 4) * Math.PI / 2 : 0;
+    createDistanceRing(distance, index === ringDistances.length - 1 ? 0x70baff : 0x3f739f, labelAngle);
+  });
+
+  const equatorLabelElement = document.createElement('span');
+  equatorLabelElement.className = 'universe-scale-label equator-label';
+  equatorLabelElement.textContent = 'Earth’s equator extended into space';
+  const equatorLabel = new CSS2DObject(equatorLabelElement);
+  equatorLabel.position.set(-outerRadius * .72, .15, outerRadius * .68);
+  earthGuideGroup.add(equatorLabel);
+
+  createDirectionArrow(
+    'Polaris · north from Earth',
+    'toward the north celestial pole',
+    37.95456067,
+    89.26410897,
+    0xa8d7ff,
+    earthGuideGroup,
+    Math.max(34, outerRadius * .86)
+  );
+  earthGuideGroup.visible = controlsUi.earthGuide.checked;
 }
 
 function displayDistance(distance) {
@@ -310,6 +404,11 @@ function buildScene() {
   createDirectionArrow('Galactic Centre', 'toward the Milky Way’s core', 266.4051, -28.9362, 0xffb45f);
   createDirectionArrow('North Galactic Pole', 'perpendicular to the galactic plane', 192.8595, 27.1283, 0x76c8ff);
 
+  earthGuideGroup = new THREE.Group();
+  earthGuideGroup.name = 'Earth orientation and distance scale';
+  scene.add(earthGuideGroup);
+  updateEarthGuide();
+
   const texture = createStarTexture();
   catalogue.forEach(star => {
     star.physicalPosition = physicalPosition(star);
@@ -377,7 +476,7 @@ function createDiffuseNebulaVolume(nebula) {
   const uniforms = {
     uTime: { value: 0 },
     uCameraLocal: { value: new THREE.Vector3() },
-    uShape: { value: nebula.volumeShape === 'ring' ? 1 : nebula.volumeShape === 'cluster' ? 2 : nebula.volumeShape === 'dumbbell' ? 3 : nebula.volumeShape === 'rho' ? 4 : nebula.volumeShape === 'crab' ? 5 : nebula.volumeShape === 'carina' ? 7 : nebula.volumeShape === 'northamerica' ? 8 : nebula.volumeShape === 'owl' ? 9 : nebula.volumeShape === 'helix' ? 10 : nebula.volumeShape === 'vela' ? 11 : 0 }
+    uShape: { value: nebula.volumeShape === 'ring' ? 1 : nebula.volumeShape === 'cluster' ? 2 : nebula.volumeShape === 'dumbbell' ? 3 : nebula.volumeShape === 'rho' ? 4 : nebula.volumeShape === 'crab' ? 5 : nebula.volumeShape === 'carina' ? 7 : nebula.volumeShape === 'northamerica' ? 8 : nebula.volumeShape === 'owl' ? 9 : nebula.volumeShape === 'helix' ? 10 : nebula.volumeShape === 'vela' ? 11 : nebula.volumeShape === 'crescent' ? 12 : nebula.volumeShape === 'elephant' ? 13 : 0 }
   };
   const material = new THREE.ShaderMaterial({
     uniforms,
@@ -528,6 +627,44 @@ function createDiffuseNebulaVolume(nebula) {
           float shrapnelD = smoothstep(.2,.04,length((p - vec3(.58,-.64,-.04)) * vec3(1.4,.72,1.12))) * .42;
           return shock * largeBreaks * (fineThreads * .85 + sweptFilaments * .38) + broadXrayShell * largeBreaks + hotInterior + shrapnelA + shrapnelD;
         }
+        if (uShape == 12) {
+          vec3 q = (p - vec3(.06,-.02,.0)) * vec3(.8,1.05,.94);
+          float radius = length(q);
+          float warpedRadius = radius + (fbm(p * 4.0 + vec3(2.4,5.1,1.3)) - .5) * .105;
+          float thinSkin = smoothstep(.105,.025,abs(warpedRadius - .76));
+          float compressedShell = smoothstep(.19,.045,abs(warpedRadius - .66));
+          float angle = atan(q.y,q.x);
+          float crescentArc = .18 + .82 * smoothstep(-.52,.72,sin(angle + .72));
+          float rupturedEdge = smoothstep(.34,.7,fbm(p * 6.2 - vec3(4.0,1.6,3.1)));
+          float filamentNet = smoothstep(.45,.77,fbm(p * 15.5 + vec3(1.3,4.7,2.2)));
+          float folds = .42 + .58 * abs(sin(angle * 7.0 + p.z * 13.0 + fbm(p * 8.0) * 4.5));
+          float hotBubble = smoothstep(.61,.12,radius) * smoothstep(.37,.72,fbm(p * 5.0)) * .09;
+          float blowout = smoothstep(.3,.06,length((p - vec3(.72,.18,.02)) * vec3(.62,1.35,1.0))) * .32;
+          return thinSkin * (.3 + rupturedEdge * .7) + compressedShell * crescentArc * (filamentNet * .9 + folds * .42) + hotBubble + blowout;
+        }
+        if (uShape == 13) {
+          vec3 q = p * vec3(.82,.84,1.72);
+          float hiiEnvelope = smoothstep(1.0,.12,length(q));
+          float billows = smoothstep(.27,.7,fbm(p * 5.1 + vec3(2.7,4.3,1.2)));
+          float fineClouds = smoothstep(.39,.75,fbm(p * 11.5 - vec3(4.1,1.8,3.0)));
+
+          // IC 1396A sits well off-centre: a broad curled head on the right
+          // tapers down and left into the long sinuous trunk seen from Earth.
+          float trunkA = length((p - vec3(.58,-.08,.04)) * vec3(2.0,2.4,2.8));
+          float trunkB = length((p - vec3(.48,-.23,.03)) * vec3(2.7,2.15,3.0));
+          float trunkC = length((p - vec3(.38,-.38,.01)) * vec3(3.2,2.2,3.3));
+          float trunkD = length((p - vec3(.27,-.52,-.01)) * vec3(3.8,2.45,3.6));
+          float trunkE = length((p - vec3(.13,-.63,-.03)) * vec3(4.8,3.0,4.0));
+          float trunkDistance = min(min(trunkA,trunkB),min(min(trunkC,trunkD),trunkE));
+          float darkGlobule = smoothstep(.3,.12,trunkDistance);
+          float brightRim = smoothstep(.38,.24,trunkDistance) * smoothstep(.1,.23,trunkDistance);
+          float compressedHead = smoothstep(.3,.07,length((p - vec3(.6,-.06,.04)) * vec3(1.25,1.45,1.3)));
+          float centralCavity = smoothstep(.28,.08,length((p - vec3(-.18,-.08,.02)) * vec3(.8,1.15,1.8)));
+          float upperLane = smoothstep(.12,.025,abs(p.y - .48 - p.x * .24)) * smoothstep(.82,.18,length(p.xz));
+          float depthFade = smoothstep(.7,.06,abs(p.z));
+          float glowingGas = hiiEnvelope * (.2 + billows * .58 + fineClouds * .2) * (1.0 - darkGlobule * .97) * (1.0 - centralCavity * .46) * (1.0 - upperLane * .32);
+          return (glowingGas + brightRim * (.16 + fineClouds * .12) + compressedHead * .045) * depthFade;
+        }
         vec3 q = vec3(p.x * .78, p.y * 1.12, p.z * .9);
         float envelope = smoothstep(1.0, .18, length(q));
         float cavity = smoothstep(.12, .55, length((p - vec3(-.18,.08,.04)) * vec3(1.0,1.35,1.0)));
@@ -564,7 +701,11 @@ function createDiffuseNebulaVolume(nebula) {
                             ? mix(vec3(.08,.67,.78), vec3(1.0,.24,.16), smoothstep(.43,.88,length(samplePoint.xy)))
                             : uShape == 11
                               ? mix(vec3(.1,.55,.9), vec3(1.0,.2,.12), smoothstep(-.55,.62,samplePoint.y + noise(samplePoint * 4.0) * .35))
-                              : mix(vec3(.12,.28,.82), vec3(1.0,.28,.18), warm);
+                              : uShape == 12
+                                ? mix(vec3(.08,.7,.82), vec3(1.0,.22,.16), smoothstep(-.42,.58,samplePoint.y + noise(samplePoint * 4.2) * .32))
+                                : uShape == 13
+                                  ? mix(vec3(.42,.07,.09), vec3(1.0,.38,.34), smoothstep(-.52,.6,samplePoint.x + noise(samplePoint * 3.7) * .34))
+                                : mix(vec3(.12,.28,.82), vec3(1.0,.28,.18), warm);
           colour = mix(colour, vec3(.76,.91,1.0), pow(density, 2.2) * .55);
           float alpha = density * (uShape == 4 ? .16 : uShape == 11 ? .075 : .095) * (1.0 - accumulated.a);
           accumulated.rgb += colour * alpha;
@@ -580,9 +721,9 @@ function createDiffuseNebulaVolume(nebula) {
   const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 72, 48), material);
   mesh.scale.fromArray(nebula.displayScale || [9, 9, 9]);
   mesh.rotation.set(
-    nebula.volumeShape === 'ring' ? -.48 : nebula.volumeShape === 'helix' ? 0 : -.24,
-    nebula.volumeShape === 'ring' ? .22 : nebula.volumeShape === 'helix' ? 0 : .38,
-    nebula.volumeShape === 'ring' ? 1.05 : nebula.volumeShape === 'helix' ? 0 : -.18
+    nebula.volumeShape === 'ring' ? -.48 : ['helix','elephant'].includes(nebula.volumeShape) ? 0 : -.24,
+    nebula.volumeShape === 'ring' ? .22 : ['helix','elephant'].includes(nebula.volumeShape) ? 0 : .38,
+    nebula.volumeShape === 'ring' ? 1.05 : ['helix','elephant'].includes(nebula.volumeShape) ? 0 : -.18
   );
   mesh.userData.volumeUniforms = uniforms;
   volumeMaterials.push({ mesh, uniforms });
@@ -666,6 +807,59 @@ function createDiffuseNebulaVolume(nebula) {
     pulsar.position.set(.18, -.32, .08);
     pulsar.scale.setScalar(.48);
     group.add(pulsar);
+    return group;
+  }
+  if (nebula.volumeShape === 'crescent') {
+    const group = new THREE.Group();
+    group.add(mesh);
+    const wr136 = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: createStarTexture(), color: 0xa9cfff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+    }));
+    wr136.position.set(.45, -.08, .12);
+    wr136.scale.setScalar(.65);
+    group.add(wr136);
+    return group;
+  }
+  if (nebula.volumeShape === 'elephant') {
+    const group = new THREE.Group();
+    group.add(mesh);
+    // The real globule is a feathered dust silhouette, not a hard opaque tube.
+    // Overlapping soft sprites give it smoky, irregular edges from every view.
+    const dustCanvas = document.createElement('canvas');
+    dustCanvas.width = dustCanvas.height = 128;
+    const dustContext = dustCanvas.getContext('2d');
+    const dustGradient = dustContext.createRadialGradient(64, 64, 5, 64, 64, 62);
+    dustGradient.addColorStop(0, 'rgba(0,0,0,.82)');
+    dustGradient.addColorStop(.42, 'rgba(2,3,5,.55)');
+    dustGradient.addColorStop(.76, 'rgba(4,6,9,.2)');
+    dustGradient.addColorStop(1, 'rgba(4,6,9,0)');
+    dustContext.fillStyle = dustGradient;
+    dustContext.fillRect(0, 0, 128, 128);
+    const dustTexture = new THREE.CanvasTexture(dustCanvas);
+    const dustBlobs = [
+      [7.25,-.65,.22,4.4,3.5,.22,.46],[6.35,-1.75,.18,3.2,2.55,.34,.41],
+      [5.25,-3.0,.12,2.7,2.2,.42,.37],[4.2,-4.25,.04,2.35,1.9,.52,.33],
+      [3.0,-5.35,-.04,2.05,1.65,.62,.29],[1.65,-6.25,-.12,1.7,1.35,.72,.25]
+    ];
+    dustBlobs.forEach(([x,y,z,width,height,rotation,opacity]) => {
+      const dust = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: dustTexture, color: 0x15171b, transparent: true, opacity,
+        depthWrite: false, depthTest: true, blending: THREE.NormalBlending, rotation
+      }));
+      dust.position.set(x,y,z);
+      dust.scale.set(width,height,1);
+      group.add(dust);
+    });
+    const starTexture = createStarTexture();
+    const youngStars = [[7.0,-.2,.3,.48],[6.2,-1.5,-.18,.34],[4.9,-3.0,.12,.28],[3.4,-4.8,-.1,.24]];
+    youngStars.forEach(([x,y,z,size]) => {
+      const star = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: starTexture, color: 0xffd5a3, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+      }));
+      star.position.set(x,y,z);
+      star.scale.setScalar(size);
+      group.add(star);
+    });
     return group;
   }
   if (nebula.volumeShape !== 'cluster') return mesh;
@@ -800,6 +994,12 @@ async function loadNebulaModel(nebula) {
       .normalize();
     model.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), helixAxis);
   }
+  if (nebula.volumeShape === 'elephant') {
+    // Present the observed broad face toward Earth; orbiting still reveals the
+    // shallower depth of the H II complex and the embedded globule.
+    const towardSun = directionFromRaDec(nebula.ra, nebula.dec).negate();
+    model.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), towardSun);
+  }
 
   const pivot = new THREE.Group();
   pivot.add(model);
@@ -922,6 +1122,7 @@ function updatePositions() {
     }
   });
   if (selected) updateSelectionLine();
+  updateEarthGuide();
   updateVisibleStars();
   controlsUi.scaleNote.innerHTML = scaleMode === 'linear'
     ? `<strong>Linear distance · ${integer.format(Math.round(maximumDistance()))} ly volume</strong><span>Distances and deep-sky spans are proportional. Invisible hit areas and labels keep physically tiny objects selectable.</span>`
@@ -1033,7 +1234,7 @@ function flyToStar(star) {
   if (!targetObject) return;
   const destinationTarget = targetObject.position.clone();
   const currentViewDirection = camera.position.clone().sub(orbit.target).normalize();
-  const direction = nebulaItem?.nebula.volumeShape === 'helix'
+  const direction = ['helix', 'elephant'].includes(nebulaItem?.nebula.volumeShape)
     ? destinationTarget.clone().negate().normalize()
     : currentViewDirection;
   const etaDiameter = nebulaItem?.nebula.volumeShape === 'eta'
@@ -1042,7 +1243,7 @@ function flyToStar(star) {
   const offset = /^(sun|sol)/i.test(star.name)
     ? 105
     : nebulaItem
-      ? (nebulaItem.nebula.volumeShape === 'eta' ? Math.max(.012, etaDiameter * 1.7) : scaleMode === 'linear' ? 5 : 28)
+      ? (nebulaItem.nebula.volumeShape === 'eta' ? Math.max(.012, etaDiameter * 1.7) : scaleMode === 'linear' ? 5 : nebulaItem.nebula.volumeShape === 'elephant' ? 27 : 28)
       : 22;
   flight = {
     started: performance.now(),
@@ -1114,9 +1315,11 @@ function resetView() {
   controlsUi.labels.checked = true;
   controlsUi.labelMagnitude.value = '1.5';
   controlsUi.plane.checked = true;
+  controlsUi.earthGuide.checked = true;
   controlsUi.directions.checked = true;
   controlsUi.nebulae.checked = true;
   planeGrid.visible = true;
+  earthGuideGroup.visible = true;
   directionGroup.visible = true;
   camera.position.set(70, 48, 105);
   orbit.target.set(0, 0, 0);
@@ -1147,12 +1350,16 @@ function bindEvents() {
   }));
   controlsUi.distance.addEventListener('input', () => {
     if (scaleMode === 'linear') updatePositions();
-    else updateVisibleStars();
+    else {
+      updateEarthGuide();
+      updateVisibleStars();
+    }
   });
   controlsUi.spectral.addEventListener('change', updateVisibleStars);
   controlsUi.labels.addEventListener('change', updateVisibleStars);
   controlsUi.labelMagnitude.addEventListener('input', updateVisibleStars);
   controlsUi.plane.addEventListener('change', () => { planeGrid.visible = controlsUi.plane.checked; });
+  controlsUi.earthGuide.addEventListener('change', () => { earthGuideGroup.visible = controlsUi.earthGuide.checked; });
   controlsUi.directions.addEventListener('change', () => { directionGroup.visible = controlsUi.directions.checked; });
   controlsUi.nebulae.addEventListener('change', async () => {
     if (controlsUi.nebulae.checked) {

@@ -52,6 +52,8 @@
 .universe-star-label.is-selected { color: #fff; background: rgba(36, 104, 180, .84); }
 .universe-direction-label { display: grid; gap: .08rem; padding: .3rem .42rem; color: #fff; background: rgba(3, 7, 15, .82); border-left: 2px solid #79c9ff; border-radius: 2px; font: 600 .65rem system-ui, sans-serif; text-shadow: 0 1px 3px #000; transform: translate(8px, -50%); white-space: nowrap; }
 .universe-direction-label small { color: #9eabc0; font-size: .54rem; font-weight: 500; }
+.universe-scale-label { padding: .14rem .32rem; color: #b9dcff; background: rgba(3, 7, 15, .76); border-radius: 3px; font: 600 .55rem system-ui, sans-serif; text-shadow: 0 1px 3px #000; white-space: nowrap; transform: translate(5px, -50%); }
+.universe-scale-label.equator-label { color: #89c9ff; border-left: 2px solid rgba(90, 177, 255, .8); }
 .universe-nebula-label { padding: .2rem .36rem; color: #fff; background: rgba(55, 24, 83, .82); border: 1px solid rgba(192, 146, 255, .65); border-radius: 999px; font: 700 .61rem system-ui, sans-serif; text-shadow: 0 1px 3px #000; transform: translate(-50%, -50%); white-space: nowrap; pointer-events: auto; cursor: pointer; }
 .universe-nebula-label:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .universe-component-label { color: #fff; font: 700 .55rem system-ui, sans-serif; text-shadow: 0 1px 4px #000, 0 0 5px #000; transform: translate(6px, -50%); white-space: nowrap; }
