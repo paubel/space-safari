@@ -110,6 +110,12 @@ const NEBULAE = [
     sourceUrl: 'https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-1/', representation: 'Procedural filamentary supernova-remnant volume', volumeShape: 'crab', displayScale: [7.0, 5.3, 5.0], physicalSizeLy: 10
   },
   {
+    name: 'Vela Supernova Remnant (SNR G263.9−3.3)', shortName: 'Vela Supernova Remnant', ra: 128.5, dec: -45.833333, distance: 815,
+    constellation: 'Vela', type: 'Core-collapse supernova remnant', format: 'volume', colour: 0x63cde2,
+    description: 'A thin, fragmented shock shell from a massive star that exploded roughly 11,000 years ago. The model combines an irregular, nearly spherical X-ray shell with brighter optical filaments, faint hot interior gas, and a few ejecta-like protrusions. Its centre follows SIMBAD; the adopted distance of 250 pc and diameter of about 35 pc follow absorption measurements and later physical modelling. Fine depth and filament placement are science-informed rather than a measured density reconstruction.',
+    sourceUrl: 'https://academic.oup.com/mnras/article/430/4/2864/1104514', sourceLabel: 'Open scientific reference →', modelSource: 'SIMBAD position · 250 pc distance model', representation: 'Procedural fragmented shock shell, filaments, and central pulsar', volumeShape: 'vela', displayScale: [12.5, 12.0, 11.5], physicalSizeLy: 114
+  },
+  {
     name: 'Carina Nebula (NGC 3372)', shortName: 'Carina Nebula (NGC 3372)', ra: 161.2854, dec: -59.8678, distance: 7500,
     constellation: 'Carina', type: 'Giant emission nebula and star-forming complex', format: 'volume', colour: 0xd87a67,
     description: 'NGC 3372 is a vast, turbulent stellar nursery more than 300 light-years across. This layered volume evokes its ionised cavities, illuminated cloud walls, embedded clusters, and obscuring molecular dust. The much smaller Homunculus Nebula and Eta Carinae A/B are positioned separately within this volume.',
@@ -371,7 +377,7 @@ function createDiffuseNebulaVolume(nebula) {
   const uniforms = {
     uTime: { value: 0 },
     uCameraLocal: { value: new THREE.Vector3() },
-    uShape: { value: nebula.volumeShape === 'ring' ? 1 : nebula.volumeShape === 'cluster' ? 2 : nebula.volumeShape === 'dumbbell' ? 3 : nebula.volumeShape === 'rho' ? 4 : nebula.volumeShape === 'crab' ? 5 : nebula.volumeShape === 'carina' ? 7 : nebula.volumeShape === 'northamerica' ? 8 : nebula.volumeShape === 'owl' ? 9 : nebula.volumeShape === 'helix' ? 10 : 0 }
+    uShape: { value: nebula.volumeShape === 'ring' ? 1 : nebula.volumeShape === 'cluster' ? 2 : nebula.volumeShape === 'dumbbell' ? 3 : nebula.volumeShape === 'rho' ? 4 : nebula.volumeShape === 'crab' ? 5 : nebula.volumeShape === 'carina' ? 7 : nebula.volumeShape === 'northamerica' ? 8 : nebula.volumeShape === 'owl' ? 9 : nebula.volumeShape === 'helix' ? 10 : nebula.volumeShape === 'vela' ? 11 : 0 }
   };
   const material = new THREE.ShaderMaterial({
     uniforms,
@@ -508,6 +514,20 @@ function createDiffuseNebulaVolume(nebula) {
           float hollowCore = smoothstep(.18,.34,radial);
           return (barrelWall * spokes * knots + flaredEnds * knots + outerEnvelope) * hollowCore;
         }
+        if (uShape == 11) {
+          vec3 q = p * vec3(.96,1.0,1.04);
+          float radius = length(q);
+          float distortedRadius = radius + (fbm(p * 3.2 + vec3(1.7,4.1,2.3)) - .5) * .1;
+          float shock = smoothstep(.115,.025,abs(distortedRadius - .78));
+          float broadXrayShell = smoothstep(.22,.055,abs(distortedRadius - .72)) * .2;
+          float largeBreaks = smoothstep(.37,.67,fbm(p * 4.8 + vec3(5.2,1.4,3.8)));
+          float fineThreads = smoothstep(.5,.76,fbm(p * 15.0 - vec3(2.1,5.0,1.7)));
+          float sweptFilaments = .45 + .55 * abs(sin(atan(p.y,p.x) * 9.0 + p.z * 10.0 + fbm(p * 7.0) * 4.0));
+          float hotInterior = smoothstep(.69,.12,radius) * smoothstep(.46,.75,fbm(p * 5.4)) * .075;
+          float shrapnelA = smoothstep(.18,.035,length((p - vec3(-.74,.48,.03)) * vec3(.7,1.5,1.15))) * .48;
+          float shrapnelD = smoothstep(.2,.04,length((p - vec3(.58,-.64,-.04)) * vec3(1.4,.72,1.12))) * .42;
+          return shock * largeBreaks * (fineThreads * .85 + sweptFilaments * .38) + broadXrayShell * largeBreaks + hotInterior + shrapnelA + shrapnelD;
+        }
         vec3 q = vec3(p.x * .78, p.y * 1.12, p.z * .9);
         float envelope = smoothstep(1.0, .18, length(q));
         float cavity = smoothstep(.12, .55, length((p - vec3(-.18,.08,.04)) * vec3(1.0,1.35,1.0)));
@@ -542,9 +562,11 @@ function createDiffuseNebulaVolume(nebula) {
                           ? mix(vec3(.12,.68,.7), vec3(.62,.9,.72), smoothstep(.28,.9,length(samplePoint)))
                           : uShape == 10
                             ? mix(vec3(.08,.67,.78), vec3(1.0,.24,.16), smoothstep(.43,.88,length(samplePoint.xy)))
-                            : mix(vec3(.12,.28,.82), vec3(1.0,.28,.18), warm);
+                            : uShape == 11
+                              ? mix(vec3(.1,.55,.9), vec3(1.0,.2,.12), smoothstep(-.55,.62,samplePoint.y + noise(samplePoint * 4.0) * .35))
+                              : mix(vec3(.12,.28,.82), vec3(1.0,.28,.18), warm);
           colour = mix(colour, vec3(.76,.91,1.0), pow(density, 2.2) * .55);
-          float alpha = density * (uShape == 4 ? .16 : .095) * (1.0 - accumulated.a);
+          float alpha = density * (uShape == 4 ? .16 : uShape == 11 ? .075 : .095) * (1.0 - accumulated.a);
           accumulated.rgb += colour * alpha;
           accumulated.a += alpha;
           samplePoint += rayDirection * stepSize;
@@ -632,6 +654,17 @@ function createDiffuseNebulaVolume(nebula) {
       map: createStarTexture(), color: 0xbfd7ff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
     }));
     pulsar.scale.setScalar(.62);
+    group.add(pulsar);
+    return group;
+  }
+  if (nebula.volumeShape === 'vela') {
+    const group = new THREE.Group();
+    group.add(mesh);
+    const pulsar = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: createStarTexture(), color: 0xaed4ff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+    }));
+    pulsar.position.set(.18, -.32, .08);
+    pulsar.scale.setScalar(.48);
     group.add(pulsar);
     return group;
   }
