@@ -67,14 +67,14 @@ const observations = [
   },
   {
     id: 'ngc7000', title: 'North America Nebula', catalogue: 'NGC 7000', constellation: 'Cygnus',
-    ra: 20.975, dec: 44.33, image: 'assets/images/astrophoto/north-america-nebula.jpg', frame: [2.25, 4.0],
+    ra: 20.975, dec: 44.33, image: 'assets/images/astrophoto/north-america-nebula.jpg', frame: [2.25, 4.0], feather: 0.14, renderOrder: 1,
     type: 'Emission nebula · H II region',
     distance: 'about 2,600 light-years', size: '2.0° × 1.7°', moons: '4.0 × 3.4 Moon diameters',
     summary: 'A vast hydrogen-emission region whose bright clouds and dark dust lanes trace a familiar continental silhouette.'
   },
   {
     id: 'ic5070', title: 'The Pelican Nebula', catalogue: 'IC 5070 · IC 5067', constellation: 'Cygnus',
-    ra: 20.85, dec: 44.3667, image: 'assets/images/astrophoto/IC 5070 – Pelican Nebula.jpg', frame: [2.25, 4.0],
+    ra: 20.85, dec: 44.3667, image: 'assets/images/astrophoto/IC 5070 – Pelican Nebula.jpg', frame: [2.25, 4.0], feather: 0.14, renderOrder: 2,
     type: 'Emission nebula · H II region',
     distance: 'about 1,800 light-years', size: 'about 1° across', moons: 'about 2 Moon diameters',
     summary: 'A glowing star-forming cloud beside the North America Nebula. A dark lane of interstellar dust separates the two bright regions and creates the Pelican’s distinctive outline.'
@@ -504,6 +504,32 @@ const selectable = [];
 const textureLoader = new THREE.TextureLoader();
 let loadedTextures = 0;
 
+function makeFeatherMap(edgeFraction) {
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const context = canvas.getContext('2d');
+  const pixels = context.createImageData(size, size);
+  const feather = Math.max(1, size * edgeFraction);
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const distanceToEdge = Math.min(x, y, size - 1 - x, size - 1 - y);
+      const alpha = THREE.MathUtils.smoothstep(distanceToEdge, 0, feather);
+      const offset = (y * size + x) * 4;
+      pixels.data[offset] = 255;
+      pixels.data[offset + 1] = Math.round(alpha * 255);
+      pixels.data[offset + 2] = 255;
+      pixels.data[offset + 3] = 255;
+    }
+  }
+
+  context.putImageData(pixels, 0, 0);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.NoColorSpace;
+  return texture;
+}
+
 observations.forEach((observation, index) => {
   const button = document.createElement('button');
   button.type = 'button';
@@ -516,7 +542,13 @@ observations.forEach((observation, index) => {
   const width = 2 * 90 * Math.tan(THREE.MathUtils.degToRad(observation.frame[0]) / 2);
   const height = 2 * 90 * Math.tan(THREE.MathUtils.degToRad(observation.frame[1]) / 2);
   const geometry = new THREE.PlaneGeometry(width, height);
-  const material = new THREE.MeshBasicMaterial({ transparent: true, opacity: .9, side: THREE.DoubleSide, depthWrite: false });
+  const material = new THREE.MeshBasicMaterial({
+    transparent: true,
+    opacity: observation.feather ? 1 : .9,
+    alphaMap: observation.feather ? makeFeatherMap(observation.feather) : null,
+    side: THREE.DoubleSide,
+    depthWrite: false
+  });
   const plane = new THREE.Mesh(geometry, material);
   plane.position.copy(center);
   plane.lookAt(0, 0, 0);
