@@ -80,6 +80,13 @@ const observations = [
     summary: 'A glowing star-forming cloud beside the North America Nebula. A dark lane of interstellar dust separates the two bright regions and creates the Pelican’s distinctive outline.'
   },
   {
+    id: 'ic5146', title: 'The Cocoon Nebula', catalogue: 'IC 5146 · Caldwell 19 · Sh2-125', constellation: 'Cygnus',
+    ra: 21.89147, dec: 47.2461, image: 'assets/images/astrophoto/IC 5146 – Cocoon Nebula.jpg', frame: [3.8, 3.8],
+    type: 'Emission and reflection nebula · star-forming region',
+    distance: 'about 4,000 light-years', size: 'about 0.22° across', moons: 'about 0.44 Moon diameters',
+    summary: 'A compact stellar nursery where glowing hydrogen, blue reflected starlight and dark molecular dust surround a young embedded star cluster. The dark nebula Barnard 168 extends westward from the bright Cocoon.'
+  },
+  {
     id: 'ngc6888', title: 'The Crescent Nebula', catalogue: 'NGC 6888 · Caldwell 27', constellation: 'Cygnus',
     ra: 20.2083, dec: 38.4167, image: 'assets/images/astrophoto/Ngc-6888.jpg', frame: [2.25, 4.0],
     type: 'Wind-blown emission nebula',
