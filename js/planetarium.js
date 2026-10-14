@@ -10,6 +10,13 @@ const observations = [
     summary: 'Our nearest large galactic neighbour, accompanied by M32 and M110. Its faint outer disc spans far more sky than the bright core suggests.'
   },
   {
+    id: 'm33', title: 'The Triangulum Galaxy', catalogue: 'M33 · NGC 598', constellation: 'Triangulum',
+    ra: 1.56414, dec: 30.6602, image: 'assets/images/astrophoto/m33.jpg', frame: [3.8, 3.8],
+    type: 'Face-on spiral galaxy · Local Group',
+    distance: 'about 2.7 million light-years', size: 'about 1.2° × 0.7°', moons: 'about 2.4 × 1.4 Moon diameters',
+    summary: 'The Local Group’s third-largest spiral galaxy. Its nearly face-on disc reveals loose spiral arms, bright star-forming regions and the enormous emission nebula NGC 604.'
+  },
+  {
     id: 'm81', title: "Bode’s Galaxy & friends", catalogue: 'M81 · M82 · NGC 3077', constellation: 'Ursa Major',
     ra: 9.926, dec: 69.10, image: 'assets/images/astrophoto/Bode and friends.jpg', frame: [2.25, 3.0],
     type: 'Interacting galaxy group',
@@ -64,6 +71,13 @@ const observations = [
     type: 'Emission nebula · H II region',
     distance: 'about 2,600 light-years', size: '2.0° × 1.7°', moons: '4.0 × 3.4 Moon diameters',
     summary: 'A vast hydrogen-emission region whose bright clouds and dark dust lanes trace a familiar continental silhouette.'
+  },
+  {
+    id: 'ic5070', title: 'The Pelican Nebula', catalogue: 'IC 5070 · IC 5067', constellation: 'Cygnus',
+    ra: 20.85, dec: 44.3667, image: 'assets/images/astrophoto/IC 5070 – Pelican Nebula.jpg', frame: [2.25, 4.0],
+    type: 'Emission nebula · H II region',
+    distance: 'about 1,800 light-years', size: 'about 1° across', moons: 'about 2 Moon diameters',
+    summary: 'A glowing star-forming cloud beside the North America Nebula. A dark lane of interstellar dust separates the two bright regions and creates the Pelican’s distinctive outline.'
   },
   {
     id: 'ngc6888', title: 'The Crescent Nebula', catalogue: 'NGC 6888 · Caldwell 27', constellation: 'Cygnus',
