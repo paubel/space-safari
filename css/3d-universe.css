@@ -28,6 +28,8 @@
 .universe-label-limit small { color: #758197; font-size: .61rem; font-weight: 500; line-height: 1.35; letter-spacing: 0; text-transform: none; }
 .universe-quality-field small { color: #758197; font-size: .61rem; font-weight: 500; line-height: 1.35; letter-spacing: 0; text-transform: none; }
 #universe-quality-output { color: #8fd2ff; }
+.universe-milky-way-label-toggle { padding-left: 1.35rem; }
+.universe-milky-way-label { pointer-events: none; color: rgba(180, 211, 255, .78); font-size: .64rem; font-weight: 700; letter-spacing: .06em; text-shadow: 0 1px 5px #020713, 0 0 9px #020713; text-transform: uppercase; white-space: nowrap; }
 .universe-segmented { display: grid; grid-template-columns: 1fr 1fr; gap: .35rem; margin: 1rem 0 0; padding: 0; border: 0; }
 .universe-segmented legend { grid-column: 1 / -1; margin-bottom: .4rem; color: var(--text-muted); font-size: .66rem; font-weight: 750; letter-spacing: .05em; text-transform: uppercase; }
 .universe-segmented label { position: relative; }

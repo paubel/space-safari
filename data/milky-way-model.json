@@ -1,0 +1,97 @@
+{
+  "modelVersion": "Space Safari Milky Way 2026.1",
+  "updated": "2026-10",
+  "coordinateSystem": "galactocentric-cartesian-light-years",
+  "sunDistanceFromCentreLy": 26400,
+  "description": "Observation-informed educational density model. Arm centre lines are a hybrid approximation and are not presented as a complete measured map.",
+  "sources": [
+    {
+      "label": "BeSSeL/VLBI spiral structure",
+      "url": "https://arxiv.org/abs/1910.03357"
+    },
+    {
+      "label": "ESA Gaia DR3 young-star structure",
+      "url": "https://www.cosmos.esa.int/web/gaia/dr3-where-are-the-stars"
+    },
+    {
+      "label": "Classical Cepheid spiral tracers (2024)",
+      "url": "https://arxiv.org/abs/2406.09127"
+    },
+    {
+      "label": "NASA Chandra/XMM outer-arm constraints (2026)",
+      "url": "https://science.nasa.gov/missions/chandra/nasas-chandra-examines-milky-way-at-arms-length/"
+    }
+  ],
+  "credit": {
+    "label": "Visual technique inspired by Dan Greenheck's WebGPU Galaxy",
+    "url": "https://github.com/dgreenheck/webgpu-galaxy"
+  },
+  "disk": {
+    "radiusLy": 52000,
+    "scaleLengthLy": 11000,
+    "halfThicknessLy": 520
+  },
+  "bulge": {
+    "radiusLy": 6200,
+    "halfThicknessLy": 2600
+  },
+  "bar": {
+    "lengthLy": 16500,
+    "widthLy": 4300,
+    "angleDegrees": 27
+  },
+  "arms": [
+    {
+      "id": "perseus",
+      "name": "Perseus Arm",
+      "phaseDegrees": 152,
+      "startRadiusLy": 11100,
+      "pitchDegrees": 9.4,
+      "turns": 1.42,
+      "widthLy": 1550,
+      "confidence": "medium"
+    },
+    {
+      "id": "sagittarius-carina",
+      "name": "Sagittarius–Carina Arm",
+      "phaseDegrees": 62,
+      "startRadiusLy": 9800,
+      "pitchDegrees": 10.6,
+      "turns": 1.5,
+      "widthLy": 1450,
+      "confidence": "medium"
+    },
+    {
+      "id": "scutum-centaurus",
+      "name": "Scutum–Centaurus Arm",
+      "phaseDegrees": -28,
+      "startRadiusLy": 8500,
+      "pitchDegrees": 12.1,
+      "turns": 1.54,
+      "widthLy": 1500,
+      "confidence": "medium"
+    },
+    {
+      "id": "norma-outer",
+      "name": "Norma–Outer Arm",
+      "phaseDegrees": -118,
+      "startRadiusLy": 7600,
+      "pitchDegrees": 12.8,
+      "turns": 1.62,
+      "widthLy": 1750,
+      "confidence": "low-to-medium"
+    }
+  ],
+  "spurs": [
+    {
+      "id": "orion",
+      "name": "Orion Spur",
+      "centreXFromSunLy": -450,
+      "centreYFromSunLy": 0,
+      "lengthLy": 20000,
+      "widthLy": 3500,
+      "angleDegrees": 25,
+      "confidence": "high-near-sun"
+    }
+  ]
+}

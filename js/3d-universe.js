@@ -4,6 +4,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { STARS } from '../data/astrophoto/interactive-stars.js?v=3d-prototype-1';
 import { createSagittariusAVisualizer } from './sagittarius-a-webgpu.js?v=adaptive-quality-1';
+import { createMilkyWay } from './milky-way.js?v=2';
 
 if (sessionStorage.getItem('space-safari-universe-return')) {
   document.body.classList.add('is-arriving-universe');
@@ -32,6 +33,9 @@ const controlsUi = {
   plane: document.querySelector('#universe-plane'),
   earthGuide: document.querySelector('#universe-earth-guide'),
   directions: document.querySelector('#universe-directions'),
+  milkyWay: document.querySelector('#universe-milky-way'),
+  milkyWayLabels: document.querySelector('#universe-milky-way-labels'),
+  milkyWayStatus: document.querySelector('#universe-milky-way-status'),
   nebulae: document.querySelector('#universe-nebulae'),
   nebulaStatus: document.querySelector('#universe-model-status'),
   nebulaList: document.querySelector('#universe-nebula-list'),
@@ -55,6 +59,7 @@ const details = {
   temperature: document.querySelector('#universe-object-temperature'),
   luminosity: document.querySelector('#universe-object-luminosity'),
   radius: document.querySelector('#universe-object-radius'),
+  galacticStructure: document.querySelector('#universe-object-galactic-structure'),
   hr: document.querySelector('#universe-hr-link'),
   source: document.querySelector('#universe-source-link'),
   labels: {
@@ -184,6 +189,8 @@ let animationFrame;
 let isAnimating = false;
 let flight = null;
 let sagittariusAVisualizer = null;
+let milkyWay = null;
+let milkyWayLoadPromise = null;
 let backgroundStars = null;
 let qualityMode = localStorage.getItem('space-safari-quality-mode') || 'auto';
 let activeQuality = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4 ? 'low' : 'medium';
@@ -1172,6 +1179,7 @@ function updatePositions() {
   });
   if (selected) updateSelectionLine();
   updateEarthGuide();
+  milkyWay?.setScaleMode(scaleMode, maximumDistance());
   updateVisibleStars();
   controlsUi.scaleNote.innerHTML = scaleMode === 'linear'
     ? `<strong>Linear distance · ${integer.format(Math.round(maximumDistance()))} ly volume</strong><span>Distances and deep-sky spans are proportional. Invisible hit areas and labels keep physically tiny objects selectable.</span>`
@@ -1205,6 +1213,23 @@ function setDetailLabels(labels) {
   Object.entries(labels).forEach(([key, value]) => { details.labels[key].textContent = value; });
 }
 
+function galacticStructureText(object) {
+  const structure = object?.galacticStructure;
+  if (!structure) return milkyWay ? 'Outside the classified model' : 'Loading Milky Way model…';
+  const qualifier = /uncertain|not arm-classified/.test(structure.confidence)
+    ? structure.confidence
+    : `${structure.confidence} confidence`;
+  return `${structure.label} · ${qualifier}`;
+}
+
+function updateGalacticClassifications() {
+  if (!milkyWay) return;
+  [...catalogue, ...NEBULAE].forEach(object => {
+    if (object.physicalPosition) object.galacticStructure = milkyWay.classifyPosition(object.physicalPosition, object);
+  });
+  if (selected) details.galacticStructure.textContent = galacticStructureText(selected);
+}
+
 function selectStar(star, fly = false) {
   if (!star) return;
   const isSun = /^(sun|sol)/i.test(star.name);
@@ -1235,6 +1260,9 @@ function selectStar(star, fly = false) {
   details.temperature.textContent = formatValue(star.temperature, 'K', 0);
   details.luminosity.textContent = formatValue(star.luminosity, 'L☉');
   details.radius.textContent = formatValue(star.radius, 'R☉');
+  details.galacticStructure.textContent = isSun
+    ? 'Orion Spur · high confidence near the Sun'
+    : galacticStructureText(star);
   details.hr.href = `hr-diagram.html?star=${encodeURIComponent(isSun ? 'Sol' : star.name)}`;
   details.hr.hidden = false;
   details.source.hidden = true;
@@ -1275,6 +1303,7 @@ function selectNebula(nebula, fly = false) {
   details.temperature.textContent = nebula.modelSource || (nebula.format === 'volume' ? 'NASA visualization reference' : 'NASA 3D Resources');
   details.luminosity.textContent = nebula.representation || 'Scientific reconstruction';
   details.radius.textContent = isBlackHole ? '< 1 AU (enlarged here)' : `≈ ${number.format(nebula.physicalSizeLy)} ly`;
+  details.galacticStructure.textContent = galacticStructureText(nebula);
   details.hr.hidden = true;
   details.source.href = nebula.sourceUrl;
   details.source.textContent = nebula.sourceLabel || (nebula.volumeShape === 'eta' ? 'Open ESO 3D model source →' : 'Open NASA reference →');
@@ -1336,6 +1365,8 @@ function saveUniverseReturnState() {
     plane: controlsUi.plane.checked,
     earthGuide: controlsUi.earthGuide.checked,
     directions: controlsUi.directions.checked,
+    milkyWay: controlsUi.milkyWay.checked,
+    milkyWayLabels: controlsUi.milkyWayLabels.checked,
     nebulae: controlsUi.nebulae.checked,
     selected: selected?.name || null
   };
@@ -1357,10 +1388,18 @@ function restoreUniverseReturnState() {
     controlsUi.plane.checked = state.plane !== false;
     controlsUi.earthGuide.checked = state.earthGuide !== false;
     controlsUi.directions.checked = state.directions !== false;
+    controlsUi.milkyWay.checked = state.milkyWay !== false;
+    controlsUi.milkyWayLabels.checked = state.milkyWayLabels === true;
+    controlsUi.milkyWayLabels.disabled = !controlsUi.milkyWay.checked;
     controlsUi.nebulae.checked = state.nebulae !== false;
     camera.position.fromArray(state.camera);
     orbit.target.fromArray(state.target);
     updatePositions();
+    if (controlsUi.milkyWay.checked) {
+      loadMilkyWay().then(() => milkyWay?.setLabelsVisible(controlsUi.milkyWayLabels.checked));
+    } else {
+      milkyWay?.setVisible(false);
+    }
     const restored = [...catalogue, ...NEBULAE].find(object => object.name === state.selected);
     if (restored?.volumeShape) selectNebula(restored);
     else if (restored) selectStar(restored);
@@ -1422,6 +1461,7 @@ function applyQuality(level) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, profile.pixelRatio));
   volumeMaterials.forEach(({ uniforms }) => { uniforms.uMaxSteps.value = profile.volumeSteps; });
   backgroundStars?.geometry.setDrawRange(0, profile.backgroundStars);
+  milkyWay?.setQuality(level);
   controlsUi.qualityOutput.textContent = `${qualityMode === 'auto' ? 'Auto · ' : ''}${level[0].toUpperCase()}${level.slice(1)}`;
   resize();
 }
@@ -1479,6 +1519,7 @@ function animate(time) {
   orbit.update();
   updateAdaptiveQuality(time);
   updateBlackHoleLod(time);
+  if (milkyWay?.group.visible) milkyWay.update(camera, time);
   volumeMaterials.forEach(({ mesh, uniforms }) => {
     uniforms.uTime.value = time * .001;
     uniforms.uCameraLocal.value.copy(mesh.worldToLocal(camera.position.clone()));
@@ -1540,6 +1581,7 @@ function bindEvents() {
     else {
       updateEarthGuide();
       updateVisibleStars();
+      milkyWay?.setScaleMode(scaleMode, maximumDistance());
     }
   });
   controlsUi.spectral.addEventListener('change', updateVisibleStars);
@@ -1556,6 +1598,16 @@ function bindEvents() {
   controlsUi.plane.addEventListener('change', () => { planeGrid.visible = controlsUi.plane.checked; });
   controlsUi.earthGuide.addEventListener('change', () => { earthGuideGroup.visible = controlsUi.earthGuide.checked; });
   controlsUi.directions.addEventListener('change', () => { directionGroup.visible = controlsUi.directions.checked; });
+  controlsUi.milkyWay.addEventListener('change', async () => {
+    localStorage.setItem('space-safari-show-milky-way', String(controlsUi.milkyWay.checked));
+    if (controlsUi.milkyWay.checked) await loadMilkyWay();
+    milkyWay?.setVisible(controlsUi.milkyWay.checked);
+    controlsUi.milkyWayLabels.disabled = !controlsUi.milkyWay.checked;
+  });
+  controlsUi.milkyWayLabels.addEventListener('change', () => {
+    localStorage.setItem('space-safari-show-milky-way-labels', String(controlsUi.milkyWayLabels.checked));
+    milkyWay?.setLabelsVisible(controlsUi.milkyWayLabels.checked);
+  });
   controlsUi.nebulae.addEventListener('change', async () => {
     if (controlsUi.nebulae.checked) {
       controlsUi.distance.value = '3.90';
@@ -1613,13 +1665,51 @@ function bindEvents() {
   });
 }
 
+async function loadMilkyWay() {
+  if (milkyWay) return milkyWay;
+  if (milkyWayLoadPromise) return milkyWayLoadPromise;
+  controlsUi.milkyWayStatus.textContent = 'Building the Milky Way map on your device…';
+  milkyWayLoadPromise = createMilkyWay({
+    scene,
+    modelUrl: new URL('../data/milky-way-model.json', import.meta.url),
+    displayDistance,
+    initialQuality: activeQuality
+  }).then(instance => {
+    milkyWay = instance;
+    milkyWay.setScaleMode(scaleMode, maximumDistance());
+    milkyWay.setQuality(activeQuality);
+    milkyWay.setVisible(controlsUi.milkyWay.checked);
+    milkyWay.setLabelsVisible(controlsUi.milkyWayLabels.checked);
+    controlsUi.milkyWayStatus.innerHTML = `${instance.model.modelVersion} · observation-informed · <a href="${instance.model.sources[0].url}" target="_blank" rel="noopener">scientific sources</a> · <a href="${instance.model.credit.url}" target="_blank" rel="noopener">Dan Greenheck inspiration</a>`;
+    updateGalacticClassifications();
+    return instance;
+  }).catch(error => {
+    console.warn('Milky Way layer could not be loaded.', error);
+    controlsUi.milkyWay.checked = false;
+    controlsUi.milkyWayLabels.disabled = true;
+    controlsUi.milkyWayStatus.textContent = 'Milky Way layer unavailable; the planetarium continues normally.';
+    milkyWayLoadPromise = null;
+    return null;
+  });
+  return milkyWayLoadPromise;
+}
+
 try {
   buildScene();
   bindEvents();
+  const storedMilkyWay = localStorage.getItem('space-safari-show-milky-way');
+  const storedMilkyWayLabels = localStorage.getItem('space-safari-show-milky-way-labels');
+  controlsUi.milkyWay.checked = storedMilkyWay !== 'false';
+  controlsUi.milkyWayLabels.checked = storedMilkyWayLabels === 'true';
+  controlsUi.milkyWayLabels.disabled = !controlsUi.milkyWay.checked;
   resize();
   applyQuality(qualityMode === 'auto' ? activeQuality : qualityMode);
   resetView();
-  loadNebulae().then(restoreUniverseReturnState);
+  if (controlsUi.milkyWay.checked) loadMilkyWay();
+  loadNebulae().then(() => {
+    updateGalacticClassifications();
+    restoreUniverseReturnState();
+  });
   loading.hidden = true;
   animate(performance.now());
 } catch (error) {
