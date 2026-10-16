@@ -183,6 +183,7 @@ let camera;
 let orbit;
 let planeGrid;
 let directionGroup;
+let galacticCentreGuide;
 let earthGuideGroup;
 let selected = catalogue.find(star => /^(sun|sol)/i.test(star.name)) || catalogue[0];
 let scaleMode = 'compressed';
@@ -270,6 +271,18 @@ function createDirectionArrow(name, detail, ra, dec, colour, parent = directionG
   const label = new CSS2DObject(labelElement);
   label.position.copy(direction.clone().multiplyScalar(length + 4));
   parent.add(label);
+  return { arrow, label, direction };
+}
+
+function updateGalacticCentreGuide() {
+  if (!galacticCentreGuide) return;
+  const centre = NEBULAE.find(object => object.volumeShape === 'sagittarius-a');
+  const physical = centre?.physicalPosition || physicalPositionForCoordinates(266.41683, -29.00781, 26400);
+  const direction = physical.clone().normalize();
+  const length = displayDistance(physical.length());
+  galacticCentreGuide.arrow.setDirection(direction);
+  galacticCentreGuide.arrow.setLength(length, Math.min(4, Math.max(.9, length * .055)), Math.min(2, Math.max(.55, length * .03)));
+  galacticCentreGuide.label.position.copy(direction.multiplyScalar(length));
 }
 
 function linearGuideDistances(maximum) {
@@ -434,7 +447,7 @@ function buildScene() {
   directionGroup = new THREE.Group();
   directionGroup.name = 'Milky Way directions';
   scene.add(directionGroup);
-  createDirectionArrow('Galactic Centre', 'toward the Milky Way’s core', 266.4051, -28.9362, 0xffb45f);
+  galacticCentreGuide = createDirectionArrow('Galactic Centre', 'Sagittarius A* · Milky Way centre', 266.41683, -29.00781, 0xffb45f);
   createDirectionArrow('North Galactic Pole', 'perpendicular to the galactic plane', 192.8595, 27.1283, 0x76c8ff);
 
   earthGuideGroup = new THREE.Group();
@@ -1180,6 +1193,7 @@ function updatePositions() {
   });
   if (selected) updateSelectionLine();
   updateEarthGuide();
+  updateGalacticCentreGuide();
   milkyWay?.setScaleMode(scaleMode, maximumDistance());
   updateVisibleStars();
   controlsUi.scaleNote.innerHTML = scaleMode === 'linear'
