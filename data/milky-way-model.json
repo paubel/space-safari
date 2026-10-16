@@ -1,13 +1,17 @@
 {
-  "modelVersion": "Space Safari Milky Way 2026.2",
+  "modelVersion": "Space Safari Milky Way 2026.3",
   "updated": "2026-10",
   "coordinateSystem": "galactocentric-cartesian-light-years",
   "sunDistanceFromCentreLy": 26400,
-  "description": "Observation-informed educational density model based on the barred, multi-arm Milky Way seen by Gaia, VLBI maser surveys and NASA visualisations. Arm centre lines remain an approximation because much of the far side is obscured.",
+  "description": "Observation-informed educational density model using ESA Gaia's 2025 face-on and edge-on artist impressions as its primary visual reference. Arm centre lines remain an approximation because much of the far side is obscured.",
   "sources": [
     {
-      "label": "ESA Gaia Milky Way map (2025)",
-      "url": "https://www.cosmos.esa.int/web/gaia/milky-way"
+      "label": "ESA Gaia best Milky Way map, labelled (2025)",
+      "url": "https://www.esa.int/ESA_Multimedia/Images/2025/01/The_best_Milky_Way_map_by_Gaia_labelled"
+    },
+    {
+      "label": "ESA Gaia best Milky Way map, edge-on (2025)",
+      "url": "https://www.esa.int/ESA_Multimedia/Images/2025/01/The_best_Milky_Way_map_by_Gaia_edge-on"
     },
     {
       "label": "NASA Milky Way structure and arm hierarchy",
@@ -33,16 +37,21 @@
   "disk": {
     "radiusLy": 56000,
     "scaleLengthLy": 11500,
-    "halfThicknessLy": 540
+    "halfThicknessLy": 480,
+    "thickDiskFraction": 0.16,
+    "thickDiskHalfThicknessLy": 1850,
+    "warpStartLy": 28500,
+    "warpAmplitudeLy": 850,
+    "warpPhaseDegrees": 18
   },
   "bulge": {
-    "radiusLy": 5700,
-    "halfThicknessLy": 2300
+    "radiusLy": 8200,
+    "halfThicknessLy": 4300
   },
   "bar": {
     "lengthLy": 20000,
-    "widthLy": 3600,
-    "halfThicknessLy": 1250,
+    "widthLy": 6800,
+    "halfThicknessLy": 2100,
     "angleDegrees": 27
   },
   "arms": [
@@ -54,10 +63,10 @@
       "sweepDegrees": 270,
       "startRadiusLy": 10000,
       "endRadiusLy": 55500,
-      "widthStartLy": 1050,
-      "widthEndLy": 2550,
-      "prominence": 1.0,
-      "clumpiness": 0.68,
+      "widthStartLy": 1750,
+      "widthEndLy": 4200,
+      "prominence": 0.82,
+      "clumpiness": 0.42,
       "labelFraction": 0.72,
       "confidence": "medium"
     },
@@ -69,10 +78,10 @@
       "sweepDegrees": 220,
       "startRadiusLy": 10000,
       "endRadiusLy": 55000,
-      "widthStartLy": 1050,
-      "widthEndLy": 2450,
-      "prominence": 0.94,
-      "clumpiness": 0.62,
+      "widthStartLy": 1700,
+      "widthEndLy": 3900,
+      "prominence": 0.78,
+      "clumpiness": 0.38,
       "labelFraction": 0.56,
       "confidence": "medium"
     },
@@ -84,10 +93,10 @@
       "sweepDegrees": 255,
       "startRadiusLy": 10500,
       "endRadiusLy": 43500,
-      "widthStartLy": 850,
-      "widthEndLy": 2050,
-      "prominence": 0.64,
-      "clumpiness": 0.78,
+      "widthStartLy": 1500,
+      "widthEndLy": 3500,
+      "prominence": 0.58,
+      "clumpiness": 0.46,
       "labelFraction": 0.76,
       "confidence": "medium"
     },
@@ -99,10 +108,10 @@
       "sweepDegrees": 248,
       "startRadiusLy": 10800,
       "endRadiusLy": 48500,
-      "widthStartLy": 850,
-      "widthEndLy": 2300,
-      "prominence": 0.57,
-      "clumpiness": 0.74,
+      "widthStartLy": 1450,
+      "widthEndLy": 3800,
+      "prominence": 0.50,
+      "clumpiness": 0.44,
       "labelFraction": 0.76,
       "confidence": "low-to-medium"
     }
@@ -119,10 +128,10 @@
         [26400, 0],
         [33000, 6500]
       ],
-      "widthStartLy": 900,
-      "widthEndLy": 1900,
-      "prominence": 0.32,
-      "clumpiness": 0.28,
+      "widthStartLy": 1250,
+      "widthEndLy": 3100,
+      "prominence": 0.14,
+      "clumpiness": 0.16,
       "labelFraction": 0.43,
       "confidence": "high-near-sun"
     }

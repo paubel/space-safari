@@ -77,6 +77,13 @@ function structureWidth(structure, fraction) {
   return THREE.MathUtils.lerp(structure.widthStartLy, structure.widthEndLy, fraction);
 }
 
+function galacticWarp(model, radius, angle) {
+  const start = model.disk.warpStartLy;
+  if (!start || radius <= start) return 0;
+  const strength = THREE.MathUtils.clamp((radius - start) / (model.disk.radiusLy - start), 0, 1);
+  return Math.sin(angle - model.disk.warpPhaseDegrees * DEG) * model.disk.warpAmplitudeLy * strength * strength;
+}
+
 function pushScenePosition(target, x, y, z, sunDistance) {
   target.push(...galactocentricToScene(x, y, z, sunDistance));
 }
@@ -116,13 +123,16 @@ function makeArmData(model, count, random, dust = false) {
     const across = dustLaneOffset + gaussian(random) * width * (dust ? .18 : .31) * Math.max(.18, taper);
     const x = point.x - tangent.y * across;
     const y = point.y + tangent.x * across;
-    const z = gaussian(random) * (dust ? 115 : 145 + point.radius * .0055);
-    const hot = !dust && random() < .20;
+    const z = galacticWarp(model, point.radius, point.angle) +
+      gaussian(random) * (dust ? 105 : 170 + point.radius * .007);
+    const colourRoll = random();
     const colour = dust
-      ? new THREE.Color().setRGB(.17 + random() * .055, .095 + random() * .03, .065 + random() * .018)
-      : hot
-        ? new THREE.Color().setRGB(.38 + random() * .18, .62 + random() * .18, .95)
-        : new THREE.Color().setRGB(.73 + random() * .24, .42 + random() * .22, .21 + random() * .18);
+      ? new THREE.Color().setRGB(.105 + random() * .035, .055 + random() * .022, .038 + random() * .015)
+      : colourRoll < .10
+        ? new THREE.Color().setRGB(.54 + random() * .13, .63 + random() * .14, .90)
+        : colourRoll < .125
+          ? new THREE.Color().setRGB(.78 + random() * .16, .22 + random() * .12, .18 + random() * .08)
+          : new THREE.Color().setRGB(.54 + random() * .18, .49 + random() * .16, .61 + random() * .19);
     pushScenePosition(positions, x, y, z, sunDistance);
     colours.push(colour.r, colour.g, colour.b);
   }
@@ -137,12 +147,36 @@ function makeDiskData(model, count, random) {
     const angle = random() * Math.PI * 2;
     const x = Math.cos(angle) * radius;
     const y = Math.sin(angle) * radius;
-    const z = gaussian(random) * model.disk.halfThicknessLy * (.28 + .72 * radius / model.disk.radiusLy);
-    const colour = new THREE.Color().setRGB(.50 + random() * .20, .45 + random() * .17, .37 + random() * .14);
+    const thickDisk = random() < model.disk.thickDiskFraction;
+    const thickness = thickDisk ? model.disk.thickDiskHalfThicknessLy : model.disk.halfThicknessLy;
+    const z = galacticWarp(model, radius, angle) +
+      gaussian(random) * thickness * (.34 + .66 * radius / model.disk.radiusLy);
+    const warmth = 1 - THREE.MathUtils.clamp(radius / 24000, 0, 1);
+    const colour = new THREE.Color().setRGB(
+      .40 + warmth * .20 + random() * .12,
+      .38 + warmth * .15 + random() * .11,
+      .48 + warmth * .08 + random() * .14
+    );
     pushScenePosition(positions, x, y, z, model.sunDistanceFromCentreLy);
     colours.push(colour.r, colour.g, colour.b);
   }
   return { positions, colours };
+}
+
+function makeDustData(model, count, random) {
+  const armCount = Math.round(count * .64);
+  const data = makeArmData(model, armCount, random, true);
+  for (let index = armCount; index < count; index++) {
+    const radius = Math.sqrt(random()) * model.disk.radiusLy;
+    const angle = random() * Math.PI * 2;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    const z = galacticWarp(model, radius, angle) + gaussian(random) * 85;
+    const colour = new THREE.Color().setRGB(.075 + random() * .035, .038 + random() * .018, .026 + random() * .012);
+    pushScenePosition(data.positions, x, y, z, model.sunDistanceFromCentreLy);
+    data.colours.push(colour.r, colour.g, colour.b);
+  }
+  return data;
 }
 
 function makeCoreData(model, count, random) {
@@ -154,7 +188,7 @@ function makeCoreData(model, count, random) {
     let y;
     let z;
     let colour;
-    if (random() < .73) {
+    if (random() < .38) {
       const halfLength = model.bar.lengthLy * .5;
       const along = THREE.MathUtils.clamp(gaussian(random) * halfLength * .45, -halfLength, halfLength);
       const endTaper = Math.sqrt(Math.max(.06, 1 - Math.pow(along / halfLength, 2)));
@@ -162,15 +196,15 @@ function makeCoreData(model, count, random) {
       x = Math.cos(barAngle) * along - Math.sin(barAngle) * across;
       y = Math.sin(barAngle) * along + Math.cos(barAngle) * across;
       z = gaussian(random) * model.bar.halfThicknessLy * .32 * endTaper;
-      colour = new THREE.Color().setRGB(.93 + random() * .07, .48 + random() * .20, .19 + random() * .12);
+      colour = new THREE.Color().setRGB(.88 + random() * .10, .70 + random() * .16, .52 + random() * .12);
     } else {
       const radius = Math.pow(random(), 1.45) * model.bulge.radiusLy;
       const angle = random() * Math.PI * 2;
-      const squash = .62 + .22 * Math.abs(Math.cos(angle - barAngle));
+      const squash = .88 + .08 * Math.abs(Math.cos(angle - barAngle));
       x = Math.cos(angle) * radius;
       y = Math.sin(angle) * radius * squash;
       z = gaussian(random) * model.bulge.halfThicknessLy * (1 - radius / model.bulge.radiusLy * .55);
-      colour = new THREE.Color().setRGB(.96 + random() * .04, .54 + random() * .17, .24 + random() * .12);
+      colour = new THREE.Color().setRGB(.90 + random() * .10, .76 + random() * .16, .62 + random() * .13);
     }
     pushScenePosition(positions, x, y, z, model.sunDistanceFromCentreLy);
     colours.push(colour.r, colour.g, colour.b);
@@ -182,13 +216,14 @@ function makeMaterial({ dust = false } = {}) {
   return new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
+    depthTest: !dust,
     blending: dust ? THREE.NormalBlending : THREE.AdditiveBlending,
     vertexColors: true,
     uniforms: {
       uLinear: { value: 0 },
       uMaximumDistance: { value: 8000 },
-      uOpacity: { value: dust ? .16 : .50 },
-      uPointSize: { value: dust ? 3.4 : 2.15 }
+      uOpacity: { value: dust ? .26 : .42 },
+      uPointSize: { value: dust ? 3.2 : 2.0 }
     },
     vertexShader: `
       uniform float uLinear;
@@ -302,9 +337,9 @@ function classifyPosition(position, object, model) {
 }
 
 const QUALITY = {
-  low: { arms: 9000, disk: 3500, core: 5000, dust: 0, opacity: .42, pointSize: 1.9 },
-  medium: { arms: 25000, disk: 9000, core: 11000, dust: 2800, opacity: .48, pointSize: 2.1 },
-  high: { arms: 56000, disk: 20000, core: 24000, dust: 7500, opacity: .54, pointSize: 2.3 }
+  low: { arms: 9000, disk: 12000, core: 5000, dust: 0, dustOpacity: 0, opacity: .31, pointSize: 1.75 },
+  medium: { arms: 25000, disk: 30000, core: 11000, dust: 5000, dustOpacity: .27, opacity: .36, pointSize: 1.9 },
+  high: { arms: 56000, disk: 60000, core: 24000, dust: 11000, dustOpacity: .32, opacity: .41, pointSize: 2.08 }
 };
 
 export async function createMilkyWay({ scene, modelUrl, displayDistance, initialQuality = 'medium' }) {
@@ -320,7 +355,7 @@ export async function createMilkyWay({ scene, modelUrl, displayDistance, initial
   const arms = createPoints(makeArmData(model, QUALITY.high.arms, random), makeMaterial(), 'Milky Way spiral arms');
   const disk = createPoints(makeDiskData(model, QUALITY.high.disk, random), makeMaterial(), 'Milky Way stellar disk');
   const core = createPoints(makeCoreData(model, QUALITY.high.core, random), makeMaterial(), 'Milky Way central bar and bulge');
-  const dust = createPoints(makeArmData(model, QUALITY.high.dust, random, true), makeMaterial({ dust: true }), 'Milky Way dust lanes');
+  const dust = createPoints(makeDustData(model, QUALITY.high.dust, random), makeMaterial({ dust: true }), 'Milky Way dust lanes');
   group.add(disk, arms, core, dust);
 
   const labels = [...model.arms, ...model.spurs].map(structure => {
@@ -380,10 +415,11 @@ export async function createMilkyWay({ scene, modelUrl, displayDistance, initial
       dust.geometry.setDrawRange(0, profile.dust);
       arms.material.uniforms.uOpacity.value = profile.opacity;
       arms.material.uniforms.uPointSize.value = profile.pointSize;
-      disk.material.uniforms.uOpacity.value = profile.opacity * .34;
-      disk.material.uniforms.uPointSize.value = profile.pointSize * .82;
-      core.material.uniforms.uOpacity.value = profile.opacity * .72;
-      core.material.uniforms.uPointSize.value = profile.pointSize * .94;
+      disk.material.uniforms.uOpacity.value = profile.opacity * .68;
+      disk.material.uniforms.uPointSize.value = profile.pointSize * .92;
+      core.material.uniforms.uOpacity.value = profile.opacity * .54;
+      core.material.uniforms.uPointSize.value = profile.pointSize * .90;
+      dust.material.uniforms.uOpacity.value = profile.dustOpacity;
       dust.visible = profile.dust > 0;
     },
     update() {},

@@ -6,7 +6,7 @@ Det här dokumentet är implementationsspecifikationen för ett visuellt och vet
 
 ## Implementerad version
 
-Den aktiva modellen är **Space Safari Milky Way 2026.2**. Den ersätter den första
+Den aktiva modellen är **Space Safari Milky Way 2026.3**. Den ersätter den första
 prototypens långa, jämnstarka logaritmiska spiraler med en data-driven,
 stavspiralformad modell:
 
@@ -22,10 +22,32 @@ stavspiralformad modell:
 - stoftbanden ligger förskjutna mot armarnas insidor,
 - inga jetstrålar, ljuskäglor eller andra utflöden skapas från Sagittarius A*.
 
+### Visuell huvudreferens
+
+Utseendet följer i första hand ESA/Gaia/DPAC:s båda illustrationer från januari
+2025:
+
+- [The best Milky Way map, by Gaia – labelled](https://www.esa.int/ESA_Multimedia/Images/2025/01/The_best_Milky_Way_map_by_Gaia_labelled)
+  styr den ovanifrån sedda helheten, den relativt svaga armkontrasten och den
+  silvergrå/lila färgpaletten.
+- [The best Milky Way map, by Gaia – edge-on](https://www.esa.int/ESA_Multimedia/Images/2025/01/The_best_Milky_Way_map_by_Gaia_edge-on)
+  styr skivans vertikala profil: en tunn stjärnskiva, ett mörkbrunt centralt
+  stoftband, en svag tjock skiva, en lätt yttre warp och en mjuk pärlvit/
+  varmgul central bula.
+
+Paletten ska vara dämpad. Spiralarmarna ska huvudsakligen bestå av kalla
+silver-, grå- och lavendeltoner med ett mindre antal blå unga stjärnor och få
+röda stjärnbildningsområden. Orange får inte vara armarnas dominerande färg.
+
 Knappen `View whole Milky Way` visar en ren galaxöversikt. Den döljer tillfälligt
 förstorade katalogstjärnor, deep-sky-markörer, koordinatnät och riktningspilar så
 att de inte kan misstolkas som galaxstruktur eller utflöden från det svarta
 hålet. Lagren kan fortfarande slås på igen via `View controls`.
+
+Knappen `View Milky Way edge-on` använder samma tredimensionella partiklar men
+placerar kameran i galaxplanet längs riktningen mellan solen och centrum. Den
+visar därmed den tunna skivan, den svagare tjocka skivan, warpen, stoftbandet och
+den centrala bulan utan att byta till en separat bakgrundsbild.
 
 Modellen ska:
 
@@ -122,7 +144,7 @@ Modellfilen ska innehålla metadata i denna form:
 
 ```json
 {
-  "modelVersion": "Space Safari Milky Way 2026.2",
+  "modelVersion": "Space Safari Milky Way 2026.3",
   "coordinateSystem": "galactocentric-cartesian-light-years",
   "sunDistanceFromCentreLy": 26400,
   "updated": "2026-10",
@@ -282,6 +304,11 @@ Modellen delas upp i separata draw calls eller logiska lager:
 - Centrum får inte innehålla jetstrålar, strålkäglor eller radiella
   dekorationslinjer. Sagittarius A* markeras endast som ett katalogobjekt när
   användaren aktiverar deep-sky-lagret.
+- I edge-on-vy ska den tunna skivan fortfarande kunna urskiljas från den
+  svagare tjocka skivan. Stoftet ska bilda ett sammanhängande men ojämnt mörkt
+  band genom skivplanet.
+- Den yttre skivan får ha en liten sinusformad warp. Den ska inte deformera den
+  centrala staven eller bulan.
 
 ## Prestanda och adaptiv kvalitet
 
@@ -291,9 +318,9 @@ Rekommenderade startvärden:
 
 | Kvalitet | Armstjärnor | Skiva och bula | Stoft | Eftereffekter |
 |---|---:|---:|---:|---|
-| Low | 9 000 | 3 500 skiva + 5 000 centrum | 0 | Ingen bloom |
-| Medium | 25 000 | 9 000 skiva + 11 000 centrum | 2 800 | Enkel punktglöd |
-| High | 56 000 | 20 000 skiva + 24 000 centrum | 7 500 | Begränsad punktglöd |
+| Low | 9 000 | 12 000 skiva + 5 000 centrum | 0 | Ingen bloom |
+| Medium | 25 000 | 30 000 skiva + 11 000 centrum | 5 000 | Enkel punktglöd |
+| High | 56 000 | 60 000 skiva + 24 000 centrum | 11 000 | Begränsad punktglöd |
 
 Den första implementationen ska hellre börja i den nedre delen av intervallen och därefter mätas på verklig hårdvara.
 
@@ -347,7 +374,7 @@ Föreslagen metadata:
     "classification": "Local (Orion) Arm",
     "confidence": "high",
     "method": "position-and-literature",
-    "modelVersion": "Space Safari Milky Way 2026.2"
+    "modelVersion": "Space Safari Milky Way 2026.3"
   }
 }
 ```
@@ -364,7 +391,7 @@ Informationspanelen kan visa:
 ```text
 Galactic structure: Orion Spur
 Confidence: High
-Model: Space Safari Milky Way 2026.2
+Model: Space Safari Milky Way 2026.3
 ```
 
 eller:

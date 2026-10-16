@@ -4,7 +4,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { STARS } from '../data/astrophoto/interactive-stars.js?v=3d-prototype-1';
 import { createSagittariusAVisualizer } from './sagittarius-a-webgpu.js?v=adaptive-quality-1';
-import { createMilkyWay } from './milky-way.js?v=6';
+import { createMilkyWay } from './milky-way.js?v=10';
 
 if (sessionStorage.getItem('space-safari-universe-return')) {
   document.body.classList.add('is-arriving-universe');
@@ -36,6 +36,7 @@ const controlsUi = {
   milkyWay: document.querySelector('#universe-milky-way'),
   milkyWayLabels: document.querySelector('#universe-milky-way-labels'),
   viewMilkyWay: document.querySelector('#universe-view-milky-way'),
+  viewMilkyWayEdge: document.querySelector('#universe-view-milky-way-edge'),
   milkyWayStatus: document.querySelector('#universe-milky-way-status'),
   nebulae: document.querySelector('#universe-nebulae'),
   nebulaStatus: document.querySelector('#universe-model-status'),
@@ -182,6 +183,7 @@ let scene;
 let camera;
 let orbit;
 let planeGrid;
+let universeAxis;
 let directionGroup;
 let galacticCentreGuide;
 let earthGuideGroup;
@@ -438,7 +440,8 @@ function buildScene() {
 
   const axesMaterial = new THREE.LineBasicMaterial({ color: 0x35557d, transparent: true, opacity: .32 });
   const axisGeometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -125, 0), new THREE.Vector3(0, 125, 0)]);
-  scene.add(new THREE.Line(axisGeometry, axesMaterial));
+  universeAxis = new THREE.Line(axisGeometry, axesMaterial);
+  scene.add(universeAxis);
 
   planeGrid = new THREE.GridHelper(240, 12, 0x31567f, 0x1b2a40);
   planeGrid.material.transparent = true;
@@ -1559,15 +1562,17 @@ function resetView() {
   controlsUi.directions.checked = true;
   controlsUi.nebulae.checked = true;
   planeGrid.visible = true;
+  universeAxis.visible = true;
   earthGuideGroup.visible = true;
   directionGroup.visible = true;
+  camera.up.set(0, 1, 0);
   camera.position.set(70, 48, 105);
   orbit.target.set(0, 0, 0);
   updatePositions();
   selectStar(catalogue.find(star => /^(sun|sol)/i.test(star.name)) || catalogue[0]);
 }
 
-async function viewWholeMilkyWay() {
+async function prepareMilkyWayOverview() {
   galaxyOverviewActive = true;
   controlsUi.milkyWay.checked = true;
   controlsUi.milkyWayLabels.disabled = false;
@@ -1583,6 +1588,7 @@ async function viewWholeMilkyWay() {
   directionGroup.visible = false;
   earthGuideGroup.visible = false;
   planeGrid.visible = false;
+  universeAxis.visible = false;
   scaleMode = 'linear';
   controlsUi.scale.forEach(input => { input.checked = input.value === scaleMode; });
   controlsUi.distance.value = '5.00';
@@ -1591,10 +1597,16 @@ async function viewWholeMilkyWay() {
   updatePositions();
 
   const galacticCentre = NEBULAE.find(object => object.volumeShape === 'sagittarius-a');
-  const centre = galacticCentre?.physicalPosition
+  return galacticCentre?.physicalPosition
     ? displayPositionForObject(galacticCentre)
     : new THREE.Vector3();
+}
+
+async function viewWholeMilkyWay() {
+  const centre = await prepareMilkyWayOverview();
   const north = physicalPositionForCoordinates(192.8595, 27.1283, 1).normalize();
+  const sunward = centre.clone().negate().normalize();
+  camera.up.copy(sunward);
   flight = {
     started: performance.now(),
     duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 950,
@@ -1602,6 +1614,21 @@ async function viewWholeMilkyWay() {
     toTarget: centre,
     fromCamera: camera.position.clone(),
     toCamera: centre.clone().add(north.multiplyScalar(190))
+  };
+}
+
+async function viewMilkyWayEdgeOn() {
+  const centre = await prepareMilkyWayOverview();
+  const sunward = centre.clone().negate().normalize();
+  const north = physicalPositionForCoordinates(192.8595, 27.1283, 1).normalize();
+  camera.up.copy(north);
+  flight = {
+    started: performance.now(),
+    duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 950,
+    fromTarget: orbit.target.clone(),
+    toTarget: centre,
+    fromCamera: camera.position.clone(),
+    toCamera: centre.clone().add(sunward.multiplyScalar(190)).add(north.clone().multiplyScalar(5))
   };
 }
 
@@ -1666,6 +1693,7 @@ function bindEvents() {
     milkyWay?.setLabelsVisible(controlsUi.milkyWayLabels.checked);
   });
   controlsUi.viewMilkyWay.addEventListener('click', viewWholeMilkyWay);
+  controlsUi.viewMilkyWayEdge.addEventListener('click', viewMilkyWayEdgeOn);
   controlsUi.nebulae.addEventListener('change', async () => {
     if (controlsUi.nebulae.checked) {
       controlsUi.distance.value = '3.90';
@@ -1729,7 +1757,7 @@ async function loadMilkyWay() {
   controlsUi.milkyWayStatus.textContent = 'Building the Milky Way map on your device…';
   milkyWayLoadPromise = createMilkyWay({
     scene,
-    modelUrl: new URL('../data/milky-way-model.json?v=2026.2b', import.meta.url),
+    modelUrl: new URL('../data/milky-way-model.json?v=2026.3d', import.meta.url),
     displayDistance,
     initialQuality: activeQuality
   }).then(instance => {
