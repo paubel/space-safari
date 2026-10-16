@@ -3,9 +3,16 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { STARS } from '../data/astrophoto/interactive-stars.js?v=3d-prototype-1';
+import { createSagittariusAVisualizer } from './sagittarius-a-webgpu.js?v=direct-orbit-2';
+
+if (sessionStorage.getItem('space-safari-universe-return')) {
+  document.body.classList.add('is-arriving-universe');
+  requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.remove('is-arriving-universe')));
+}
 
 const stage = document.querySelector('#universe-stage');
 const stageWrap = document.querySelector('#universe-stage-wrap');
+const workspace = document.querySelector('.universe-workspace');
 const loading = document.querySelector('#universe-loading');
 const errorPanel = document.querySelector('#universe-error');
 
@@ -29,10 +36,13 @@ const controlsUi = {
   reset: document.querySelector('#universe-reset'),
   home: document.querySelector('#universe-home'),
   fullscreen: document.querySelector('#universe-fullscreen'),
+  toggleControls: document.querySelector('#universe-toggle-controls'),
+  toggleDetails: document.querySelector('#universe-toggle-details'),
   count: document.querySelector('#universe-count'),
   scaleNote: document.querySelector('#universe-scale-note'),
   fly: document.querySelector('#universe-fly')
 };
+controlsUi.flyHint = document.querySelector('#universe-fly-hint');
 
 const details = {
   name: document.querySelector('#universe-object-name'),
@@ -139,10 +149,17 @@ const NEBULAE = [
     constellation: 'Carina · inside NGC 3372', type: 'Bipolar ejecta nebula and massive binary system', format: 'volume', colour: 0xffad62,
     description: 'The roughly 0.7-light-year Homunculus lies inside the much larger Carina Nebula and surrounds the highly eccentric 5.5-year binary Eta Carinae. Its shell uses the observation-based ESO/VLT reconstruction by Steffen and collaborators, including asymmetric polar trenches, openings, and equatorial protrusions. Eta Carinae A is about 90 solar masses and its hot companion, Eta Carinae B, about 30 solar masses. Their true orbital separation is far below the scale of this map, so only their navigation markers are deliberately separated and enlarged.',
     sourceUrl: 'https://www.eso.org/public/products/models3d/3dmodel_004/', modelSource: 'ESO VLT/X-Shooter observations', representation: 'Observation-based ESO/VLT 3D shell with enlarged binary markers', volumeShape: 'eta', displayScale: [4.25, 8.0, 3.8], physicalSizeLy: 0.7
+  },
+  {
+    name: 'Sagittarius A* (Sgr A*)', shortName: 'Sagittarius A*', ra: 266.41683, dec: -29.00781, distance: 26400,
+    constellation: 'Sagittarius · Galactic Centre', type: 'Supermassive black hole · ≈ 4.15 million M☉', format: 'procedural', colour: 0xffb06b,
+    description: 'The supermassive black hole at the centre of the Milky Way. Its event horizon is far too small to show at this map scale, so the close view is intentionally enlarged. On approach, an orbitable WebGPU raymarcher bends light through a Schwarzschild-like field, revealing the far side of the hot disk, turbulent orbital structure, Doppler beaming, stars, and faint background gas.',
+    sourceUrl: 'https://www.eso.org/sci/publications/messenger/archive/no.177-sep19/messenger-no177-25-35.pdf', sourceLabel: 'Open ESO scientific reference →', modelSource: 'ESO/GRAVITY and EHT measurements', representation: 'Orbitable 32-step WebGPU relativistic raymarching', volumeShape: 'sagittarius-a', displayScale: [6, 6, 6], physicalSizeLy: 0.000005
   }
 ];
 
 const volumeMaterials = [];
+const blackHoleObjects = [];
 
 const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 const integer = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
@@ -164,6 +181,7 @@ let scaleMode = 'compressed';
 let animationFrame;
 let isAnimating = false;
 let flight = null;
+let sagittariusAVisualizer = null;
 const starObjects = [];
 const nebulaObjects = [];
 const raycaster = new THREE.Raycaster();
@@ -377,6 +395,8 @@ function buildScene() {
   renderer.setClearColor(0x010207, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   stage.append(renderer.domElement);
+
+  sagittariusAVisualizer = createSagittariusAVisualizer(stage);
 
   labelRenderer = new CSS2DRenderer();
   labelRenderer.domElement.className = 'universe-label-layer';
@@ -966,10 +986,24 @@ async function createHomunculusModel(nebula) {
   return group;
 }
 
+function createSagittariusAModel() {
+  const root = new THREE.Group();
+  const marker = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: createStarTexture(), color: 0xffad68, transparent: true,
+    depthWrite: false, blending: THREE.AdditiveBlending
+  }));
+  marker.scale.setScalar(5.2);
+  root.add(marker);
+  root.userData.blackHoleLod = { marker, active: false };
+  return root;
+}
+
 async function loadNebulaModel(nebula) {
   const model = nebula.volumeShape === 'eta'
     ? await createHomunculusModel(nebula)
-    : createDiffuseNebulaVolume(nebula);
+    : nebula.volumeShape === 'sagittarius-a'
+      ? createSagittariusAModel()
+      : createDiffuseNebulaVolume(nebula);
 
   if (nebula.volumeShape === 'helix') {
     // The barrel's local +Z axis points almost back toward the Sun. The small
@@ -1038,6 +1072,10 @@ async function loadNebulaModel(nebula) {
   scene.add(hitTarget);
   const item = { nebula, model: pivot, hitTarget, label, labelElement };
   nebulaObjects.push(item);
+  if (nebula.volumeShape === 'sagittarius-a') {
+    item.blackHoleLod = model.userData.blackHoleLod;
+    blackHoleObjects.push(item);
+  }
   const button = controlsUi.nebulaList.querySelector(`[data-nebula="${nebula.shortName}"]`);
   if (button) button.disabled = false;
   updateVisibleNebulae();
@@ -1047,7 +1085,7 @@ async function loadNebulaModel(nebula) {
 let nebulaLoadPromise;
 async function loadNebulae() {
   if (nebulaLoadPromise) return nebulaLoadPromise;
-  controlsUi.nebulaStatus.textContent = `Building ${NEBULAE.length} diffuse objects…`;
+  controlsUi.nebulaStatus.textContent = `Building ${NEBULAE.length} deep-sky objects…`;
   controlsUi.nebulae.disabled = true;
   nebulaLoadPromise = Promise.allSettled(NEBULAE.map(async nebula => {
     nebula.physicalPosition = physicalPositionForCoordinates(nebula.ra, nebula.dec, nebula.distance);
@@ -1056,8 +1094,8 @@ async function loadNebulae() {
     const loaded = results.filter(result => result.status === 'fulfilled').length;
     controlsUi.nebulae.disabled = false;
     controlsUi.nebulaStatus.textContent = loaded === NEBULAE.length
-      ? `${NEBULAE.length} diffuse objects loaded`
-      : `${loaded} of ${NEBULAE.length} nebula models loaded`;
+      ? `${NEBULAE.length} deep-sky objects loaded`
+      : `${loaded} of ${NEBULAE.length} deep-sky objects loaded`;
     controlsUi.nebulaList.hidden = loaded === 0;
     updatePositions();
     return results;
@@ -1112,7 +1150,9 @@ function updatePositions() {
     item.model.position.copy(displayPositionForObject(item.nebula));
     item.hitTarget.position.copy(item.model.position);
     item.hitTarget.scale.setScalar(scaleMode === 'linear' ? 2.2 : 5);
-    if (scaleMode === 'linear') {
+    if (item.nebula.volumeShape === 'sagittarius-a') {
+      item.model.scale.setScalar(scaleMode === 'linear' ? .65 : 1);
+    } else if (scaleMode === 'linear') {
       const physicalDisplayDiameter = Number(item.nebula.physicalSizeLy) * (80 / maximumDistance());
       const navigationDiameter = Math.max(...item.nebula.displayScale) * 2;
       item.model.scale.setScalar(Math.max(.0005, physicalDisplayDiameter / navigationDiameter));
@@ -1190,6 +1230,7 @@ function selectStar(star, fly = false) {
   details.hr.hidden = false;
   details.source.hidden = true;
   controlsUi.fly.textContent = 'Fly to selected star';
+  controlsUi.flyHint.hidden = true;
   controlsUi.search.value = isSun ? 'Sun' : star.name;
   if (rangeChanged && scaleMode === 'linear') updatePositions();
   else {
@@ -1202,9 +1243,18 @@ function selectStar(star, fly = false) {
 function selectNebula(nebula, fly = false) {
   const item = nebulaObjects.find(candidate => candidate.nebula === nebula);
   if (!item) return;
-  if (nebula.distance > maximumDistance()) controlsUi.distance.value = Math.log10(nebula.distance).toFixed(2);
+  if (nebula.distance > maximumDistance()) {
+    controlsUi.distance.value = Math.min(
+      Number(controlsUi.distance.max),
+      Math.ceil(Math.log10(nebula.distance) * 100) / 100
+    );
+  }
   selected = nebula;
-  setDetailLabels({
+  const isBlackHole = nebula.volumeShape === 'sagittarius-a';
+  setDetailLabels(isBlackHole ? {
+    distance: 'Distance', constellation: 'Location', spectral: 'Object type',
+    temperature: 'Scientific basis', luminosity: 'Rendering', radius: 'Event-horizon scale'
+  } : {
     distance: 'Distance', constellation: 'Constellation', spectral: 'Object type',
     temperature: '3D source', luminosity: 'Representation', radius: 'Approx. physical span'
   });
@@ -1215,14 +1265,15 @@ function selectNebula(nebula, fly = false) {
   details.spectral.textContent = nebula.type;
   details.temperature.textContent = nebula.modelSource || (nebula.format === 'volume' ? 'NASA visualization reference' : 'NASA 3D Resources');
   details.luminosity.textContent = nebula.representation || 'Scientific reconstruction';
-  details.radius.textContent = `≈ ${number.format(nebula.physicalSizeLy)} ly`;
+  details.radius.textContent = isBlackHole ? '< 1 AU (enlarged here)' : `≈ ${number.format(nebula.physicalSizeLy)} ly`;
   details.hr.hidden = true;
   details.source.href = nebula.sourceUrl;
   details.source.textContent = nebula.sourceLabel || (nebula.volumeShape === 'eta' ? 'Open ESO 3D model source →' : 'Open NASA reference →');
   details.source.hidden = false;
   controlsUi.fly.textContent = nebula.volumeShape === 'eta'
     ? 'Zoom in on Homunculus and Eta A/B'
-    : 'Fly to selected object';
+    : isBlackHole ? 'Enter Sagittarius A* simulation' : 'Fly to selected object';
+  controlsUi.flyHint.hidden = !isBlackHole;
   updatePositions();
   if (fly) flyToStar(nebula);
 }
@@ -1243,7 +1294,7 @@ function flyToStar(star) {
   const offset = /^(sun|sol)/i.test(star.name)
     ? 105
     : nebulaItem
-      ? (nebulaItem.nebula.volumeShape === 'eta' ? Math.max(.012, etaDiameter * 1.7) : scaleMode === 'linear' ? 5 : nebulaItem.nebula.volumeShape === 'elephant' ? 27 : 28)
+      ? (nebulaItem.nebula.volumeShape === 'eta' ? Math.max(.012, etaDiameter * 1.7) : nebulaItem.nebula.volumeShape === 'sagittarius-a' ? 18 : scaleMode === 'linear' ? 5 : nebulaItem.nebula.volumeShape === 'elephant' ? 27 : 28)
       : 22;
   flight = {
     started: performance.now(),
@@ -1264,9 +1315,63 @@ function updateFlight(time) {
   if (progress >= 1) flight = null;
 }
 
+function saveUniverseReturnState() {
+  const state = {
+    camera: camera.position.toArray(),
+    target: orbit.target.toArray(),
+    scaleMode,
+    distance: controlsUi.distance.value,
+    spectral: controlsUi.spectral.value,
+    labels: controlsUi.labels.checked,
+    labelMagnitude: controlsUi.labelMagnitude.value,
+    plane: controlsUi.plane.checked,
+    earthGuide: controlsUi.earthGuide.checked,
+    directions: controlsUi.directions.checked,
+    nebulae: controlsUi.nebulae.checked,
+    selected: selected?.name || null
+  };
+  sessionStorage.setItem('space-safari-universe-return', JSON.stringify(state));
+}
+
+function restoreUniverseReturnState() {
+  const raw = sessionStorage.getItem('space-safari-universe-return');
+  if (!raw) return;
+  sessionStorage.removeItem('space-safari-universe-return');
+  try {
+    const state = JSON.parse(raw);
+    scaleMode = state.scaleMode === 'linear' ? 'linear' : 'compressed';
+    controlsUi.scale.forEach(input => { input.checked = input.value === scaleMode; });
+    controlsUi.distance.value = state.distance || '3.90';
+    controlsUi.spectral.value = state.spectral || 'all';
+    controlsUi.labels.checked = state.labels !== false;
+    controlsUi.labelMagnitude.value = state.labelMagnitude || '1.5';
+    controlsUi.plane.checked = state.plane !== false;
+    controlsUi.earthGuide.checked = state.earthGuide !== false;
+    controlsUi.directions.checked = state.directions !== false;
+    controlsUi.nebulae.checked = state.nebulae !== false;
+    camera.position.fromArray(state.camera);
+    orbit.target.fromArray(state.target);
+    updatePositions();
+    const restored = [...catalogue, ...NEBULAE].find(object => object.name === state.selected);
+    if (restored?.volumeShape) selectNebula(restored);
+    else if (restored) selectStar(restored);
+  } catch (error) {
+    console.warn('Could not restore the universe view.', error);
+  }
+}
+
 function findStar() {
   const query = controlsUi.search.value.trim().toLowerCase();
   if (!query) return;
+  const deepSkyObject = NEBULAE.find(object =>
+    object.name.toLowerCase() === query || object.shortName.toLowerCase() === query ||
+    object.name.toLowerCase().includes(query) || object.shortName.toLowerCase().includes(query)
+  );
+  if (deepSkyObject) {
+    if (deepSkyObject.volumeShape === 'sagittarius-a') saveUniverseReturnState();
+    selectNebula(deepSkyObject, true);
+    return;
+  }
   const exact = catalogue.find(star => star.name.toLowerCase() === query || (query === 'sun' && star.name === 'Sun (Sol)'));
   const partial = catalogue.find(star => star.name.toLowerCase().includes(query));
   selectStar(exact || partial, true);
@@ -1292,6 +1397,24 @@ function resize() {
   camera.updateProjectionMatrix();
   renderer.setSize(width, height, false);
   labelRenderer.setSize(width, height);
+  sagittariusAVisualizer?.resize();
+}
+
+function updateBlackHoleLod(time) {
+  let nearAnyBlackHole = false;
+  blackHoleObjects.forEach(item => {
+    const lod = item.blackHoleLod;
+    const active = item.model.visible && camera.position.distanceTo(item.model.position) < 46;
+    if (active !== lod.active) {
+      lod.active = active;
+      lod.marker.visible = !active;
+      if (active) sagittariusAVisualizer?.show();
+    }
+    nearAnyBlackHole ||= active;
+  });
+  stage.classList.toggle('is-black-hole-near', nearAnyBlackHole);
+  if (!nearAnyBlackHole) sagittariusAVisualizer?.hide();
+  else sagittariusAVisualizer?.update(time);
 }
 
 function animate(time) {
@@ -1299,6 +1422,7 @@ function animate(time) {
   animationFrame = requestAnimationFrame(animate);
   updateFlight(time);
   orbit.update();
+  updateBlackHoleLod(time);
   volumeMaterials.forEach(({ mesh, uniforms }) => {
     uniforms.uTime.value = time * .001;
     uniforms.uCameraLocal.value.copy(mesh.worldToLocal(camera.position.clone()));
@@ -1328,9 +1452,13 @@ function resetView() {
 }
 
 function bindEvents() {
-  controlsUi.list.replaceChildren(...catalogue.slice().sort((a, b) => a.name.localeCompare(b.name)).map(star => {
+  const searchableObjects = [
+    ...catalogue.map(star => star.name === 'Sun (Sol)' ? 'Sun' : star.name),
+    ...NEBULAE.map(object => object.shortName)
+  ].sort((a, b) => a.localeCompare(b));
+  controlsUi.list.replaceChildren(...searchableObjects.map(name => {
     const option = document.createElement('option');
-    option.value = star.name === 'Sun (Sol)' ? 'Sun' : star.name;
+    option.value = name;
     return option;
   }));
   controlsUi.nebulaList.replaceChildren(...NEBULAE.map(nebula => {
@@ -1343,6 +1471,7 @@ function bindEvents() {
     return button;
   }));
   controlsUi.find.addEventListener('click', findStar);
+  stage.addEventListener('sagittarius-a-exit', resetView);
   controlsUi.search.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); findStar(); } });
   controlsUi.scale.forEach(input => input.addEventListener('change', () => {
     scaleMode = input.value;
@@ -1370,10 +1499,40 @@ function bindEvents() {
   });
   controlsUi.reset.addEventListener('click', resetView);
   controlsUi.home.addEventListener('click', () => selectStar(catalogue.find(star => /^(sun|sol)/i.test(star.name)), true));
-  controlsUi.fly.addEventListener('click', () => flyToStar(selected));
+  controlsUi.fly.addEventListener('click', () => {
+    if (selected?.volumeShape === 'sagittarius-a') saveUniverseReturnState();
+    flyToStar(selected);
+  });
   controlsUi.fullscreen.addEventListener('click', async () => {
     if (document.fullscreenElement) await document.exitFullscreen();
-    else await stageWrap.requestFullscreen();
+    else await workspace.requestFullscreen();
+  });
+  const setFullscreenPanel = (className, button, panelName, hidden) => {
+    workspace.classList.toggle(className, hidden);
+    button.setAttribute('aria-pressed', String(!hidden));
+    button.textContent = `${hidden ? 'Show' : 'Hide'} ${panelName}`;
+  };
+  controlsUi.toggleControls.addEventListener('click', () => {
+    const show = workspace.classList.contains('is-controls-hidden');
+    setFullscreenPanel('is-controls-hidden', controlsUi.toggleControls, 'View controls', !show);
+    if (show && matchMedia('(max-width: 680px)').matches) {
+      setFullscreenPanel('is-details-hidden', controlsUi.toggleDetails, 'Selected object', true);
+    }
+  });
+  controlsUi.toggleDetails.addEventListener('click', () => {
+    const show = workspace.classList.contains('is-details-hidden');
+    setFullscreenPanel('is-details-hidden', controlsUi.toggleDetails, 'Selected object', !show);
+    if (show && matchMedia('(max-width: 680px)').matches) {
+      setFullscreenPanel('is-controls-hidden', controlsUi.toggleControls, 'View controls', true);
+    }
+  });
+  document.addEventListener('fullscreenchange', () => {
+    const isFullscreen = document.fullscreenElement === workspace;
+    controlsUi.fullscreen.textContent = isFullscreen ? 'Exit full screen' : 'Full screen';
+    if (isFullscreen) {
+      setFullscreenPanel('is-controls-hidden', controlsUi.toggleControls, 'View controls', false);
+      setFullscreenPanel('is-details-hidden', controlsUi.toggleDetails, 'Selected object', matchMedia('(max-width: 680px)').matches);
+    }
   });
   renderer.domElement.addEventListener('click', pointerSelection);
   new ResizeObserver(resize).observe(stage);
@@ -1393,7 +1552,7 @@ try {
   bindEvents();
   resize();
   resetView();
-  loadNebulae();
+  loadNebulae().then(restoreUniverseReturnState);
   loading.hidden = true;
   animate(performance.now());
 } catch (error) {

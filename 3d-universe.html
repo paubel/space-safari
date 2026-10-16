@@ -6,7 +6,7 @@
     <meta name="description" content="Explore the three-dimensional positions of nearby and famous stars in the Space Safari stellar catalogue.">
     <title>3D Universe - Space Safari</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/3d-universe.css?v=scale-guide-1">
+    <link rel="stylesheet" href="css/3d-universe.css?v=black-hole-orbit-1">
     <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SL7KJ6J4ZZ"></script>
     <script>
@@ -50,6 +50,10 @@
         </header>
 
         <section class="universe-workspace" aria-label="Interactive three-dimensional star map">
+            <div class="universe-fullscreen-tools" aria-label="Full-screen panels">
+                <button id="universe-toggle-controls" type="button" aria-pressed="true">Hide View controls</button>
+                <button id="universe-toggle-details" type="button" aria-pressed="true">Hide Selected object</button>
+            </div>
             <aside class="universe-controls" aria-label="3D Universe controls">
                 <div class="universe-control-heading">
                     <div><p class="overline">View controls</p><h2>Stellar neighbourhood</h2></div>
@@ -73,7 +77,7 @@
 
                 <label class="universe-field" for="universe-distance">
                     <span>Maximum distance <output id="universe-distance-output">7,943 ly</output></span>
-                    <input id="universe-distance" type="range" min="0.7" max="4.35" step="0.01" value="3.90">
+                    <input id="universe-distance" type="range" min="0.7" max="4.50" step="0.01" value="3.90">
                 </label>
 
                 <label class="universe-field" for="universe-spectral">
@@ -100,8 +104,8 @@
                 <label class="universe-check"><input id="universe-plane" type="checkbox" checked><span>Show celestial equatorial plane</span></label>
                 <label class="universe-check"><input id="universe-earth-guide" type="checkbox" checked><span>Show Polaris and light-year scale</span></label>
                 <label class="universe-check"><input id="universe-directions" type="checkbox" checked><span>Show Milky Way directions</span></label>
-                <label class="universe-check universe-model-toggle"><input id="universe-nebulae" type="checkbox" checked><span>Show fourteen diffuse deep-sky objects</span></label>
-                <p class="universe-model-status" id="universe-model-status">Building diffuse visualisations in your browser…</p>
+                <label class="universe-check universe-model-toggle"><input id="universe-nebulae" type="checkbox" checked><span>Show fifteen deep-sky objects</span></label>
+                <p class="universe-model-status" id="universe-model-status">Building deep-sky visualisations in your browser…</p>
                 <div class="universe-nebula-list" id="universe-nebula-list" hidden></div>
 
                 <div class="universe-button-row">
@@ -135,6 +139,7 @@
                     <div><dt id="universe-label-radius">Radius</dt><dd id="universe-object-radius">1 R☉</dd></div>
                 </dl>
                 <button id="universe-fly" type="button">Fly to selected star</button>
+                <p id="universe-fly-hint" class="universe-fly-hint" hidden>Opens an interactive relativistic close-up with its own orbit camera.</p>
                 <a id="universe-hr-link" href="hr-diagram.html?star=Sol">Find in the H–R diagram →</a>
                 <a id="universe-source-link" class="universe-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Open NASA model source →</a>
             </aside>
@@ -150,6 +155,6 @@
     </main>
 
     <script src="js/main.js"></script>
-  <script type="module" src="js/3d-universe.js?v=30"></script>
+  <script type="module" src="js/3d-universe.js?v=47"></script>
 </body>
 </html>
