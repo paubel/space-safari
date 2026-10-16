@@ -42,7 +42,8 @@ function galactocentricToScene(x, y, z, sunDistance) {
 function armPoint(arm, fraction) {
   const safeFraction = THREE.MathUtils.clamp(fraction, 0, 1);
   const radius = arm.startRadiusLy * Math.pow(arm.endRadiusLy / arm.startRadiusLy, safeFraction);
-  const angle = (arm.startAngleDegrees + arm.sweepDegrees * safeFraction) * DEG;
+  const angle = (arm.startAngleDegrees + arm.sweepDegrees * safeFraction +
+    (arm.bendDegrees || 0) * Math.sin(safeFraction * Math.PI * 2) * Math.sin(safeFraction * Math.PI)) * DEG;
   return { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius, radius, angle };
 }
 
@@ -99,11 +100,30 @@ function chooseWeighted(items, random) {
 }
 
 function sampledFraction(structure, random) {
-  if (random() > structure.clumpiness) return random();
-  const clumpCount = structure.role === 'major' ? 22 : 15;
-  const centre = (Math.floor(random() * clumpCount) + .5) / clumpCount;
-  const spread = structure.role === 'local-branch' ? .055 : structure.role === 'major' ? .026 : .038;
-  return THREE.MathUtils.clamp(centre + gaussian(random) * spread, 0, 1);
+  // Rejection sampling avoids endpoint piles and periodic pearl-like clumps.
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const f = random();
+    let density = .70 + .20 * Math.sin(f * 49 + structure.startRadiusLy * .001) +
+      .10 * Math.sin(f * 113 + structure.prominence * 17);
+    density *= Math.min(1, f / .04, (1 - f) / .09);
+    for (const [centre, width, depth] of structure.gaps || []) {
+      density *= 1 - depth * Math.exp(-.5 * ((f - centre) / width) ** 2);
+    }
+    if (random() < density) return f;
+  }
+  return .15 + random() * .7;
+}
+
+function exponentialHeight(random, scale) {
+  return (random() < .5 ? -1 : 1) * -Math.log(Math.max(1e-7, random())) * scale;
+}
+
+function sampleDiskRadius(model, random) {
+  // Area element R dR makes an exponential surface density a Gamma(2) law.
+  let radius;
+  do { radius = -model.disk.scaleLengthLy * Math.log(Math.max(1e-10, random() * random())); }
+  while (radius > model.disk.radiusLy);
+  return radius;
 }
 
 function makeArmData(model, count, random, dust = false) {
@@ -120,7 +140,8 @@ function makeArmData(model, count, random, dust = false) {
     const width = structureWidth(structure, fraction);
     const taper = Math.min(1, fraction / .035, (1 - fraction) / .055);
     const dustLaneOffset = dust ? -width * .22 : 0;
-    const across = dustLaneOffset + gaussian(random) * width * (dust ? .18 : .31) * Math.max(.18, taper);
+    const filament = Math.sin(fraction * 83 + point.angle) * width * .10;
+    const across = dustLaneOffset + filament + gaussian(random) * width * (dust ? .14 : .42) * Math.max(.18, taper);
     const x = point.x - tangent.y * across;
     const y = point.y + tangent.x * across;
     const z = galacticWarp(model, point.radius, point.angle) +
@@ -132,7 +153,7 @@ function makeArmData(model, count, random, dust = false) {
         ? new THREE.Color().setRGB(.54 + random() * .13, .63 + random() * .14, .90)
         : colourRoll < .125
           ? new THREE.Color().setRGB(.78 + random() * .16, .22 + random() * .12, .18 + random() * .08)
-          : new THREE.Color().setRGB(.54 + random() * .18, .49 + random() * .16, .61 + random() * .19);
+          : new THREE.Color().setRGB(.68 + random() * .15, .65 + random() * .15, .70 + random() * .16);
     pushScenePosition(positions, x, y, z, sunDistance);
     colours.push(colour.r, colour.g, colour.b);
   }
@@ -143,19 +164,19 @@ function makeDiskData(model, count, random) {
   const positions = [];
   const colours = [];
   for (let index = 0; index < count; index++) {
-    const radius = Math.min(model.disk.radiusLy, -Math.log(Math.max(1e-7, 1 - random())) * model.disk.scaleLengthLy);
+    const radius = sampleDiskRadius(model, random);
     const angle = random() * Math.PI * 2;
     const x = Math.cos(angle) * radius;
     const y = Math.sin(angle) * radius;
     const thickDisk = random() < model.disk.thickDiskFraction;
-    const thickness = thickDisk ? model.disk.thickDiskHalfThicknessLy : model.disk.halfThicknessLy;
+    const thickness = thickDisk ? model.sampling.thickScaleHeightLy : model.sampling.thinScaleHeightLy;
     const z = galacticWarp(model, radius, angle) +
-      gaussian(random) * thickness * (.34 + .66 * radius / model.disk.radiusLy);
+      exponentialHeight(random, thickness) * (1 + model.sampling.flareFraction * (radius / model.disk.radiusLy) ** 2);
     const warmth = 1 - THREE.MathUtils.clamp(radius / 24000, 0, 1);
     const colour = new THREE.Color().setRGB(
-      .40 + warmth * .20 + random() * .12,
-      .38 + warmth * .15 + random() * .11,
-      .48 + warmth * .08 + random() * .14
+      .59 + warmth * .19 + random() * .12,
+      .57 + warmth * .12 + random() * .11,
+      .65 - warmth * .10 + random() * .12
     );
     pushScenePosition(positions, x, y, z, model.sunDistanceFromCentreLy);
     colours.push(colour.r, colour.g, colour.b);
@@ -164,10 +185,16 @@ function makeDiskData(model, count, random) {
 }
 
 function makeDustData(model, count, random) {
-  const armCount = Math.round(count * .64);
-  const data = makeArmData(model, armCount, random, true);
-  for (let index = armCount; index < count; index++) {
-    const radius = Math.sqrt(random()) * model.disk.radiusLy;
+  const data = { positions: [], colours: [] };
+  // Interleave both populations: every quality prefix retains diffuse dust.
+  for (let index = 0; index < count; index++) {
+    if (random() < .64) {
+      const arm = makeArmData(model, 1, random, true);
+      data.positions.push(...arm.positions);
+      data.colours.push(...arm.colours);
+      continue;
+    }
+    const radius = sampleDiskRadius(model, random);
     const angle = random() * Math.PI * 2;
     const x = Math.cos(angle) * radius;
     const y = Math.sin(angle) * radius;
@@ -188,9 +215,10 @@ function makeCoreData(model, count, random) {
     let y;
     let z;
     let colour;
-    if (random() < .38) {
+    if (random() < model.sampling.barFraction) {
       const halfLength = model.bar.lengthLy * .5;
-      const along = THREE.MathUtils.clamp(gaussian(random) * halfLength * .45, -halfLength, halfLength);
+      let along;
+      do { along = gaussian(random) * halfLength * .49; } while (Math.abs(along) > halfLength);
       const endTaper = Math.sqrt(Math.max(.06, 1 - Math.pow(along / halfLength, 2)));
       const across = gaussian(random) * model.bar.widthLy * .22 * endTaper;
       x = Math.cos(barAngle) * along - Math.sin(barAngle) * across;
@@ -198,12 +226,13 @@ function makeCoreData(model, count, random) {
       z = gaussian(random) * model.bar.halfThicknessLy * .32 * endTaper;
       colour = new THREE.Color().setRGB(.88 + random() * .10, .70 + random() * .16, .52 + random() * .12);
     } else {
-      const radius = Math.pow(random(), 1.45) * model.bulge.radiusLy;
-      const angle = random() * Math.PI * 2;
-      const squash = .88 + .08 * Math.abs(Math.cos(angle - barAngle));
-      x = Math.cos(angle) * radius;
-      y = Math.sin(angle) * radius * squash;
-      z = gaussian(random) * model.bulge.halfThicknessLy * (1 - radius / model.bulge.radiusLy * .55);
+      // Correlated ellipsoidal density, no cylindrical cusp/spike at R=0.
+      const along = gaussian(random) * model.bulge.radiusLy * .43;
+      const across = gaussian(random) * model.bulge.radiusLy * .27;
+      x = Math.cos(barAngle) * along - Math.sin(barAngle) * across;
+      y = Math.sin(barAngle) * along + Math.cos(barAngle) * across;
+      z = gaussian(random) * model.bulge.halfThicknessLy * .48 *
+        (.75 + .30 * Math.exp(-(((Math.abs(along) - 2200) / 1800) ** 2)));
       colour = new THREE.Color().setRGB(.90 + random() * .10, .76 + random() * .16, .62 + random() * .13);
     }
     pushScenePosition(positions, x, y, z, model.sunDistanceFromCentreLy);
@@ -212,25 +241,48 @@ function makeCoreData(model, count, random) {
   return { positions, colours };
 }
 
-function makeMaterial({ dust = false } = {}) {
+function makeHaloData(model, count, random) {
+  const data = { positions: [], colours: [] };
+  for (let i = 0; i < count; i++) {
+    const radius = 9000 * Math.pow(model.sampling.haloRadiusLy / 9000, random());
+    const angle = random() * Math.PI * 2;
+    const cosine = random() * 2 - 1;
+    const planar = radius * Math.sqrt(1 - cosine * cosine);
+    pushScenePosition(data.positions, planar * Math.cos(angle), planar * Math.sin(angle), radius * cosine * .72, model.sunDistanceFromCentreLy);
+    data.colours.push(.59, .54, .46);
+  }
+  return data;
+}
+
+function makeMaterial({ dust = false, glow = false, model } = {}) {
   return new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
-    depthTest: !dust,
+    depthTest: true,
     blending: dust ? THREE.NormalBlending : THREE.AdditiveBlending,
     vertexColors: true,
     uniforms: {
       uLinear: { value: 0 },
       uMaximumDistance: { value: 8000 },
       uOpacity: { value: dust ? .26 : .42 },
-      uPointSize: { value: dust ? 3.2 : 2.0 }
+      uPointSize: { value: dust ? 3.2 : 2.0 },
+      uCameraGalactic: { value: new THREE.Vector3() },
+      uSunDistance: { value: model.sunDistanceFromCentreLy },
+      uExtinction: { value: model.sampling.extinctionStrength },
+      uCinematic: { value: 0 },
+      uGlow: { value: glow ? 1 : 0 }
     },
     vertexShader: `
       uniform float uLinear;
       uniform float uMaximumDistance;
       uniform float uPointSize;
+      uniform vec3 uCameraGalactic;
+      uniform float uSunDistance;
+      uniform float uExtinction;
+      uniform float uGlow;
       varying vec3 vColour;
       varying float vVisible;
+      varying float vTransmission;
       void main() {
         float physicalDistance = length(position);
         float linearDistance = physicalDistance * (80.0 / max(1.0, uMaximumDistance));
@@ -242,21 +294,43 @@ function makeMaterial({ dust = false } = {}) {
         // when the user zooms out beyond the selected catalogue range.
         vVisible = 1.0;
         vColour = color;
+        // A short optical-depth integral through the synthetic dust disk.
+        // These are physical light-years in the same frame as the geometry.
+        vec3 e = vec3(position.x, -position.z, position.y);
+        vec3 g = vec3(uSunDistance - dot(vec3(-.0548755604,-.8734370902,-.4838350155),e),
+          dot(vec3(.4941094279,-.4448296300,.7469822445),e),
+          dot(vec3(-.8676661490,-.1980763734,.4559837762),e));
+        vec3 ray = g - uCameraGalactic;
+        float tPlane = clamp(-uCameraGalactic.z / (abs(ray.z) < .001 ? .001 : ray.z), 0.0, 1.0);
+        vec3 crossing = uCameraGalactic + ray * tPlane;
+        float radius = length(crossing.xy);
+        float dustPatch = .55 + .22*sin(crossing.x*.0012 + sin(crossing.y*.0017)) +
+          .16*sin(crossing.y*.0031 + crossing.x*.0014);
+        float column = exp(-radius/26000.0) * exp(-abs(crossing.z)/240.0) *
+          min(7.0, length(ray)/max(240.0,abs(ray.z))) * dustPatch;
+        vTransmission = exp(-column * uExtinction * uLinear);
         vec4 mvPosition = modelViewMatrix * vec4(shownPosition, 1.0);
         gl_Position = projectionMatrix * mvPosition;
-        gl_PointSize = vVisible * uPointSize * clamp(155.0 / max(18.0, -mvPosition.z), .82, 2.7);
+        gl_PointSize = vVisible * uPointSize * clamp(155.0 / max(18.0, -mvPosition.z), .65, 2.7);
       }
     `,
     fragmentShader: `
       uniform float uOpacity;
+      uniform float uCinematic;
+      uniform float uGlow;
       varying vec3 vColour;
       varying float vVisible;
+      varying float vTransmission;
       void main() {
         vec2 centred = gl_PointCoord - .5;
         float radius = length(centred) * 2.0;
-        float alpha = smoothstep(1.0, .12, radius) * uOpacity * vVisible;
-        if (alpha < .004) discard;
-        gl_FragColor = vec4(vColour, alpha);
+        float profile = mix(smoothstep(1.0, .12, radius), exp(-radius*radius*4.5) * smoothstep(1.0,.65,radius), uGlow);
+        float alpha = profile * uOpacity * vVisible * vTransmission;
+        if (alpha < .001) discard;
+        vec3 colour = mix(vColour, pow(vColour, vec3(.84)), uCinematic);
+        gl_FragColor = vec4(colour, alpha);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
       }
     `
   });
@@ -325,7 +399,7 @@ function classifyPosition(position, object, model) {
   const nearest = candidates[0];
   const width = Math.max(nearest.structure.widthStartLy, nearest.structure.widthEndLy);
   const inherentlyUncertain = /planetary nebula|white dwarf/.test(type);
-  let confidence = nearest.distance <= width * .45 ? 'high' : nearest.distance <= width ? 'medium' : 'low';
+  let confidence = nearest.distance <= width ? 'model proximity; membership unverified' : 'low';
   if (inherentlyUncertain) confidence = 'nearest arm only; membership uncertain';
   else if (Math.abs(galactic.z) > 1800) confidence = 'low';
   return {
@@ -337,9 +411,9 @@ function classifyPosition(position, object, model) {
 }
 
 const QUALITY = {
-  low: { arms: 9000, disk: 12000, core: 5000, dust: 0, dustOpacity: 0, opacity: .31, pointSize: 1.75 },
-  medium: { arms: 25000, disk: 30000, core: 11000, dust: 5000, dustOpacity: .27, opacity: .36, pointSize: 1.9 },
-  high: { arms: 56000, disk: 60000, core: 24000, dust: 11000, dustOpacity: .32, opacity: .41, pointSize: 2.08 }
+  low: { arms: 9000, disk: 16000, core: 6000, dust: 0, halo: 350, glow: 2000, opacity: .62, pointSize: 1.65 },
+  medium: { arms: 25000, disk: 40000, core: 14000, dust: 3000, halo: 800, glow: 5000, opacity: .36, pointSize: 1.65 },
+  high: { arms: 50000, disk: 80000, core: 28000, dust: 6500, halo: 1500, glow: 9000, opacity: .22, pointSize: 1.65 }
 };
 
 export async function createMilkyWay({ scene, modelUrl, displayDistance, initialQuality = 'medium' }) {
@@ -351,12 +425,76 @@ export async function createMilkyWay({ scene, modelUrl, displayDistance, initial
   group.name = 'milkyWayGroup';
   group.renderOrder = -5;
 
-  const random = seededRandom();
-  const arms = createPoints(makeArmData(model, QUALITY.high.arms, random), makeMaterial(), 'Milky Way spiral arms');
-  const disk = createPoints(makeDiskData(model, QUALITY.high.disk, random), makeMaterial(), 'Milky Way stellar disk');
-  const core = createPoints(makeCoreData(model, QUALITY.high.core, random), makeMaterial(), 'Milky Way central bar and bulge');
-  const dust = createPoints(makeDustData(model, QUALITY.high.dust, random), makeMaterial({ dust: true }), 'Milky Way dust lanes');
-  group.add(disk, arms, core, dust);
+  const random = seededRandom(model.sampling.seed);
+  const arms = createPoints(makeArmData(model, QUALITY.high.arms, random), makeMaterial({ model }), 'Milky Way spiral arms');
+  const disk = createPoints(makeDiskData(model, QUALITY.high.disk, random), makeMaterial({ model }), 'Milky Way stellar disk');
+  const core = createPoints(makeCoreData(model, QUALITY.high.core, random), makeMaterial({ model }), 'Milky Way central bar and bulge');
+  const dust = createPoints(makeDustData(model, QUALITY.high.dust, random), makeMaterial({ dust: true, model }), 'Milky Way dust lanes');
+  const halo = createPoints(makeHaloData(model, QUALITY.high.halo, random), makeMaterial({ model }), 'Sparse stellar halo');
+  // Reuse sampled densities as broad soft splats; this is not a second model.
+  const glowData = { positions: [], colours: [] };
+  const populations = [disk, disk, disk, arms, core];
+  for (let i = 0; i < QUALITY.high.glow; i++) {
+    const source = populations[i % populations.length].geometry;
+    const p = source.getAttribute('position');
+    const c = source.getAttribute('color');
+    const j = Math.floor(random() * p.count);
+    glowData.positions.push(p.getX(j), p.getY(j), p.getZ(j));
+    glowData.colours.push(c.getX(j), c.getY(j), c.getZ(j));
+  }
+  const glow = createPoints(glowData, makeMaterial({ glow: true, model }), 'Soft stellar density');
+  group.add(halo, glow, disk, arms, core, dust);
+  const particles = [arms, disk, core, dust, halo, glow];
+
+  const outlines = new THREE.Group();
+  const uncertainty = new THREE.Group();
+  const projectables = [];
+  function physicalLine(points, colour, opacity, destination) {
+    const geometry = new THREE.BufferGeometry().setFromPoints(points.map(p => new THREE.Vector3(...p)));
+    const line = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: colour, transparent: true, opacity, depthWrite: false }));
+    line.userData.physical = geometry.getAttribute('position').array.slice();
+    projectables.push(line);
+    destination.add(line);
+  }
+  [...model.arms, ...model.spurs].forEach(structure => {
+    const points = [];
+    const bounds = [[], []];
+    for (let i = 0; i <= 180; i++) {
+      const f = i / 180;
+      const p = structurePoint(structure, f);
+      const t = structureTangent(structure, f);
+      points.push(galactocentricToScene(p.x, p.y, 0, model.sunDistanceFromCentreLy));
+      bounds.forEach((bound, side) => {
+        const width = structureWidth(structure, f) * (side === 0 ? -1 : 1) *
+          (structure.confidence.includes('low') ? 1.6 : 1.15);
+        bound.push(galactocentricToScene(p.x - t.y * width, p.y + t.x * width, 0, model.sunDistanceFromCentreLy));
+      });
+    }
+    physicalLine(points, 0x8cbad4, .44, outlines);
+    bounds.forEach(bound => physicalLine(bound, 0xdcb881, .23, uncertainty));
+  });
+  outlines.visible = uncertainty.visible = false;
+  group.add(outlines, uncertainty);
+
+  const references = [];
+  function referenceLabel(text, coordinates, className = '') {
+    const element = document.createElement('span');
+    element.className = 'universe-milky-way-label ' + className;
+    element.textContent = text;
+    const label = new CSS2DObject(element);
+    label.userData.physicalPosition = new THREE.Vector3(...coordinates);
+    group.add(label);
+    references.push(label);
+    return label;
+  }
+  referenceLabel('☉ Sun · ≈8.2 kpc', [0, 0, 0], 'universe-galaxy-sun');
+  referenceLabel('Galactic Center', galactocentricToScene(0, 0, 0, model.sunDistanceFromCentreLy));
+  const scaleStart = galactocentricToScene(-36000, -36000, 0, model.sunDistanceFromCentreLy);
+  const scaleEnd = galactocentricToScene(-26000, -36000, 0, model.sunDistanceFromCentreLy);
+  const scaleGroup = new THREE.Group();
+  physicalLine([scaleStart, scaleEnd], 0xb5c4d5, .7, scaleGroup);
+  group.add(scaleGroup);
+  const scaleLabel = referenceLabel('10,000 ly · linear scale', scaleStart);
 
   const labels = [...model.arms, ...model.spurs].map(structure => {
     const element = document.createElement('span');
@@ -373,6 +511,9 @@ export async function createMilkyWay({ scene, modelUrl, displayDistance, initial
   let scaleMode = 'compressed';
   let maximumDistance = 8000;
   let labelsVisible = false;
+  let referencesVisible = true;
+  let visualMode = 'scientific';
+  let quality = initialQuality;
 
   function updateLabels() {
     labels.forEach(label => {
@@ -381,10 +522,29 @@ export async function createMilkyWay({ scene, modelUrl, displayDistance, initial
       label.position.copy(physical).normalize().multiplyScalar(displayDistance(distance));
       label.visible = group.visible && labelsVisible;
     });
+    references.forEach(label => {
+      const physical = label.userData.physicalPosition;
+      const distance = physical.length();
+      label.position.copy(physical).multiplyScalar(distance > 0 ? displayDistance(distance) / distance : 1);
+      label.visible = group.visible && referencesVisible && (label !== scaleLabel || scaleMode === 'linear');
+    });
+    scaleGroup.visible = referencesVisible && scaleMode === 'linear';
+    projectables.forEach(line => {
+      const data = line.userData.physical;
+      const position = line.geometry.getAttribute('position');
+      for (let i = 0; i < position.count; i++) {
+        const p = new THREE.Vector3(data[i*3], data[i*3+1], data[i*3+2]);
+        const distance = p.length();
+        p.multiplyScalar(distance > 0 ? displayDistance(distance) / distance : 1);
+        position.setXYZ(i, p.x, p.y, p.z);
+      }
+      position.needsUpdate = true;
+      line.frustumCulled = false;
+    });
   }
 
   function updateUniforms() {
-    [arms.material, disk.material, core.material, dust.material].forEach(material => {
+    particles.map(p => p.material).forEach(material => {
       material.uniforms.uLinear.value = scaleMode === 'linear' ? 1 : 0;
       material.uniforms.uMaximumDistance.value = maximumDistance;
     });
@@ -402,34 +562,62 @@ export async function createMilkyWay({ scene, modelUrl, displayDistance, initial
       labelsVisible = Boolean(visible);
       updateLabels();
     },
+    setLayer(layer, visible) {
+      if (layer === 'outlines') outlines.visible = Boolean(visible);
+      if (layer === 'uncertainty') uncertainty.visible = Boolean(visible);
+      if (layer === 'references') referencesVisible = Boolean(visible);
+      updateLabels();
+    },
+    setVisualMode(mode) {
+      visualMode = mode === 'cinematic' ? mode : 'scientific';
+      api.setQuality(quality);
+    },
+    getPhysicalPosition(x, y, z = 0) {
+      return new THREE.Vector3(...galactocentricToScene(x, y, z, model.sunDistanceFromCentreLy));
+    },
     setScaleMode(mode, maximum) {
       scaleMode = mode === 'linear' ? 'linear' : 'compressed';
       maximumDistance = Math.max(1, Number(maximum) || maximumDistance);
       updateUniforms();
     },
     setQuality(level) {
+      quality = level;
       const profile = QUALITY[level] || QUALITY.medium;
       arms.geometry.setDrawRange(0, profile.arms);
       disk.geometry.setDrawRange(0, profile.disk);
       core.geometry.setDrawRange(0, profile.core);
       dust.geometry.setDrawRange(0, profile.dust);
-      arms.material.uniforms.uOpacity.value = profile.opacity;
+      halo.geometry.setDrawRange(0, profile.halo);
+      glow.geometry.setDrawRange(0, profile.glow);
+      const richness = visualMode === 'cinematic' ? 1.35 : 1;
+      particles.forEach(p => { p.material.uniforms.uCinematic.value = visualMode === 'cinematic' ? 1 : 0; });
+      arms.material.uniforms.uOpacity.value = profile.opacity * richness * .90;
       arms.material.uniforms.uPointSize.value = profile.pointSize;
-      disk.material.uniforms.uOpacity.value = profile.opacity * .68;
+      disk.material.uniforms.uOpacity.value = profile.opacity * richness * 1.10;
       disk.material.uniforms.uPointSize.value = profile.pointSize * .92;
-      core.material.uniforms.uOpacity.value = profile.opacity * .54;
+      core.material.uniforms.uOpacity.value = profile.opacity * richness * .64;
       core.material.uniforms.uPointSize.value = profile.pointSize * .90;
-      dust.material.uniforms.uOpacity.value = profile.dustOpacity;
+      dust.material.uniforms.uOpacity.value = .12;
+      halo.material.uniforms.uOpacity.value = .20;
+      halo.material.uniforms.uPointSize.value = 1;
+      glow.material.uniforms.uOpacity.value = model.sampling.glowOpacity * (9000 / profile.glow) * (visualMode === 'cinematic' ? 1.65 : 1);
+      glow.material.uniforms.uPointSize.value = visualMode === 'cinematic' ? 18 : 14;
       dust.visible = profile.dust > 0;
     },
-    update() {},
+    update(camera) {
+      if (!group.visible) return;
+      const physicalCamera = camera.position.clone();
+      if (scaleMode === 'linear') physicalCamera.multiplyScalar(maximumDistance / 80);
+      const g = sceneToGalactocentric(physicalCamera, model.sunDistanceFromCentreLy);
+      particles.forEach(p => p.material.uniforms.uCameraGalactic.value.set(g.x, g.y, g.z));
+    },
     classifyPosition(position, object = {}) {
       return classifyPosition(position, object, model);
     },
     dispose() {
       scene.remove(group);
-      labels.forEach(label => label.element?.remove());
-      [arms, disk, core, dust].forEach(points => {
+      [...labels, ...references].forEach(label => label.element?.remove());
+      [...particles, ...projectables].forEach(points => {
         points.geometry.dispose();
         points.material.dispose();
       });

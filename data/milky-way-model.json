@@ -1,8 +1,29 @@
 {
-  "modelVersion": "Space Safari Milky Way 2026.3",
+  "modelVersion": "Space Safari Milky Way 2026.4",
   "updated": "2026-10",
   "coordinateSystem": "galactocentric-cartesian-light-years",
-  "sunDistanceFromCentreLy": 26400,
+  "sunDistanceFromCentreLy": 26700,
+  "parameterNotes": {
+    "sunDistanceFromCentreLy": "Rounded 8.2 kpc convention; GRAVITY 2019 measures 8178 +/- 13 statistical +/- 22 systematic pc. https://arxiv.org/abs/1904.05721",
+    "disk": "112000 ly diameter is a display convention, not a sharp observed edge. Scale length and vertical populations informed by https://arxiv.org/abs/1602.07702 ; adopted sampling scales are illustrative.",
+    "bar": "30000 ly full length and 30 degree angle approximate the 4.6-5.0 kpc half length and 28-33 degree angle of https://arxiv.org/abs/1504.01401",
+    "warp": "Phenomenological outer warp, not a fit: https://arxiv.org/abs/1902.00998 . Adopted amplitude, onset and phase are visualization choices.",
+    "arms": "Illustrative multiarm centre lines, widths and gaps informed by ESA/Gaia/DPAC 2025 and https://arxiv.org/abs/1910.03357 ; not a published coefficient fit. Major/secondary are display weights, not a unique arm taxonomy.",
+    "orion": "Local curve passes through adopted Sun location. Its connection to Sagittarius is an illustrative hypothesis, not a confirmed junction.",
+    "bulgeAndHalo": "Synthetic ellipsoid and sparse halo informed by https://arxiv.org/abs/1602.07702 ; dimensions and particle weights are display choices, not stellar mass fractions.",
+    "appearance": "Colours, extinction strength, particle counts and glow are artistic transfer functions, not calibrated photometry. No ESA image pixels are embedded."
+  },
+  "sampling": {
+    "seed": 5962481,
+    "thinScaleHeightLy": 850,
+    "thickScaleHeightLy": 2700,
+    "flareFraction": 0.5,
+    "barFraction": 0.64,
+    "haloRadiusLy": 85000,
+    "dustScaleHeightLy": 150,
+    "extinctionStrength": 1.3,
+    "glowOpacity": 0.047
+  },
   "description": "Observation-informed educational density model using ESA Gaia's 2025 face-on and edge-on artist impressions as its primary visual reference. Arm centre lines remain an approximation because much of the far side is obscured.",
   "sources": [
     {
@@ -36,7 +57,7 @@
   },
   "disk": {
     "radiusLy": 56000,
-    "scaleLengthLy": 11500,
+    "scaleLengthLy": 8500,
     "halfThicknessLy": 480,
     "thickDiskFraction": 0.16,
     "thickDiskHalfThicknessLy": 1850,
@@ -45,28 +66,30 @@
     "warpPhaseDegrees": 18
   },
   "bulge": {
-    "radiusLy": 8200,
-    "halfThicknessLy": 4300
+    "radiusLy": 6500,
+    "halfThicknessLy": 2600
   },
   "bar": {
-    "lengthLy": 20000,
+    "lengthLy": 30000,
     "widthLy": 6800,
     "halfThicknessLy": 2100,
-    "angleDegrees": 27
+    "angleDegrees": 30
   },
   "arms": [
     {
       "id": "scutum-centaurus",
       "name": "Scutum–Centaurus Arm",
       "role": "major",
-      "startAngleDegrees": 27,
+      "startAngleDegrees": 30,
       "sweepDegrees": 270,
-      "startRadiusLy": 10000,
+      "startRadiusLy": 14800,
       "endRadiusLy": 55500,
       "widthStartLy": 1750,
       "widthEndLy": 4200,
       "prominence": 0.82,
       "clumpiness": 0.42,
+      "bendDegrees": 8,
+      "gaps": [[0.43, 0.055, 0.65], [0.78, 0.035, 0.55]],
       "labelFraction": 0.72,
       "confidence": "medium"
     },
@@ -74,14 +97,16 @@
       "id": "perseus",
       "name": "Perseus Arm",
       "role": "major",
-      "startAngleDegrees": 207,
+      "startAngleDegrees": 210,
       "sweepDegrees": 220,
-      "startRadiusLy": 10000,
+      "startRadiusLy": 14800,
       "endRadiusLy": 55000,
       "widthStartLy": 1700,
       "widthEndLy": 3900,
       "prominence": 0.78,
       "clumpiness": 0.38,
+      "bendDegrees": -11,
+      "gaps": [[0.60, 0.045, 0.70]],
       "labelFraction": 0.56,
       "confidence": "medium"
     },
@@ -97,6 +122,8 @@
       "widthEndLy": 3500,
       "prominence": 0.58,
       "clumpiness": 0.46,
+      "bendDegrees": 13,
+      "gaps": [[0.27, 0.06, 0.75], [0.72, 0.045, 0.65]],
       "labelFraction": 0.76,
       "confidence": "medium"
     },
@@ -112,6 +139,8 @@
       "widthEndLy": 3800,
       "prominence": 0.50,
       "clumpiness": 0.44,
+      "bendDegrees": -9,
+      "gaps": [[0.36, 0.065, 0.80], [0.82, 0.05, 0.70]],
       "labelFraction": 0.76,
       "confidence": "low-to-medium"
     }
@@ -125,7 +154,7 @@
       "fromFraction": 0.40,
       "controlPointsLy": [
         [22000, -2700],
-        [26400, 0],
+        [26700, 0],
         [33000, 6500]
       ],
       "widthStartLy": 1250,

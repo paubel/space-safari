@@ -6,7 +6,7 @@
     <meta name="description" content="Explore the three-dimensional positions of nearby and famous stars in the Space Safari stellar catalogue.">
     <title>3D Universe - Space Safari</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/3d-universe.css?v=gaia-milky-way-1">
+    <link rel="stylesheet" href="css/3d-universe.css?v=gaia-milky-way-2">
     <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SL7KJ6J4ZZ"></script>
     <script>
@@ -119,6 +119,27 @@
                 <label class="universe-check universe-milky-way-label-toggle"><input id="universe-milky-way-labels" type="checkbox"><span>Show spiral-arm names</span></label>
                 <button id="universe-view-milky-way" type="button">View whole Milky Way</button>
                 <button id="universe-view-milky-way-edge" type="button">View Milky Way edge-on</button>
+                <div class="universe-galaxy-presets" aria-label="Milky Way camera presets">
+                    <button id="universe-view-milky-way-oblique" type="button" title="An angled view of the bar and thin disk">Oblique</button>
+                    <button id="universe-view-milky-way-sun" type="button" title="Look towards the Galactic Center from the Sun">View from Sun</button>
+                </div>
+                <label class="universe-field" for="universe-galaxy-style">
+                    <span>Milky Way appearance</span>
+                    <select id="universe-galaxy-style">
+                        <option value="scientific" selected>Scientific · restrained starlight</option>
+                        <option value="cinematic">Cinematic · richer glow</option>
+                    </select>
+                </label>
+                <details class="universe-galaxy-info">
+                    <summary>Map layers &amp; model notes</summary>
+                    <label class="universe-check"><input id="universe-galaxy-references" type="checkbox" checked><span>Sun, center &amp; scale</span></label>
+                    <label class="universe-check"><input id="universe-galaxy-outlines" type="checkbox"><span>Inferred arm centerlines</span></label>
+                    <label class="universe-check"><input id="universe-galaxy-uncertainty" type="checkbox"><span>Illustrative uncertainty bounds</span></label>
+                    <p>Approximate stellar-disk diameter: 112,000 light-years. Sun: ≈8.2 kpc (26,700 ly) from the center.</p>
+                    <p>A reconstruction, not a photograph or an official ESA 3D dataset. Stars and clouds are synthetic. Arm boundaries, junctions and the far side remain uncertain. Bounds illustrate model ambiguity; they are not statistical confidence intervals.</p>
+                    <p>Visual reference: <a href="https://www.cosmos.esa.int/web/gaia/milky-way" target="_blank" rel="noopener">ESA/Gaia/DPAC, Stefan Payne-Wardenaar (2025)</a>. Independent arm evidence: <a href="https://arxiv.org/abs/1910.03357" target="_blank" rel="noopener">Reid et al. (2019)</a>. No ESA image is embedded.</p>
+                    <p>Scientific and Cinematic use identical positions. Linear scale preserves the galaxy’s shape; logarithmic scale distorts distances around the Sun.</p>
+                </details>
                 <p class="universe-model-status" id="universe-milky-way-status">Loading the Milky Way model…</p>
                 <label class="universe-check universe-model-toggle"><input id="universe-nebulae" type="checkbox" checked><span>Show fifteen deep-sky objects</span></label>
                 <p class="universe-model-status" id="universe-model-status">Building deep-sky visualisations in your browser…</p>
@@ -172,6 +193,6 @@
     </main>
 
     <script src="js/main.js"></script>
-  <script type="module" src="js/3d-universe.js?v=68"></script>
+  <script type="module" src="js/3d-universe.js?v=69"></script>
 </body>
 </html>

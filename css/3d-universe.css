@@ -24,6 +24,22 @@
 .universe-search-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .35rem; }
 .universe-search-row button, .universe-button-row button, #universe-fly, #universe-view-milky-way, #universe-view-milky-way-edge { padding: .55rem .65rem; color: #e9f3ff; background: rgba(74, 158, 255, .12); border: 1px solid rgba(74, 158, 255, .38); border-radius: 5px; cursor: pointer; }
 #universe-view-milky-way, #universe-view-milky-way-edge { width: 100%; margin-top: .15rem; }
+.universe-galaxy-presets { display: grid; grid-template-columns: 1fr 1fr; gap: .35rem; margin-top: .35rem; }
+.universe-galaxy-presets button { padding: .55rem .3rem; color: #e9f3ff; background: #13243b; border: 1px solid #47719d; border-radius: 5px; cursor: pointer; }
+.universe-galaxy-info { margin-top: .7rem; font-size: .68rem; color: #b9c7d9; line-height: 1.55; }
+.universe-galaxy-info summary { cursor: pointer; color: #c7e2ff; padding: .35rem 0; }
+.universe-galaxy-info p { margin: .6rem 0; }
+.universe-galaxy-info a { color: #9fcfff; text-decoration: underline; }
+.universe-galaxy-sun { color: #ffe2a6; font-size: .65rem; }
+.universe-galaxy-presets button:focus-visible, .universe-controls select:focus-visible, .universe-controls summary:focus-visible { outline: 2px solid #c9e6ff; outline-offset: 3px; }
+@media (min-width: 1121px) and (max-width: 2199px) {
+  .universe-workspace { height: clamp(740px, calc(100svh - 150px), 1050px); }
+  .universe-controls, .universe-details { min-height: 0; overflow-y: auto; }
+  .universe-stage-wrap { min-height: 0; }
+}
+@media (max-width: 760px) {
+  .universe-controls { max-height: 52svh; overflow-y: auto; }
+}
 .universe-field input[type="range"] { width: 100%; accent-color: var(--accent); }
 .universe-label-limit { margin-top: .65rem; }
 .universe-label-limit small { color: #758197; font-size: .61rem; font-weight: 500; line-height: 1.35; letter-spacing: 0; text-transform: none; }
@@ -49,7 +65,7 @@
 .universe-count { margin-top: 1rem; color: #b9d9ff; font: .7rem ui-monospace, monospace; }
 .universe-help { margin-top: .7rem; color: #758197; font-size: .66rem; line-height: 1.45; }
 
-.universe-stage-wrap { position: relative; min-width: 0; min-height: 720px; overflow: hidden; background: radial-gradient(circle at center, #0c1830 0, #030711 48%, #010207 100%); }
+.universe-stage-wrap { position: relative; min-width: 0; min-height: 720px; overflow: hidden; background: #010204; }
 .universe-stage { position: absolute; inset: 0; cursor: grab; }
 .universe-stage:active { cursor: grabbing; }
 .universe-stage canvas, .universe-label-layer { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }

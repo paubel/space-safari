@@ -4,7 +4,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { STARS } from '../data/astrophoto/interactive-stars.js?v=3d-prototype-1';
 import { createSagittariusAVisualizer } from './sagittarius-a-webgpu.js?v=adaptive-quality-1';
-import { createMilkyWay } from './milky-way.js?v=10';
+import { createMilkyWay } from './milky-way.js?v=11';
 
 if (sessionStorage.getItem('space-safari-universe-return')) {
   document.body.classList.add('is-arriving-universe');
@@ -37,6 +37,12 @@ const controlsUi = {
   milkyWayLabels: document.querySelector('#universe-milky-way-labels'),
   viewMilkyWay: document.querySelector('#universe-view-milky-way'),
   viewMilkyWayEdge: document.querySelector('#universe-view-milky-way-edge'),
+  viewMilkyWayOblique: document.querySelector('#universe-view-milky-way-oblique'),
+  viewMilkyWaySun: document.querySelector('#universe-view-milky-way-sun'),
+  galaxyStyle: document.querySelector('#universe-galaxy-style'),
+  galaxyReferences: document.querySelector('#universe-galaxy-references'),
+  galaxyOutlines: document.querySelector('#universe-galaxy-outlines'),
+  galaxyUncertainty: document.querySelector('#universe-galaxy-uncertainty'),
   milkyWayStatus: document.querySelector('#universe-milky-way-status'),
   nebulae: document.querySelector('#universe-nebulae'),
   nebulaStatus: document.querySelector('#universe-model-status'),
@@ -160,7 +166,7 @@ const NEBULAE = [
     sourceUrl: 'https://www.eso.org/public/products/models3d/3dmodel_004/', modelSource: 'ESO VLT/X-Shooter observations', representation: 'Observation-based ESO/VLT 3D shell with enlarged binary markers', volumeShape: 'eta', displayScale: [4.25, 8.0, 3.8], physicalSizeLy: 0.7
   },
   {
-    name: 'Sagittarius A* (Sgr A*)', shortName: 'Sagittarius A*', ra: 266.41683, dec: -29.00781, distance: 26400,
+    name: 'Sagittarius A* (Sgr A*)', shortName: 'Sagittarius A*', ra: 266.41683, dec: -29.00781, distance: 26700,
     constellation: 'Sagittarius · Galactic Centre', type: 'Supermassive black hole · ≈ 4.15 million M☉', format: 'procedural', colour: 0xffb06b,
     description: 'The supermassive black hole at the centre of the Milky Way. Its event horizon is far too small to show at this map scale, so the close view is intentionally enlarged. On approach, an orbitable WebGPU raymarcher bends light through a Schwarzschild-like field, revealing the far side of the hot disk, turbulent orbital structure, Doppler beaming, stars, and faint background gas.',
     sourceUrl: 'https://www.eso.org/sci/publications/messenger/archive/no.177-sep19/messenger-no177-25-35.pdf', sourceLabel: 'Open ESO scientific reference →', modelSource: 'ESO/GRAVITY and EHT measurements', representation: 'Orbitable 32-step WebGPU relativistic raymarching', volumeShape: 'sagittarius-a', displayScale: [6, 6, 6], physicalSizeLy: 0.000005
@@ -280,7 +286,7 @@ function createDirectionArrow(name, detail, ra, dec, colour, parent = directionG
 function updateGalacticCentreGuide() {
   if (!galacticCentreGuide) return;
   const centre = NEBULAE.find(object => object.volumeShape === 'sagittarius-a');
-  const physical = centre?.physicalPosition || physicalPositionForCoordinates(266.41683, -29.00781, 26400);
+  const physical = centre?.physicalPosition || physicalPositionForCoordinates(266.41683, -29.00781, 26700);
   const direction = physical.clone().normalize();
   const length = displayDistance(physical.length());
   galacticCentreGuide.arrow.setDirection(direction);
@@ -1235,7 +1241,7 @@ function setDetailLabels(labels) {
 function galacticStructureText(object) {
   const structure = object?.galacticStructure;
   if (!structure) return milkyWay ? 'Outside the classified model' : 'Loading Milky Way model…';
-  const qualifier = /uncertain|not arm-classified/.test(structure.confidence)
+  const qualifier = /uncertain|not arm-classified|unverified/.test(structure.confidence)
     ? structure.confidence
     : `${structure.confidence} confidence`;
   return `${structure.label} · ${qualifier}`;
@@ -1550,6 +1556,7 @@ function animate(time) {
 }
 
 function resetView() {
+  flight = null;
   galaxyOverviewActive = false;
   scaleMode = 'compressed';
   controlsUi.scale.find(input => input.value === 'compressed').checked = true;
@@ -1596,17 +1603,15 @@ async function prepareMilkyWayOverview() {
   milkyWay?.setVisible(true);
   updatePositions();
 
-  const galacticCentre = NEBULAE.find(object => object.volumeShape === 'sagittarius-a');
-  return galacticCentre?.physicalPosition
-    ? displayPositionForObject(galacticCentre)
-    : new THREE.Vector3();
+  const physical = milkyWay?.getPhysicalPosition(0, 0, 0);
+  return physical ? physical.clone().normalize().multiplyScalar(displayDistance(physical.length())) : new THREE.Vector3();
 }
 
 async function viewWholeMilkyWay() {
   const centre = await prepareMilkyWayOverview();
   const north = physicalPositionForCoordinates(192.8595, 27.1283, 1).normalize();
   const sunward = centre.clone().negate().normalize();
-  camera.up.copy(sunward);
+  camera.up.copy(sunward).negate();
   flight = {
     started: performance.now(),
     duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 950,
@@ -1628,7 +1633,31 @@ async function viewMilkyWayEdgeOn() {
     fromTarget: orbit.target.clone(),
     toTarget: centre,
     fromCamera: camera.position.clone(),
-    toCamera: centre.clone().add(sunward.multiplyScalar(190)).add(north.clone().multiplyScalar(5))
+    toCamera: centre.clone().add(sunward.multiplyScalar(190)).add(north.clone().multiplyScalar(.6))
+  };
+}
+
+async function viewMilkyWayOblique() {
+  const centre = await prepareMilkyWayOverview();
+  const north = milkyWay.getPhysicalPosition(0, 0, 1).sub(milkyWay.getPhysicalPosition(0, 0, 0)).normalize();
+  const sunward = centre.clone().negate().normalize();
+  camera.up.copy(north);
+  flight = {
+    started: performance.now(), duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 950,
+    fromTarget: orbit.target.clone(), toTarget: centre,
+    fromCamera: camera.position.clone(),
+    toCamera: centre.clone().addScaledVector(north, 115).addScaledVector(sunward, 150)
+  };
+}
+
+async function viewMilkyWayFromSun() {
+  const centre = await prepareMilkyWayOverview();
+  const north = milkyWay.getPhysicalPosition(0, 0, 1).sub(milkyWay.getPhysicalPosition(0, 0, 0)).normalize();
+  camera.up.copy(north);
+  flight = {
+    started: performance.now(), duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 950,
+    fromTarget: orbit.target.clone(), toTarget: centre,
+    fromCamera: camera.position.clone(), toCamera: new THREE.Vector3()
   };
 }
 
@@ -1694,6 +1723,14 @@ function bindEvents() {
   });
   controlsUi.viewMilkyWay.addEventListener('click', viewWholeMilkyWay);
   controlsUi.viewMilkyWayEdge.addEventListener('click', viewMilkyWayEdgeOn);
+  controlsUi.viewMilkyWayOblique.addEventListener('click', viewMilkyWayOblique);
+  controlsUi.viewMilkyWaySun.addEventListener('click', viewMilkyWayFromSun);
+  controlsUi.galaxyStyle.addEventListener('change', () => milkyWay?.setVisualMode(controlsUi.galaxyStyle.value));
+  [
+    [controlsUi.galaxyReferences, 'references'],
+    [controlsUi.galaxyOutlines, 'outlines'],
+    [controlsUi.galaxyUncertainty, 'uncertainty']
+  ].forEach(([input, layer]) => input.addEventListener('change', () => milkyWay?.setLayer(layer, input.checked)));
   controlsUi.nebulae.addEventListener('change', async () => {
     if (controlsUi.nebulae.checked) {
       controlsUi.distance.value = '3.90';
@@ -1757,7 +1794,7 @@ async function loadMilkyWay() {
   controlsUi.milkyWayStatus.textContent = 'Building the Milky Way map on your device…';
   milkyWayLoadPromise = createMilkyWay({
     scene,
-    modelUrl: new URL('../data/milky-way-model.json?v=2026.3d', import.meta.url),
+    modelUrl: new URL('../data/milky-way-model.json?v=2026.4', import.meta.url),
     displayDistance,
     initialQuality: activeQuality
   }).then(instance => {
@@ -1766,6 +1803,10 @@ async function loadMilkyWay() {
     milkyWay.setQuality(activeQuality);
     milkyWay.setVisible(controlsUi.milkyWay.checked);
     milkyWay.setLabelsVisible(controlsUi.milkyWayLabels.checked);
+    milkyWay.setVisualMode(controlsUi.galaxyStyle.value);
+    milkyWay.setLayer('references', controlsUi.galaxyReferences.checked);
+    milkyWay.setLayer('outlines', controlsUi.galaxyOutlines.checked);
+    milkyWay.setLayer('uncertainty', controlsUi.galaxyUncertainty.checked);
     controlsUi.milkyWayStatus.innerHTML = `${instance.model.modelVersion} · observation-informed · <a href="${instance.model.sources[0].url}" target="_blank" rel="noopener">scientific sources</a> · <a href="${instance.model.credit.url}" target="_blank" rel="noopener">Dan Greenheck inspiration</a>`;
     updateGalacticClassifications();
     return instance;
@@ -1791,7 +1832,7 @@ try {
   resize();
   applyQuality(qualityMode === 'auto' ? activeQuality : qualityMode);
   resetView();
-  if (controlsUi.milkyWay.checked) loadMilkyWay();
+  if (controlsUi.milkyWay.checked && !sessionStorage.getItem('space-safari-universe-return')) viewWholeMilkyWay();
   loadNebulae().then(() => {
     updateGalacticClassifications();
     restoreUniverseReturnState();
