@@ -423,9 +423,10 @@ controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
 
 document.querySelector('.return-universe').addEventListener('click', event => {
   event.preventDefault();
+  const returnUrl = event.currentTarget.href;
   document.body.classList.add('is-leaving');
   const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 320;
-  window.setTimeout(() => { window.location.href = event.currentTarget.href; }, delay);
+  window.setTimeout(() => { window.location.href = returnUrl; }, delay);
 });
 
 // Exposed only for local integration tests; it lets the parent verify that a

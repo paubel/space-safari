@@ -5,7 +5,7 @@
  * top level.
  */
 export function createSagittariusAVisualizer() {
-  const simulationUrl = new URL('../sagittarius-a-view.html?v=direct-orbit-2', import.meta.url).href;
+  const simulationUrl = new URL('../sagittarius-a-view.html?v=direct-orbit-3', import.meta.url).href;
   let opening = false;
 
   function show() {
