@@ -22,7 +22,8 @@
 .universe-field output { color: #cbd7e8; font-family: ui-monospace, monospace; font-weight: 600; letter-spacing: 0; text-transform: none; }
 .universe-field input[type="search"], .universe-field select { width: 100%; min-width: 0; height: 38px; padding: 0 .6rem; color: var(--text); background: #0b1120; border: 1px solid #30394d; border-radius: 5px; font: .75rem system-ui, sans-serif; text-transform: none; }
 .universe-search-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .35rem; }
-.universe-search-row button, .universe-button-row button, #universe-fly { padding: .55rem .65rem; color: #e9f3ff; background: rgba(74, 158, 255, .12); border: 1px solid rgba(74, 158, 255, .38); border-radius: 5px; cursor: pointer; }
+.universe-search-row button, .universe-button-row button, #universe-fly, #universe-view-milky-way { padding: .55rem .65rem; color: #e9f3ff; background: rgba(74, 158, 255, .12); border: 1px solid rgba(74, 158, 255, .38); border-radius: 5px; cursor: pointer; }
+#universe-view-milky-way { width: 100%; margin-top: .15rem; }
 .universe-field input[type="range"] { width: 100%; accent-color: var(--accent); }
 .universe-label-limit { margin-top: .65rem; }
 .universe-label-limit small { color: #758197; font-size: .61rem; font-weight: 500; line-height: 1.35; letter-spacing: 0; text-transform: none; }

@@ -35,6 +35,7 @@ const controlsUi = {
   directions: document.querySelector('#universe-directions'),
   milkyWay: document.querySelector('#universe-milky-way'),
   milkyWayLabels: document.querySelector('#universe-milky-way-labels'),
+  viewMilkyWay: document.querySelector('#universe-view-milky-way'),
   milkyWayStatus: document.querySelector('#universe-milky-way-status'),
   nebulae: document.querySelector('#universe-nebulae'),
   nebulaStatus: document.querySelector('#universe-model-status'),
@@ -1548,6 +1549,32 @@ function resetView() {
   selectStar(catalogue.find(star => /^(sun|sol)/i.test(star.name)) || catalogue[0]);
 }
 
+async function viewWholeMilkyWay() {
+  controlsUi.milkyWay.checked = true;
+  controlsUi.milkyWayLabels.disabled = false;
+  localStorage.setItem('space-safari-show-milky-way', 'true');
+  scaleMode = 'linear';
+  controlsUi.scale.forEach(input => { input.checked = input.value === scaleMode; });
+  controlsUi.distance.value = '5.00';
+  await loadMilkyWay();
+  milkyWay?.setVisible(true);
+  updatePositions();
+
+  const galacticCentre = NEBULAE.find(object => object.volumeShape === 'sagittarius-a');
+  const centre = galacticCentre?.physicalPosition
+    ? displayPositionForObject(galacticCentre)
+    : new THREE.Vector3();
+  const north = physicalPositionForCoordinates(192.8595, 27.1283, 1).normalize();
+  flight = {
+    started: performance.now(),
+    duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 950,
+    fromTarget: orbit.target.clone(),
+    toTarget: centre,
+    fromCamera: camera.position.clone(),
+    toCamera: centre.clone().add(north.multiplyScalar(190))
+  };
+}
+
 function bindEvents() {
   if (!['auto', 'high', 'medium', 'low'].includes(qualityMode)) qualityMode = 'auto';
   controlsUi.quality.value = qualityMode;
@@ -1608,6 +1635,7 @@ function bindEvents() {
     localStorage.setItem('space-safari-show-milky-way-labels', String(controlsUi.milkyWayLabels.checked));
     milkyWay?.setLabelsVisible(controlsUi.milkyWayLabels.checked);
   });
+  controlsUi.viewMilkyWay.addEventListener('click', viewWholeMilkyWay);
   controlsUi.nebulae.addEventListener('change', async () => {
     if (controlsUi.nebulae.checked) {
       controlsUi.distance.value = '3.90';

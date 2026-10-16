@@ -77,7 +77,7 @@
 
                 <label class="universe-field" for="universe-distance">
                     <span>Maximum distance <output id="universe-distance-output">7,943 ly</output></span>
-                    <input id="universe-distance" type="range" min="0.7" max="4.50" step="0.01" value="3.90">
+                    <input id="universe-distance" type="range" min="0.7" max="5.00" step="0.01" value="3.90">
                 </label>
 
                 <label class="universe-field" for="universe-spectral">
@@ -117,6 +117,7 @@
                 <label class="universe-check"><input id="universe-directions" type="checkbox" checked><span>Show Milky Way directions</span></label>
                 <label class="universe-check universe-model-toggle"><input id="universe-milky-way" type="checkbox" checked><span>Show Milky Way</span></label>
                 <label class="universe-check universe-milky-way-label-toggle"><input id="universe-milky-way-labels" type="checkbox"><span>Show spiral-arm names</span></label>
+                <button id="universe-view-milky-way" type="button">View whole Milky Way</button>
                 <p class="universe-model-status" id="universe-milky-way-status">Loading the Milky Way model…</p>
                 <label class="universe-check universe-model-toggle"><input id="universe-nebulae" type="checkbox" checked><span>Show fifteen deep-sky objects</span></label>
                 <p class="universe-model-status" id="universe-model-status">Building deep-sky visualisations in your browser…</p>
@@ -170,6 +171,6 @@
     </main>
 
     <script src="js/main.js"></script>
-  <script type="module" src="js/3d-universe.js?v=52"></script>
+  <script type="module" src="js/3d-universe.js?v=53"></script>
 </body>
 </html>
