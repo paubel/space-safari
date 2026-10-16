@@ -147,11 +147,14 @@ function makeMaterial({ dust = false } = {}) {
         float logarithmicDistance = 30.0 * log(1.0 + physicalDistance) / log(10.0);
         float shownDistance = mix(logarithmicDistance, linearDistance, uLinear);
         vec3 shownPosition = physicalDistance > 0.001 ? normalize(position) * shownDistance : position;
-        vVisible = 1.0 - step(uMaximumDistance, physicalDistance);
+        // The catalogue distance control changes the linear scale, but the
+        // Milky Way is a persistent context layer and must remain available
+        // when the user zooms out beyond the selected catalogue range.
+        vVisible = 1.0;
         vColour = color;
         vec4 mvPosition = modelViewMatrix * vec4(shownPosition, 1.0);
         gl_Position = projectionMatrix * mvPosition;
-        gl_PointSize = vVisible * uPointSize * clamp(155.0 / max(18.0, -mvPosition.z), .45, 2.7);
+        gl_PointSize = vVisible * uPointSize * clamp(155.0 / max(18.0, -mvPosition.z), .82, 2.7);
       }
     `,
     fragmentShader: `
@@ -302,7 +305,7 @@ export async function createMilkyWay({ scene, modelUrl, displayDistance, initial
       const physical = label.userData.physicalPosition;
       const distance = physical.length();
       label.position.copy(physical).normalize().multiplyScalar(displayDistance(distance));
-      label.visible = group.visible && labelsVisible && distance <= maximumDistance;
+      label.visible = group.visible && labelsVisible;
     });
   }
 

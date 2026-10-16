@@ -4,7 +4,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { STARS } from '../data/astrophoto/interactive-stars.js?v=3d-prototype-1';
 import { createSagittariusAVisualizer } from './sagittarius-a-webgpu.js?v=adaptive-quality-1';
-import { createMilkyWay } from './milky-way.js?v=2';
+import { createMilkyWay } from './milky-way.js?v=4';
 
 if (sessionStorage.getItem('space-safari-universe-return')) {
   document.body.classList.add('is-arriving-universe');
@@ -413,7 +413,7 @@ function buildScene() {
   const modelLight = new THREE.DirectionalLight(0xffffff, 2.8);
   modelLight.position.set(80, 110, 60);
   scene.add(modelLight);
-  camera = new THREE.PerspectiveCamera(50, 1, .001, 2000);
+  camera = new THREE.PerspectiveCamera(50, 1, .001, 7000);
   camera.position.set(70, 48, 105);
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
@@ -432,7 +432,7 @@ function buildScene() {
   orbit.enableDamping = true;
   orbit.dampingFactor = .075;
   orbit.minDistance = .004;
-  orbit.maxDistance = 700;
+  orbit.maxDistance = 3000;
   orbit.target.set(0, 0, 0);
 
   const axesMaterial = new THREE.LineBasicMaterial({ color: 0x35557d, transparent: true, opacity: .32 });
