@@ -95,6 +95,17 @@
                     </select>
                 </label>
 
+                <label class="universe-field universe-quality-field" for="universe-quality">
+                    <span>Graphics quality <output id="universe-quality-output">Auto · Medium</output></span>
+                    <select id="universe-quality">
+                        <option value="auto">Auto (recommended)</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                    <small>Auto adjusts resolution and effect detail from measured performance.</small>
+                </label>
+
                 <label class="universe-check"><input id="universe-labels" type="checkbox" checked><span>Show star names</span></label>
                 <label class="universe-field universe-label-limit" for="universe-label-magnitude">
                     <span>Names down to apparent magnitude <output id="universe-label-magnitude-output">+1.5</output></span>
@@ -155,6 +166,6 @@
     </main>
 
     <script src="js/main.js"></script>
-  <script type="module" src="js/3d-universe.js?v=48"></script>
+  <script type="module" src="js/3d-universe.js?v=50"></script>
 </body>
 </html>

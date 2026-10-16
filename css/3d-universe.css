@@ -26,6 +26,8 @@
 .universe-field input[type="range"] { width: 100%; accent-color: var(--accent); }
 .universe-label-limit { margin-top: .65rem; }
 .universe-label-limit small { color: #758197; font-size: .61rem; font-weight: 500; line-height: 1.35; letter-spacing: 0; text-transform: none; }
+.universe-quality-field small { color: #758197; font-size: .61rem; font-weight: 500; line-height: 1.35; letter-spacing: 0; text-transform: none; }
+#universe-quality-output { color: #8fd2ff; }
 .universe-segmented { display: grid; grid-template-columns: 1fr 1fr; gap: .35rem; margin: 1rem 0 0; padding: 0; border: 0; }
 .universe-segmented legend { grid-column: 1 / -1; margin-bottom: .4rem; color: var(--text-muted); font-size: .66rem; font-weight: 750; letter-spacing: .05em; text-transform: uppercase; }
 .universe-segmented label { position: relative; }

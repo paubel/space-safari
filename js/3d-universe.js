@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { STARS } from '../data/astrophoto/interactive-stars.js?v=3d-prototype-1';
-import { createSagittariusAVisualizer } from './sagittarius-a-webgpu.js?v=direct-orbit-3';
+import { createSagittariusAVisualizer } from './sagittarius-a-webgpu.js?v=adaptive-quality-1';
 
 if (sessionStorage.getItem('space-safari-universe-return')) {
   document.body.classList.add('is-arriving-universe');
@@ -24,6 +24,8 @@ const controlsUi = {
   distance: document.querySelector('#universe-distance'),
   distanceOutput: document.querySelector('#universe-distance-output'),
   spectral: document.querySelector('#universe-spectral'),
+  quality: document.querySelector('#universe-quality'),
+  qualityOutput: document.querySelector('#universe-quality-output'),
   labels: document.querySelector('#universe-labels'),
   labelMagnitude: document.querySelector('#universe-label-magnitude'),
   labelMagnitudeOutput: document.querySelector('#universe-label-magnitude-output'),
@@ -182,6 +184,15 @@ let animationFrame;
 let isAnimating = false;
 let flight = null;
 let sagittariusAVisualizer = null;
+let backgroundStars = null;
+let qualityMode = localStorage.getItem('space-safari-quality-mode') || 'auto';
+let activeQuality = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4 ? 'low' : 'medium';
+let qualityFrameTotal = 0;
+let qualityFrameCount = 0;
+let qualityWindowStarted = performance.now();
+let lastQualityFrameTime = performance.now();
+let slowQualityWindows = 0;
+let fastQualityWindows = 0;
 const starObjects = [];
 const nebulaObjects = [];
 const raycaster = new THREE.Raycaster();
@@ -254,16 +265,10 @@ function createDirectionArrow(name, detail, ra, dec, colour, parent = directionG
 }
 
 function linearGuideDistances(maximum) {
-  // Preserve a genuinely useful ruler around the Sun instead of only dividing
-  // the full (often several-thousand-light-year) volume into four broad rings.
-  const candidates = [1, 2, 5, 10, 25, 50, 100, 250, 500, 1000, 2000, 4000, 6000, 10000];
-  const visible = candidates.filter(distance => distance < maximum * .96);
-  if (visible.length <= 10) return visible;
-
-  // Keep the fine inner ruler and thin only the largest, outermost values.
-  const inner = visible.filter(distance => distance <= 1000);
-  const outer = visible.filter(distance => distance > 1000);
-  return [...inner, ...outer.slice(-3)];
+  // In linear mode every ring represents the same physical interval, making
+  // proportional distance visually unambiguous across the galactic view.
+  return Array.from({ length: 20 }, (_, index) => (index + 1) * 1000)
+    .filter(distance => distance < maximum * .98);
 }
 
 function clearEarthGuide() {
@@ -391,7 +396,7 @@ function buildScene() {
   camera.position.set(70, 48, 105);
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  renderer.setPixelRatio(1);
   renderer.setClearColor(0x010207, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   stage.append(renderer.domElement);
@@ -462,7 +467,8 @@ function buildScene() {
     backgroundPositions.push(direction.x, direction.y, direction.z);
   }
   background.setAttribute('position', new THREE.Float32BufferAttribute(backgroundPositions, 3));
-  scene.add(new THREE.Points(background, new THREE.PointsMaterial({ color: 0x6f82a8, size: 1.05, transparent: true, opacity: .5, sizeAttenuation: false })));
+  backgroundStars = new THREE.Points(background, new THREE.PointsMaterial({ color: 0x6f82a8, size: 1.05, transparent: true, opacity: .5, sizeAttenuation: false }));
+  scene.add(backgroundStars);
 }
 
 function normaliseModel(model, targetSize = 9) {
@@ -496,6 +502,7 @@ function createDiffuseNebulaVolume(nebula) {
   const uniforms = {
     uTime: { value: 0 },
     uCameraLocal: { value: new THREE.Vector3() },
+    uMaxSteps: { value: activeQuality === 'high' ? 58 : activeQuality === 'low' ? 26 : 42 },
     uShape: { value: nebula.volumeShape === 'ring' ? 1 : nebula.volumeShape === 'cluster' ? 2 : nebula.volumeShape === 'dumbbell' ? 3 : nebula.volumeShape === 'rho' ? 4 : nebula.volumeShape === 'crab' ? 5 : nebula.volumeShape === 'carina' ? 7 : nebula.volumeShape === 'northamerica' ? 8 : nebula.volumeShape === 'owl' ? 9 : nebula.volumeShape === 'helix' ? 10 : nebula.volumeShape === 'vela' ? 11 : nebula.volumeShape === 'crescent' ? 12 : nebula.volumeShape === 'elephant' ? 13 : 0 }
   };
   const material = new THREE.ShaderMaterial({
@@ -517,6 +524,7 @@ function createDiffuseNebulaVolume(nebula) {
       uniform vec3 uCameraLocal;
       uniform float uTime;
       uniform int uShape;
+      uniform int uMaxSteps;
 
       float hash(vec3 p) {
         p = fract(p * .1031);
@@ -698,6 +706,7 @@ function createDiffuseNebulaVolume(nebula) {
         vec4 accumulated = vec4(0.0);
         const float stepSize = .037;
         for (int i = 0; i < 58; i++) {
+          if (i >= uMaxSteps) break;
           if (length(samplePoint) > 1.03 && i > 2) break;
           float density = densityAt(samplePoint);
           float warm = smoothstep(-.45, .65, samplePoint.y + noise(samplePoint * 2.2));
@@ -1400,6 +1409,52 @@ function resize() {
   sagittariusAVisualizer?.resize();
 }
 
+const QUALITY_PROFILES = {
+  low: { pixelRatio: .8, volumeSteps: 26, backgroundStars: 650 },
+  medium: { pixelRatio: 1.2, volumeSteps: 42, backgroundStars: 1000 },
+  high: { pixelRatio: 1.75, volumeSteps: 58, backgroundStars: 1400 }
+};
+
+function applyQuality(level) {
+  if (!QUALITY_PROFILES[level]) return;
+  activeQuality = level;
+  const profile = QUALITY_PROFILES[level];
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, profile.pixelRatio));
+  volumeMaterials.forEach(({ uniforms }) => { uniforms.uMaxSteps.value = profile.volumeSteps; });
+  backgroundStars?.geometry.setDrawRange(0, profile.backgroundStars);
+  controlsUi.qualityOutput.textContent = `${qualityMode === 'auto' ? 'Auto · ' : ''}${level[0].toUpperCase()}${level.slice(1)}`;
+  resize();
+}
+
+function updateAdaptiveQuality(time) {
+  const frameTime = Math.min(100, time - lastQualityFrameTime);
+  lastQualityFrameTime = time;
+  if (qualityMode !== 'auto') return;
+  qualityFrameTotal += frameTime;
+  qualityFrameCount++;
+  if (time - qualityWindowStarted < 2200) return;
+  const averageFrameMs = qualityFrameTotal / Math.max(1, qualityFrameCount);
+  if (averageFrameMs > 24) {
+    slowQualityWindows++;
+    fastQualityWindows = 0;
+  } else if (averageFrameMs < 18) {
+    fastQualityWindows++;
+    slowQualityWindows = 0;
+  } else {
+    slowQualityWindows = fastQualityWindows = 0;
+  }
+  if (slowQualityWindows >= 2 && activeQuality !== 'low') {
+    applyQuality(activeQuality === 'high' ? 'medium' : 'low');
+    slowQualityWindows = 0;
+  } else if (fastQualityWindows >= 4 && activeQuality !== 'high') {
+    applyQuality(activeQuality === 'low' ? 'medium' : 'high');
+    fastQualityWindows = 0;
+  }
+  qualityFrameTotal = 0;
+  qualityFrameCount = 0;
+  qualityWindowStarted = time;
+}
+
 function updateBlackHoleLod(time) {
   let nearAnyBlackHole = false;
   blackHoleObjects.forEach(item => {
@@ -1422,6 +1477,7 @@ function animate(time) {
   animationFrame = requestAnimationFrame(animate);
   updateFlight(time);
   orbit.update();
+  updateAdaptiveQuality(time);
   updateBlackHoleLod(time);
   volumeMaterials.forEach(({ mesh, uniforms }) => {
     uniforms.uTime.value = time * .001;
@@ -1452,6 +1508,8 @@ function resetView() {
 }
 
 function bindEvents() {
+  if (!['auto', 'high', 'medium', 'low'].includes(qualityMode)) qualityMode = 'auto';
+  controlsUi.quality.value = qualityMode;
   const searchableObjects = [
     ...catalogue.map(star => star.name === 'Sun (Sol)' ? 'Sun' : star.name),
     ...NEBULAE.map(object => object.shortName)
@@ -1485,6 +1543,14 @@ function bindEvents() {
     }
   });
   controlsUi.spectral.addEventListener('change', updateVisibleStars);
+  controlsUi.quality.addEventListener('change', () => {
+    qualityMode = controlsUi.quality.value;
+    localStorage.setItem('space-safari-quality-mode', qualityMode);
+    slowQualityWindows = fastQualityWindows = 0;
+    applyQuality(qualityMode === 'auto'
+      ? (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4 ? 'low' : 'medium')
+      : qualityMode);
+  });
   controlsUi.labels.addEventListener('change', updateVisibleStars);
   controlsUi.labelMagnitude.addEventListener('input', updateVisibleStars);
   controlsUi.plane.addEventListener('change', () => { planeGrid.visible = controlsUi.plane.checked; });
@@ -1551,6 +1617,7 @@ try {
   buildScene();
   bindEvents();
   resize();
+  applyQuality(qualityMode === 'auto' ? activeQuality : qualityMode);
   resetView();
   loadNebulae().then(restoreUniverseReturnState);
   loading.hidden = true;

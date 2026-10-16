@@ -22,6 +22,7 @@
   <a class="return-universe" href="3d-universe.html">← Return to 3D Universe</a>
   <aside class="black-hole-hud" aria-label="Black-hole controls and credits">
     <span class="black-hole-controls"><strong>Move:</strong> drag to orbit · Shift-drag or right-drag to pan · scroll to zoom</span>
+    <span id="black-hole-quality">Quality: Auto · Medium</span>
     <span>Visualization based on work by <strong>Dan Greenheck</strong> · <a href="https://threejsroadmap.com/blog/raytracing-a-black-hole-with-webgpu" target="_blank" rel="noopener noreferrer">article</a> · <a href="https://github.com/dgreenheck/webgpu-black-hole" target="_blank" rel="noopener noreferrer">source code</a></span>
   </aside>
   <script type="importmap">
@@ -85,6 +86,22 @@ const config = {
   bloomRadius: 0,
   bloomThreshold: 0.45
 };
+
+const qualityMode = localStorage.getItem('space-safari-quality-mode') || 'auto';
+const qualityProfiles = {
+  low: { pixelRatio: 0.7, bloom: 0 },
+  medium: { pixelRatio: 1.15, bloom: 0.4 },
+  high: { pixelRatio: 1.75, bloom: config.bloomStrength }
+};
+let activeQuality = qualityMode === 'auto'
+  ? (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4 ? 'low' : 'medium')
+  : qualityMode;
+if (!qualityProfiles[activeQuality]) activeQuality = 'medium';
+let qualityFrameTotal = 0;
+let qualityFrameCount = 0;
+let qualityWindowStarted = performance.now();
+let slowQualityWindows = 0;
+let fastQualityWindows = 0;
 
 // ============================================================================
 // SHADER UTILITIES
@@ -399,7 +416,7 @@ camera.lookAt(0, 0, 0);
 
 const renderer = new THREE.WebGPURenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, qualityProfiles[activeQuality].pixelRatio));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 document.body.appendChild(renderer.domElement);
 
@@ -446,7 +463,45 @@ scene.add(mesh);
 // ============================================================================
 
 let postProcessing = null;
+let bloomPass = null;
 let lastFrameTime = performance.now();
+
+function applyQuality(level) {
+  if (!qualityProfiles[level]) return;
+  activeQuality = level;
+  const profile = qualityProfiles[level];
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, profile.pixelRatio));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  if (bloomPass) bloomPass.strength.value = profile.bloom;
+  const label = document.querySelector('#black-hole-quality');
+  label.textContent = `Quality: ${qualityMode === 'auto' ? 'Auto · ' : ''}${level[0].toUpperCase()}${level.slice(1)}`;
+}
+
+function updateAdaptiveQuality(frameMs, now) {
+  if (qualityMode !== 'auto') return;
+  qualityFrameTotal += Math.min(frameMs, 100);
+  qualityFrameCount++;
+  if (now - qualityWindowStarted < 2200) return;
+  const average = qualityFrameTotal / Math.max(1, qualityFrameCount);
+  if (average > 26) {
+    slowQualityWindows++;
+    fastQualityWindows = 0;
+  } else if (average < 18) {
+    fastQualityWindows++;
+    slowQualityWindows = 0;
+  } else {
+    slowQualityWindows = fastQualityWindows = 0;
+  }
+  if (slowQualityWindows >= 2 && activeQuality !== 'low') {
+    applyQuality(activeQuality === 'high' ? 'medium' : 'low');
+    slowQualityWindows = 0;
+  } else if (fastQualityWindows >= 4 && activeQuality !== 'high') {
+    applyQuality(activeQuality === 'low' ? 'medium' : 'high');
+    fastQualityWindows = 0;
+  }
+  qualityFrameTotal = qualityFrameCount = 0;
+  qualityWindowStarted = now;
+}
 
 function updateCamera() {
   uniforms.cameraPosition.value.copy(camera.position);
@@ -460,7 +515,9 @@ function animate() {
   requestAnimationFrame(animate);
   const currentTime = performance.now();
   const deltaTime = Math.min((currentTime - lastFrameTime) / 1000, 0.033);
+  const frameMs = currentTime - lastFrameTime;
   lastFrameTime = currentTime;
+  updateAdaptiveQuality(frameMs, currentTime);
 
   controls.update();
   uniforms.time.value += deltaTime;
@@ -485,11 +542,12 @@ renderer.init().then(() => {
   postProcessing = new THREE.PostProcessing(renderer);
   const scenePass = pass(scene, camera);
   const scenePassColor = scenePass.getTextureNode();
-  const bloomPass = bloom(scenePassColor);
+  bloomPass = bloom(scenePassColor);
   bloomPass.threshold.value = config.bloomThreshold;
   bloomPass.strength.value = config.bloomStrength;
   bloomPass.radius.value = config.bloomRadius;
   postProcessing.outputNode = scenePassColor.add(bloomPass);
+  applyQuality(activeQuality);
   animate();
   requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.remove('is-arriving')));
 }).catch(err => {
