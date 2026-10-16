@@ -40,84 +40,139 @@ function galactocentricToScene(x, y, z, sunDistance) {
 }
 
 function armPoint(arm, fraction) {
-  const theta = fraction * arm.turns * Math.PI * 2;
-  const radius = arm.startRadiusLy * Math.exp(theta * Math.tan(arm.pitchDegrees * DEG));
-  const angle = arm.phaseDegrees * DEG + theta;
+  const safeFraction = THREE.MathUtils.clamp(fraction, 0, 1);
+  const radius = arm.startRadiusLy * Math.pow(arm.endRadiusLy / arm.startRadiusLy, safeFraction);
+  const angle = (arm.startAngleDegrees + arm.sweepDegrees * safeFraction) * DEG;
   return { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius, radius, angle };
+}
+
+function prepareStructureCurves(model) {
+  model.spurs.forEach(spur => {
+    const parent = model.arms.find(arm => arm.id === spur.fromArmId);
+    const start = parent ? armPoint(parent, spur.fromFraction) : { x: 0, y: 0 };
+    const points = [
+      new THREE.Vector3(start.x, start.y, 0),
+      ...spur.controlPointsLy.map(([x, y]) => new THREE.Vector3(x, y, 0))
+    ];
+    spur.curve = new THREE.CatmullRomCurve3(points, false, 'centripetal', .5);
+  });
+}
+
+function structurePoint(structure, fraction) {
+  if (structure.curve) {
+    const point = structure.curve.getPointAt(THREE.MathUtils.clamp(fraction, 0, 1));
+    return { x: point.x, y: point.y, radius: Math.hypot(point.x, point.y), angle: Math.atan2(point.y, point.x) };
+  }
+  return armPoint(structure, fraction);
+}
+
+function structureTangent(structure, fraction) {
+  if (structure.curve) return structure.curve.getTangentAt(THREE.MathUtils.clamp(fraction, 0, 1));
+  const before = armPoint(structure, Math.max(0, fraction - .002));
+  const after = armPoint(structure, Math.min(1, fraction + .002));
+  return new THREE.Vector3(after.x - before.x, after.y - before.y, 0).normalize();
+}
+
+function structureWidth(structure, fraction) {
+  return THREE.MathUtils.lerp(structure.widthStartLy, structure.widthEndLy, fraction);
 }
 
 function pushScenePosition(target, x, y, z, sunDistance) {
   target.push(...galactocentricToScene(x, y, z, sunDistance));
 }
 
-function makeParticleData(model, count, kind, random) {
+function chooseWeighted(items, random) {
+  const total = items.reduce((sum, item) => sum + item.prominence, 0);
+  let value = random() * total;
+  for (const item of items) {
+    value -= item.prominence;
+    if (value <= 0) return item;
+  }
+  return items[items.length - 1];
+}
+
+function sampledFraction(structure, random) {
+  if (random() > structure.clumpiness) return random();
+  const clumpCount = structure.role === 'major' ? 22 : 15;
+  const centre = (Math.floor(random() * clumpCount) + .5) / clumpCount;
+  const spread = structure.role === 'local-branch' ? .055 : structure.role === 'major' ? .026 : .038;
+  return THREE.MathUtils.clamp(centre + gaussian(random) * spread, 0, 1);
+}
+
+function makeArmData(model, count, random, dust = false) {
   const positions = [];
   const colours = [];
   const sunDistance = model.sunDistanceFromCentreLy;
   const armsAndSpur = [...model.arms, ...model.spurs];
 
   for (let index = 0; index < count; index++) {
+    const structure = chooseWeighted(dust ? model.arms : armsAndSpur, random);
+    const fraction = sampledFraction(structure, random);
+    const point = structurePoint(structure, fraction);
+    const tangent = structureTangent(structure, fraction);
+    const width = structureWidth(structure, fraction);
+    const taper = Math.min(1, fraction / .035, (1 - fraction) / .055);
+    const dustLaneOffset = dust ? -width * .22 : 0;
+    const across = dustLaneOffset + gaussian(random) * width * (dust ? .18 : .31) * Math.max(.18, taper);
+    const x = point.x - tangent.y * across;
+    const y = point.y + tangent.x * across;
+    const z = gaussian(random) * (dust ? 115 : 145 + point.radius * .0055);
+    const hot = !dust && random() < .20;
+    const colour = dust
+      ? new THREE.Color().setRGB(.17 + random() * .055, .095 + random() * .03, .065 + random() * .018)
+      : hot
+        ? new THREE.Color().setRGB(.38 + random() * .18, .62 + random() * .18, .95)
+        : new THREE.Color().setRGB(.73 + random() * .24, .42 + random() * .22, .21 + random() * .18);
+    pushScenePosition(positions, x, y, z, sunDistance);
+    colours.push(colour.r, colour.g, colour.b);
+  }
+  return { positions, colours };
+}
+
+function makeDiskData(model, count, random) {
+  const positions = [];
+  const colours = [];
+  for (let index = 0; index < count; index++) {
+    const radius = Math.min(model.disk.radiusLy, -Math.log(Math.max(1e-7, 1 - random())) * model.disk.scaleLengthLy);
+    const angle = random() * Math.PI * 2;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    const z = gaussian(random) * model.disk.halfThicknessLy * (.28 + .72 * radius / model.disk.radiusLy);
+    const colour = new THREE.Color().setRGB(.50 + random() * .20, .45 + random() * .17, .37 + random() * .14);
+    pushScenePosition(positions, x, y, z, model.sunDistanceFromCentreLy);
+    colours.push(colour.r, colour.g, colour.b);
+  }
+  return { positions, colours };
+}
+
+function makeCoreData(model, count, random) {
+  const positions = [];
+  const colours = [];
+  const barAngle = model.bar.angleDegrees * DEG;
+  for (let index = 0; index < count; index++) {
     let x;
     let y;
     let z;
     let colour;
-
-    if (kind === 'dust') {
-      const arm = model.arms[index % model.arms.length];
-      const point = armPoint(arm, random());
-      const across = gaussian(random) * arm.widthLy * .62;
-      x = point.x + Math.cos(point.angle + Math.PI / 2) * across;
-      y = point.y + Math.sin(point.angle + Math.PI / 2) * across;
-      z = gaussian(random) * 170;
-      colour = new THREE.Color().setRGB(.20 + random() * .05, .12 + random() * .035, .09 + random() * .02);
+    if (random() < .73) {
+      const halfLength = model.bar.lengthLy * .5;
+      const along = THREE.MathUtils.clamp(gaussian(random) * halfLength * .45, -halfLength, halfLength);
+      const endTaper = Math.sqrt(Math.max(.06, 1 - Math.pow(along / halfLength, 2)));
+      const across = gaussian(random) * model.bar.widthLy * .22 * endTaper;
+      x = Math.cos(barAngle) * along - Math.sin(barAngle) * across;
+      y = Math.sin(barAngle) * along + Math.cos(barAngle) * across;
+      z = gaussian(random) * model.bar.halfThicknessLy * .32 * endTaper;
+      colour = new THREE.Color().setRGB(.93 + random() * .07, .48 + random() * .20, .19 + random() * .12);
     } else {
-      const choice = random();
-      if (choice < .64) {
-        const structure = armsAndSpur[index % armsAndSpur.length];
-        if ('turns' in structure) {
-          const point = armPoint(structure, random());
-          const across = gaussian(random) * structure.widthLy * .42;
-          x = point.x + Math.cos(point.angle + Math.PI / 2) * across;
-          y = point.y + Math.sin(point.angle + Math.PI / 2) * across;
-          z = gaussian(random) * (170 + point.radius * .006);
-        } else {
-          const along = (random() - .5) * structure.lengthLy;
-          const across = gaussian(random) * structure.widthLy * .28;
-          const angle = structure.angleDegrees * DEG;
-          x = sunDistance + structure.centreXFromSunLy + Math.cos(angle) * along - Math.sin(angle) * across;
-          y = structure.centreYFromSunLy + Math.sin(angle) * along + Math.cos(angle) * across;
-          z = gaussian(random) * 180;
-        }
-        const hot = random() < .18;
-        colour = hot
-          ? new THREE.Color().setRGB(.34 + random() * .15, .58 + random() * .18, .95)
-          : new THREE.Color().setRGB(.78 + random() * .20, .48 + random() * .20, .25 + random() * .18);
-      } else if (choice < .86) {
-        const radius = Math.min(model.disk.radiusLy, -Math.log(Math.max(1e-7, 1 - random())) * model.disk.scaleLengthLy);
-        const angle = random() * Math.PI * 2;
-        x = Math.cos(angle) * radius;
-        y = Math.sin(angle) * radius;
-        z = gaussian(random) * model.disk.halfThicknessLy * (.35 + .65 * radius / model.disk.radiusLy);
-        colour = new THREE.Color().setRGB(.66 + random() * .22, .55 + random() * .18, .42 + random() * .15);
-      } else if (choice < .95) {
-        const radius = Math.pow(random(), 1.8) * model.bulge.radiusLy;
-        const angle = random() * Math.PI * 2;
-        x = Math.cos(angle) * radius;
-        y = Math.sin(angle) * radius;
-        z = gaussian(random) * model.bulge.halfThicknessLy * (1 - radius / model.bulge.radiusLy * .5);
-        colour = new THREE.Color().setRGB(.98, .62 + random() * .18, .30 + random() * .10);
-      } else {
-        const along = (random() - .5) * model.bar.lengthLy;
-        const across = gaussian(random) * model.bar.widthLy * .23;
-        const angle = model.bar.angleDegrees * DEG;
-        x = Math.cos(angle) * along - Math.sin(angle) * across;
-        y = Math.sin(angle) * along + Math.cos(angle) * across;
-        z = gaussian(random) * 650;
-        colour = new THREE.Color().setRGB(.98, .58 + random() * .16, .26);
-      }
+      const radius = Math.pow(random(), 1.45) * model.bulge.radiusLy;
+      const angle = random() * Math.PI * 2;
+      const squash = .62 + .22 * Math.abs(Math.cos(angle - barAngle));
+      x = Math.cos(angle) * radius;
+      y = Math.sin(angle) * radius * squash;
+      z = gaussian(random) * model.bulge.halfThicknessLy * (1 - radius / model.bulge.radiusLy * .55);
+      colour = new THREE.Color().setRGB(.96 + random() * .04, .54 + random() * .17, .24 + random() * .12);
     }
-
-    pushScenePosition(positions, x, y, z, sunDistance);
+    pushScenePosition(positions, x, y, z, model.sunDistanceFromCentreLy);
     colours.push(colour.r, colour.g, colour.b);
   }
   return { positions, colours };
@@ -184,18 +239,8 @@ function createPoints(data, material, name) {
 }
 
 function labelAnchor(structure, model) {
-  if ('turns' in structure) {
-    const point = armPoint(structure, .58);
-    return galactocentricToScene(point.x, point.y, 420, model.sunDistanceFromCentreLy);
-  }
-  const angle = structure.angleDegrees * DEG;
-  const along = structure.lengthLy * .30;
-  return galactocentricToScene(
-    model.sunDistanceFromCentreLy + structure.centreXFromSunLy + Math.cos(angle) * along,
-    structure.centreYFromSunLy + Math.sin(angle) * along,
-    350,
-    model.sunDistanceFromCentreLy
-  );
+  const point = structurePoint(structure, structure.labelFraction ?? .58);
+  return galactocentricToScene(point.x, point.y, 420, model.sunDistanceFromCentreLy);
 }
 
 function sceneToGalactocentric(position, sunDistance) {
@@ -218,20 +263,11 @@ function pointToSegmentDistance(px, py, ax, ay, bx, by) {
 
 function distanceToStructure(position, structure, model) {
   let minimum = Infinity;
-  if ('turns' in structure) {
-    let previous = armPoint(structure, 0);
-    for (let index = 1; index <= 160; index++) {
-      const current = armPoint(structure, index / 160);
-      minimum = Math.min(minimum, pointToSegmentDistance(position.x, position.y, previous.x, previous.y, current.x, current.y));
-      previous = current;
-    }
-  } else {
-    const angle = structure.angleDegrees * DEG;
-    const centreX = model.sunDistanceFromCentreLy + structure.centreXFromSunLy;
-    const centreY = structure.centreYFromSunLy;
-    const halfX = Math.cos(angle) * structure.lengthLy * .5;
-    const halfY = Math.sin(angle) * structure.lengthLy * .5;
-    minimum = pointToSegmentDistance(position.x, position.y, centreX - halfX, centreY - halfY, centreX + halfX, centreY + halfY);
+  let previous = structurePoint(structure, 0);
+  for (let index = 1; index <= 180; index++) {
+    const current = structurePoint(structure, index / 180);
+    minimum = Math.min(minimum, pointToSegmentDistance(position.x, position.y, previous.x, previous.y, current.x, current.y));
+    previous = current;
   }
   return minimum;
 }
@@ -252,7 +288,7 @@ function classifyPosition(position, object, model) {
     distance: distanceToStructure(galactic, structure, model)
   })).sort((a, b) => a.distance - b.distance);
   const nearest = candidates[0];
-  const width = nearest.structure.widthLy;
+  const width = Math.max(nearest.structure.widthStartLy, nearest.structure.widthEndLy);
   const inherentlyUncertain = /planetary nebula|white dwarf/.test(type);
   let confidence = nearest.distance <= width * .45 ? 'high' : nearest.distance <= width ? 'medium' : 'low';
   if (inherentlyUncertain) confidence = 'nearest arm only; membership uncertain';
@@ -266,23 +302,26 @@ function classifyPosition(position, object, model) {
 }
 
 const QUALITY = {
-  low: { stars: 15000, dust: 0, opacity: .42, pointSize: 1.9 },
-  medium: { stars: 40000, dust: 3500, opacity: .48, pointSize: 2.1 },
-  high: { stars: 100000, dust: 8000, opacity: .54, pointSize: 2.3 }
+  low: { arms: 9000, disk: 3500, core: 5000, dust: 0, opacity: .42, pointSize: 1.9 },
+  medium: { arms: 25000, disk: 9000, core: 11000, dust: 2800, opacity: .48, pointSize: 2.1 },
+  high: { arms: 56000, disk: 20000, core: 24000, dust: 7500, opacity: .54, pointSize: 2.3 }
 };
 
 export async function createMilkyWay({ scene, modelUrl, displayDistance, initialQuality = 'medium' }) {
   const response = await fetch(modelUrl);
   if (!response.ok) throw new Error(`Milky Way model could not be loaded (${response.status}).`);
   const model = await response.json();
+  prepareStructureCurves(model);
   const group = new THREE.Group();
   group.name = 'milkyWayGroup';
   group.renderOrder = -5;
 
   const random = seededRandom();
-  const stars = createPoints(makeParticleData(model, QUALITY.high.stars, 'stars', random), makeMaterial(), 'Milky Way stars');
-  const dust = createPoints(makeParticleData(model, QUALITY.high.dust, 'dust', random), makeMaterial({ dust: true }), 'Milky Way dust');
-  group.add(stars, dust);
+  const arms = createPoints(makeArmData(model, QUALITY.high.arms, random), makeMaterial(), 'Milky Way spiral arms');
+  const disk = createPoints(makeDiskData(model, QUALITY.high.disk, random), makeMaterial(), 'Milky Way stellar disk');
+  const core = createPoints(makeCoreData(model, QUALITY.high.core, random), makeMaterial(), 'Milky Way central bar and bulge');
+  const dust = createPoints(makeArmData(model, QUALITY.high.dust, random, true), makeMaterial({ dust: true }), 'Milky Way dust lanes');
+  group.add(disk, arms, core, dust);
 
   const labels = [...model.arms, ...model.spurs].map(structure => {
     const element = document.createElement('span');
@@ -310,7 +349,7 @@ export async function createMilkyWay({ scene, modelUrl, displayDistance, initial
   }
 
   function updateUniforms() {
-    [stars.material, dust.material].forEach(material => {
+    [arms.material, disk.material, core.material, dust.material].forEach(material => {
       material.uniforms.uLinear.value = scaleMode === 'linear' ? 1 : 0;
       material.uniforms.uMaximumDistance.value = maximumDistance;
     });
@@ -335,10 +374,16 @@ export async function createMilkyWay({ scene, modelUrl, displayDistance, initial
     },
     setQuality(level) {
       const profile = QUALITY[level] || QUALITY.medium;
-      stars.geometry.setDrawRange(0, profile.stars);
+      arms.geometry.setDrawRange(0, profile.arms);
+      disk.geometry.setDrawRange(0, profile.disk);
+      core.geometry.setDrawRange(0, profile.core);
       dust.geometry.setDrawRange(0, profile.dust);
-      stars.material.uniforms.uOpacity.value = profile.opacity;
-      stars.material.uniforms.uPointSize.value = profile.pointSize;
+      arms.material.uniforms.uOpacity.value = profile.opacity;
+      arms.material.uniforms.uPointSize.value = profile.pointSize;
+      disk.material.uniforms.uOpacity.value = profile.opacity * .34;
+      disk.material.uniforms.uPointSize.value = profile.pointSize * .82;
+      core.material.uniforms.uOpacity.value = profile.opacity * .72;
+      core.material.uniforms.uPointSize.value = profile.pointSize * .94;
       dust.visible = profile.dust > 0;
     },
     update() {},
@@ -348,7 +393,7 @@ export async function createMilkyWay({ scene, modelUrl, displayDistance, initial
     dispose() {
       scene.remove(group);
       labels.forEach(label => label.element?.remove());
-      [stars, dust].forEach(points => {
+      [arms, disk, core, dust].forEach(points => {
         points.geometry.dispose();
         points.material.dispose();
       });

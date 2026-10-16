@@ -1,21 +1,25 @@
 {
-  "modelVersion": "Space Safari Milky Way 2026.1",
+  "modelVersion": "Space Safari Milky Way 2026.2",
   "updated": "2026-10",
   "coordinateSystem": "galactocentric-cartesian-light-years",
   "sunDistanceFromCentreLy": 26400,
-  "description": "Observation-informed educational density model. Arm centre lines are a hybrid approximation and are not presented as a complete measured map.",
+  "description": "Observation-informed educational density model based on the barred, multi-arm Milky Way seen by Gaia, VLBI maser surveys and NASA visualisations. Arm centre lines remain an approximation because much of the far side is obscured.",
   "sources": [
+    {
+      "label": "ESA Gaia Milky Way map (2025)",
+      "url": "https://www.cosmos.esa.int/web/gaia/milky-way"
+    },
+    {
+      "label": "NASA Milky Way structure and arm hierarchy",
+      "url": "https://science.nasa.gov/resource/the-milky-way-galaxy/"
+    },
+    {
+      "label": "NASA: the Sun in the Orion Spur",
+      "url": "https://science.nasa.gov/sun/facts/"
+    },
     {
       "label": "BeSSeL/VLBI spiral structure",
       "url": "https://arxiv.org/abs/1910.03357"
-    },
-    {
-      "label": "ESA Gaia DR3 young-star structure",
-      "url": "https://www.cosmos.esa.int/web/gaia/dr3-where-are-the-stars"
-    },
-    {
-      "label": "Classical Cepheid spiral tracers (2024)",
-      "url": "https://arxiv.org/abs/2406.09127"
     },
     {
       "label": "NASA Chandra/XMM outer-arm constraints (2026)",
@@ -27,70 +31,99 @@
     "url": "https://github.com/dgreenheck/webgpu-galaxy"
   },
   "disk": {
-    "radiusLy": 52000,
-    "scaleLengthLy": 11000,
-    "halfThicknessLy": 520
+    "radiusLy": 56000,
+    "scaleLengthLy": 11500,
+    "halfThicknessLy": 540
   },
   "bulge": {
-    "radiusLy": 6200,
-    "halfThicknessLy": 2600
+    "radiusLy": 5700,
+    "halfThicknessLy": 2300
   },
   "bar": {
-    "lengthLy": 16500,
-    "widthLy": 4300,
+    "lengthLy": 20000,
+    "widthLy": 3600,
+    "halfThicknessLy": 1250,
     "angleDegrees": 27
   },
   "arms": [
     {
+      "id": "scutum-centaurus",
+      "name": "Scutum–Centaurus Arm",
+      "role": "major",
+      "startAngleDegrees": 27,
+      "sweepDegrees": 270,
+      "startRadiusLy": 10000,
+      "endRadiusLy": 55500,
+      "widthStartLy": 1050,
+      "widthEndLy": 2550,
+      "prominence": 1.0,
+      "clumpiness": 0.68,
+      "labelFraction": 0.72,
+      "confidence": "medium"
+    },
+    {
       "id": "perseus",
       "name": "Perseus Arm",
-      "phaseDegrees": 152,
-      "startRadiusLy": 11100,
-      "pitchDegrees": 9.4,
-      "turns": 1.42,
-      "widthLy": 1550,
+      "role": "major",
+      "startAngleDegrees": 207,
+      "sweepDegrees": 220,
+      "startRadiusLy": 10000,
+      "endRadiusLy": 55000,
+      "widthStartLy": 1050,
+      "widthEndLy": 2450,
+      "prominence": 0.94,
+      "clumpiness": 0.62,
+      "labelFraction": 0.56,
       "confidence": "medium"
     },
     {
       "id": "sagittarius-carina",
       "name": "Sagittarius–Carina Arm",
-      "phaseDegrees": 62,
-      "startRadiusLy": 9800,
-      "pitchDegrees": 10.6,
-      "turns": 1.5,
-      "widthLy": 1450,
-      "confidence": "medium"
-    },
-    {
-      "id": "scutum-centaurus",
-      "name": "Scutum–Centaurus Arm",
-      "phaseDegrees": -28,
-      "startRadiusLy": 8500,
-      "pitchDegrees": 12.1,
-      "turns": 1.54,
-      "widthLy": 1500,
+      "role": "secondary",
+      "startAngleDegrees": -118,
+      "sweepDegrees": 255,
+      "startRadiusLy": 10500,
+      "endRadiusLy": 43500,
+      "widthStartLy": 850,
+      "widthEndLy": 2050,
+      "prominence": 0.64,
+      "clumpiness": 0.78,
+      "labelFraction": 0.76,
       "confidence": "medium"
     },
     {
       "id": "norma-outer",
       "name": "Norma–Outer Arm",
-      "phaseDegrees": -118,
-      "startRadiusLy": 7600,
-      "pitchDegrees": 12.8,
-      "turns": 1.62,
-      "widthLy": 1750,
+      "role": "secondary",
+      "startAngleDegrees": 62,
+      "sweepDegrees": 248,
+      "startRadiusLy": 10800,
+      "endRadiusLy": 48500,
+      "widthStartLy": 850,
+      "widthEndLy": 2300,
+      "prominence": 0.57,
+      "clumpiness": 0.74,
+      "labelFraction": 0.76,
       "confidence": "low-to-medium"
     }
   ],
   "spurs": [
     {
       "id": "orion",
-      "name": "Orion Spur",
-      "centreXFromSunLy": -450,
-      "centreYFromSunLy": 0,
-      "lengthLy": 20000,
-      "widthLy": 3500,
-      "angleDegrees": 25,
+      "name": "Local (Orion) Arm",
+      "role": "local-branch",
+      "fromArmId": "sagittarius-carina",
+      "fromFraction": 0.40,
+      "controlPointsLy": [
+        [22000, -2700],
+        [26400, 0],
+        [33000, 6500]
+      ],
+      "widthStartLy": 900,
+      "widthEndLy": 1900,
+      "prominence": 0.32,
+      "clumpiness": 0.28,
+      "labelFraction": 0.43,
       "confidence": "high-near-sun"
     }
   ]

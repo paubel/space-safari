@@ -4,6 +4,29 @@
 
 Det här dokumentet är implementationsspecifikationen för ett visuellt och vetenskapligt motiverat Vintergatslager i `3d-universe.html`.
 
+## Implementerad version
+
+Den aktiva modellen är **Space Safari Milky Way 2026.2**. Den ersätter den första
+prototypens långa, jämnstarka logaritmiska spiraler med en data-driven,
+stavspiralformad modell:
+
+- Scutum–Centaurus och Perseus återges som de två tydligaste huvudarmarna.
+- Sagittarius–Carina och Norma–Outer återges svagare och bredare där
+  observationsläget är osäkrare.
+- Local (Orion) Arm är en böjd spline som förgrenas från Sagittarius–Carina,
+  passerar solens galaktocentriska position och tonar ut mot området innanför
+  Perseusarmen. Den är alltså inte längre ett fristående band ovanpå galaxen.
+- den centrala staven är cirka 20 000 ljusår lång, vinklad 27 grader i modellens
+  sol–centrum-plan och renderas i ett eget partikellager,
+- armarnas densitet är klumpig och ojämn för att undvika perfekta ringar,
+- stoftbanden ligger förskjutna mot armarnas insidor,
+- inga jetstrålar, ljuskäglor eller andra utflöden skapas från Sagittarius A*.
+
+Knappen `View whole Milky Way` visar en ren galaxöversikt. Den döljer tillfälligt
+förstorade katalogstjärnor, deep-sky-markörer, koordinatnät och riktningspilar så
+att de inte kan misstolkas som galaxstruktur eller utflöden från det svarta
+hålet. Lagren kan fortfarande slås på igen via `View controls`.
+
 Modellen ska:
 
 - ge användaren ett galaktiskt sammanhang för stjärnor, nebulosor, stjärnhopar och Sagittarius A*,
@@ -47,11 +70,29 @@ Space Safari ska därför använda en versionsmärkt hybridmodell. Den ska samma
 
 ### Primära underlag
 
-- BeSSeL/VLBI-mätningar av maserparallaxer används för den grundläggande spiralstrukturen och massiva stjärnbildningsområden. Resultaten stöder huvudsakligen en struktur med fyra större armar: [Reid med flera, 2019](https://arxiv.org/abs/1910.03357).
-- Gaia DR3:s unga stjärnpopulationer används för närliggande armsegment och lokal struktur: [ESA Gaia DR3 – Mapping the asymmetric disc](https://www.cosmos.esa.int/web/gaia/dr3-where-are-the-stars).
-- Klassiska cepheider kompletterar delar av galaxen där maserparallaxerna är glesa: [The Milky Way as Seen by Classical Cepheids II, 2024](https://arxiv.org/abs/2406.09127).
-- Chandra- och XMM-Newton-mätningar av röntgenljusekon används som underlag för senare justeringar av de yttre armarnas avstånd: [NASA Chandra – Milky Way at Arms' Length](https://science.nasa.gov/missions/chandra/nasas-chandra-examines-milky-way-at-arms-length/).
-- NASA:s statistiska COBE/DIRBE-modell är en principiell referens för olika stjärnpopulationers fördelning i skiva, armar och bula: [NASA LAMBDA Milky Way model](https://lambda.gsfc.nasa.gov/product/cobe/vrml_models.html).
+- [ESA Gaia – Milky Way map (2025)](https://www.cosmos.esa.int/web/gaia/milky-way)
+  är den övergripande visuella referensen. Gaia-bilden visar en mindre regelbunden
+  flerarmsstruktur än äldre skolboksbilder och en tydligt vinklad centralstav.
+- [NASA – The Milky Way Galaxy](https://science.nasa.gov/resource/the-milky-way-galaxy/)
+  används för armhierarkin: Scutum–Centaurus och Perseus är de två framträdande
+  huvudarmarna som utgår från stavens ändar; Sagittarius och Norma är svagare
+  mellanliggande strukturer.
+- [NASA – Sun facts](https://science.nasa.gov/sun/facts/) och
+  [NASA – Milky Way and Our Location](https://science.nasa.gov/asset/webb/milky-way-and-our-location/)
+  används för solens placering i Orion-sporren, mellan Sagittarius- och
+  Perseusarmarna.
+- BeSSeL/VLBI-mätningar av maserparallaxer används för den grundläggande
+  flerarmsstrukturen och massiva stjärnbildningsområden:
+  [Reid med flera, 2019](https://arxiv.org/abs/1910.03357).
+- Gaia DR3:s unga stjärnpopulationer används för närliggande armsegment och
+  lokal struktur:
+  [Gaia DR3-resultat i MNRAS](https://academic.oup.com/mnras/article/527/1/1472/7337334).
+- Chandra- och XMM-Newton-mätningar används som underlag för de yttre armarnas
+  avstånd och bredd:
+  [NASA Chandra – Milky Way at Arms' Length](https://science.nasa.gov/missions/chandra/nasas-chandra-examines-milky-way-at-arms-length/).
+- [ESA – Guide to our galaxy](https://www.esa.int/Science_Exploration/Space_Science/Gaia/Guide_to_our_galaxy)
+  används som stöd för en cirka 10 000 ljusår lång halvstav och en boxig/
+  jordnötsformad central bula.
 
 ### Modellerade strukturer
 
@@ -61,13 +102,19 @@ Följande strukturer ska kunna representeras:
 - Sagittarius–Carina-armen,
 - Scutum–Centaurus-armen,
 - Norma-/Outer-armens relevanta segment,
-- den lokala Orion-sporren,
+- den lokala Orionarmen/-sporren som en fysisk förgrening från
+  Sagittarius–Carina,
 - den centrala galaktiska staven,
 - den centrala bulan,
 - den tunna stjärnskivan,
 - ett tjockare och mycket svagare skiv-/halolager.
 
-Armarnas form ska lagras som data och inte hårdkodas i renderingslogiken. Modellen ska tillåta både logaritmiska spiralavsnitt och punkt-/splinebaserade korrigeringar där observationerna avviker från en idealisk spiral.
+Armarnas form lagras som data och hårdkodas inte i renderingslogiken.
+Huvudarmarna beskrivs av begränsade spiralavsnitt med startvinkel, svep,
+start-/slutradie, lokal bredd, prominens och klumpighet. Orionstrukturen är en
+Catmull–Rom-spline som börjar exakt på Sagittarius–Carinas centrumlinje. Den
+lösningen gör lokala förgreningar möjliga utan att återgå till perfekta
+koncentriska spiraler.
 
 ### Versionsinformation
 
@@ -75,14 +122,14 @@ Modellfilen ska innehålla metadata i denna form:
 
 ```json
 {
-  "modelVersion": "Space Safari Milky Way 2026.1",
+  "modelVersion": "Space Safari Milky Way 2026.2",
   "coordinateSystem": "galactocentric-cartesian-light-years",
   "sunDistanceFromCentreLy": 26400,
   "updated": "2026-10",
   "sources": [
+    "ESA Gaia Milky Way map 2025",
+    "NASA Milky Way structure",
     "BeSSeL/VLBI",
-    "Gaia DR3",
-    "Classical Cepheids 2024",
     "Chandra/XMM-Newton outer-arm constraints"
   ]
 }
@@ -215,12 +262,14 @@ Krav vid skalväxling:
 
 Modellen delas upp i separata draw calls eller logiska lager:
 
-1. `armStars` – ljusa och unga stjärnpopulationer längs spiralarmarna.
-2. `diskStars` – svag, bred exponentiell stjärnskiva.
-3. `bulgeStars` – tät ellipsoidisk population runt centrum.
-4. `barStars` – avlång central struktur.
-5. `dustClouds` – sparsamt lager som antyder mörka stoftband.
-6. `armLabels` – valfria CSS2D-etiketter eller motsvarande.
+1. `Milky Way spiral arms` – ljusa och unga stjärnpopulationer längs
+   spiralarmarna och Orionförgreningen.
+2. `Milky Way stellar disk` – svag, bred exponentiell stjärnskiva.
+3. `Milky Way central bar and bulge` – ett eget lager där 73 procent av
+   partiklarna bygger den avlånga staven och resten den boxiga bulan.
+4. `Milky Way dust lanes` – sparsamma, mörkare stoftband förskjutna mot
+   spiralarmarnas insidor.
+5. `armLabels` – valfria CSS2D-etiketter eller motsvarande.
 
 ### Visuell princip
 
@@ -230,6 +279,9 @@ Modellen delas upp i separata draw calls eller logiska lager:
 - Osäkra armsegment kan göras svagare eller bredare.
 - Den bortre sidan får inte ges falskt hög detaljgrad.
 - Den centrala bulan ska vara synlig men inte täcka Sagittarius A*.
+- Centrum får inte innehålla jetstrålar, strålkäglor eller radiella
+  dekorationslinjer. Sagittarius A* markeras endast som ett katalogobjekt när
+  användaren aktiverar deep-sky-lagret.
 
 ## Prestanda och adaptiv kvalitet
 
@@ -239,9 +291,9 @@ Rekommenderade startvärden:
 
 | Kvalitet | Armstjärnor | Skiva och bula | Stoft | Eftereffekter |
 |---|---:|---:|---:|---|
-| Low | 12 000–15 000 | 5 000 | 1 000–1 500 | Ingen bloom |
-| Medium | 30 000–40 000 | 12 000 | 3 000–4 000 | Enkel shaderglöd |
-| High | 70 000–100 000 | 25 000 | 6 000–8 000 | Mjuk, begränsad glöd |
+| Low | 9 000 | 3 500 skiva + 5 000 centrum | 0 | Ingen bloom |
+| Medium | 25 000 | 9 000 skiva + 11 000 centrum | 2 800 | Enkel punktglöd |
+| High | 56 000 | 20 000 skiva + 24 000 centrum | 7 500 | Begränsad punktglöd |
 
 Den första implementationen ska hellre börja i den nedre delen av intervallen och därefter mätas på verklig hårdvara.
 
@@ -292,10 +344,10 @@ Föreslagen metadata:
 ```json
 {
   "galacticStructure": {
-    "classification": "Orion Spur",
+    "classification": "Local (Orion) Arm",
     "confidence": "high",
     "method": "position-and-literature",
-    "modelVersion": "Space Safari Milky Way 2026.1"
+    "modelVersion": "Space Safari Milky Way 2026.2"
   }
 }
 ```
@@ -312,7 +364,7 @@ Informationspanelen kan visa:
 ```text
 Galactic structure: Orion Spur
 Confidence: High
-Model: Space Safari Milky Way 2026.1
+Model: Space Safari Milky Way 2026.2
 ```
 
 eller:

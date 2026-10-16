@@ -4,7 +4,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { STARS } from '../data/astrophoto/interactive-stars.js?v=3d-prototype-1';
 import { createSagittariusAVisualizer } from './sagittarius-a-webgpu.js?v=adaptive-quality-1';
-import { createMilkyWay } from './milky-way.js?v=4';
+import { createMilkyWay } from './milky-way.js?v=6';
 
 if (sessionStorage.getItem('space-safari-universe-return')) {
   document.body.classList.add('is-arriving-universe');
@@ -193,6 +193,7 @@ let flight = null;
 let sagittariusAVisualizer = null;
 let milkyWay = null;
 let milkyWayLoadPromise = null;
+let galaxyOverviewActive = false;
 let backgroundStars = null;
 let qualityMode = localStorage.getItem('space-safari-quality-mode') || 'auto';
 let activeQuality = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4 ? 'low' : 'medium';
@@ -1156,7 +1157,7 @@ function updateVisibleStars() {
   starObjects.forEach(item => {
     const matchesDistance = Number(item.star.distance) <= maximum || /^(sun|sol)/i.test(item.star.name);
     const matchesSpectral = spectral === 'all' || spectralLetter(item.star) === spectral;
-    item.sprite.visible = matchesDistance && matchesSpectral;
+    item.sprite.visible = !galaxyOverviewActive && matchesDistance && matchesSpectral;
     item.label.visible = item.sprite.visible && controlsUi.labels.checked &&
       (Number(item.star.magnitude) <= labelMagnitude || item.star === selected || /^(sun|sol)/i.test(item.star.name));
     item.labelElement.classList.toggle('is-selected', item.star === selected);
@@ -1247,6 +1248,7 @@ function updateGalacticClassifications() {
 
 function selectStar(star, fly = false) {
   if (!star) return;
+  galaxyOverviewActive = false;
   const isSun = /^(sun|sol)/i.test(star.name);
   const starDistance = Number(star.distance);
   let rangeChanged = false;
@@ -1295,6 +1297,7 @@ function selectStar(star, fly = false) {
 function selectNebula(nebula, fly = false) {
   const item = nebulaObjects.find(candidate => candidate.nebula === nebula);
   if (!item) return;
+  galaxyOverviewActive = false;
   if (nebula.distance > maximumDistance()) {
     controlsUi.distance.value = Math.min(
       Number(controlsUi.distance.max),
@@ -1544,6 +1547,7 @@ function animate(time) {
 }
 
 function resetView() {
+  galaxyOverviewActive = false;
   scaleMode = 'compressed';
   controlsUi.scale.find(input => input.value === 'compressed').checked = true;
   controlsUi.distance.value = '3.90';
@@ -1564,9 +1568,21 @@ function resetView() {
 }
 
 async function viewWholeMilkyWay() {
+  galaxyOverviewActive = true;
   controlsUi.milkyWay.checked = true;
   controlsUi.milkyWayLabels.disabled = false;
   localStorage.setItem('space-safari-show-milky-way', 'true');
+  // A clean face-on galaxy view: no navigation arrows, coordinate grids or
+  // enlarged deep-sky markers that could be mistaken for structures or jets
+  // emerging from Sagittarius A*. Every layer can still be switched back on.
+  controlsUi.directions.checked = false;
+  controlsUi.earthGuide.checked = false;
+  controlsUi.plane.checked = false;
+  controlsUi.labels.checked = false;
+  controlsUi.nebulae.checked = false;
+  directionGroup.visible = false;
+  earthGuideGroup.visible = false;
+  planeGrid.visible = false;
   scaleMode = 'linear';
   controlsUi.scale.forEach(input => { input.checked = input.value === scaleMode; });
   controlsUi.distance.value = '5.00';
@@ -1713,7 +1729,7 @@ async function loadMilkyWay() {
   controlsUi.milkyWayStatus.textContent = 'Building the Milky Way map on your device…';
   milkyWayLoadPromise = createMilkyWay({
     scene,
-    modelUrl: new URL('../data/milky-way-model.json', import.meta.url),
+    modelUrl: new URL('../data/milky-way-model.json?v=2026.2b', import.meta.url),
     displayDistance,
     initialQuality: activeQuality
   }).then(instance => {
