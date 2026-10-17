@@ -294,11 +294,10 @@ function updateGalacticCentreGuide() {
   galacticCentreGuide.label.position.copy(direction.multiplyScalar(length));
 }
 
-function linearGuideDistances(maximum) {
-  // In linear mode every ring represents the same physical interval, making
-  // proportional distance visually unambiguous across the galactic view.
-  return Array.from({ length: 20 }, (_, index) => (index + 1) * 1000)
-    .filter(distance => distance < maximum * .98);
+function guideDistances() {
+  // Reference rings are context, independent of the catalogue distance filter.
+  const thousands = Array.from({ length: 20 }, (_, index) => (index + 1) * 1000);
+  return scaleMode === 'linear' ? thousands : [1, 10, 100, ...thousands];
 }
 
 function clearEarthGuide() {
@@ -334,7 +333,7 @@ function updateEarthGuide() {
   if (!earthGuideGroup) return;
   clearEarthGuide();
   const maximum = maximumDistance();
-  const outerRadius = displayDistance(maximum);
+  const outerRadius = displayDistance(Math.max(maximum, 20000));
   const disk = new THREE.Mesh(
     new THREE.CircleGeometry(outerRadius, 128),
     new THREE.MeshBasicMaterial({ color: 0x367bb6, transparent: true, opacity: .025, side: THREE.DoubleSide, depthWrite: false })
@@ -342,11 +341,10 @@ function updateEarthGuide() {
   disk.rotation.x = -Math.PI / 2;
   earthGuideGroup.add(disk);
 
-  const ringDistances = scaleMode === 'linear'
-    ? linearGuideDistances(maximum)
-    : [1, 10, 100, 1000, 5000, 10000].filter(distance => distance < maximum * .98);
+  const ringDistances = guideDistances();
   ringDistances.forEach((distance, index) => {
-    const labelAngle = scaleMode === 'linear' ? (index % 4) * Math.PI / 2 : 0;
+    // Spread labels around eight directions to keep compressed rings readable.
+    const labelAngle = (index % 8) * Math.PI / 4;
     createDistanceRing(distance, index === ringDistances.length - 1 ? 0x70baff : 0x3f739f, labelAngle);
   });
 

@@ -27,6 +27,12 @@ on the Sun in logarithmic scale, with the 3D deep-sky objects enabled**.
 An explicit return from the black-hole viewer can restore the saved view.
 The Milky Way visibility preference remains separately saved.
 
+Reference rings run from 1,000 to 20,000 ly at 1,000 ly intervals in both
+distance modes. Logarithmic mode also retains the 1, 10 and 100 ly rings.
+These context rings are independent of the catalogue distance filter. Labels
+are distributed over eight radial directions to reduce overlap. The existing
+Polaris/light-year-scale checkbox switches the rings on and off.
+
 The four galaxy camera presets all select linear scale and a 100,000 ly
 catalogue range, center the target on the model's Galactic Center and hide
 enlarged catalogue markers, coordinate grids and directional arrows:
