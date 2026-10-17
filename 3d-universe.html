@@ -6,7 +6,7 @@
     <meta name="description" content="Explore the three-dimensional positions of nearby and famous stars in the Space Safari stellar catalogue.">
     <title>3D Universe - Space Safari</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/3d-universe.css?v=gaia-milky-way-3">
+    <link rel="stylesheet" href="css/3d-universe.css?v=fullscreen-toolbar-1">
     <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SL7KJ6J4ZZ"></script>
     <script>
@@ -50,6 +50,9 @@
         </header>
 
         <section class="universe-workspace" aria-label="Interactive three-dimensional star map">
+            <div class="universe-workspace-toolbar">
+                <button id="universe-fullscreen" type="button" aria-pressed="false">Full screen</button>
+            </div>
             <div class="universe-fullscreen-tools" aria-label="Full-screen panels">
                 <button id="universe-toggle-controls" type="button" aria-pressed="true">Hide View controls</button>
                 <button id="universe-toggle-details" type="button" aria-pressed="true">Hide Selected object</button>
@@ -147,7 +150,6 @@
 
                 <div class="universe-button-row">
                     <button id="universe-home" type="button">Return to the Sun</button>
-                    <button id="universe-fullscreen" type="button">Full screen</button>
                 </div>
 
                 <p class="universe-count" id="universe-count" aria-live="polite">Loading stars…</p>
@@ -193,6 +195,6 @@
     </main>
 
     <script src="js/main.js"></script>
-  <script type="module" src="js/3d-universe.js?v=70"></script>
+  <script type="module" src="js/3d-universe.js?v=71"></script>
 </body>
 </html>

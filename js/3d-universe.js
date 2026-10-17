@@ -1780,6 +1780,7 @@ function bindEvents() {
   document.addEventListener('fullscreenchange', () => {
     const isFullscreen = document.fullscreenElement === workspace;
     controlsUi.fullscreen.textContent = isFullscreen ? 'Exit full screen' : 'Full screen';
+    controlsUi.fullscreen.setAttribute('aria-pressed', String(isFullscreen));
     if (isFullscreen) {
       setFullscreenPanel('is-controls-hidden', controlsUi.toggleControls, 'View controls', false);
       setFullscreenPanel('is-details-hidden', controlsUi.toggleDetails, 'Selected object', matchMedia('(max-width: 680px)').matches);
