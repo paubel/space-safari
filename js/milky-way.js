@@ -268,6 +268,7 @@ function makeMaterial({ dust = false, glow = false, model } = {}) {
       uPointSize: { value: dust ? 3.2 : 2.0 },
       uCameraGalactic: { value: new THREE.Vector3() },
       uSunDistance: { value: model.sunDistanceFromCentreLy },
+      uDustHeight: { value: model.sampling.dustScaleHeightLy },
       uExtinction: { value: model.sampling.extinctionStrength },
       uCinematic: { value: 0 },
       uGlow: { value: glow ? 1 : 0 }
@@ -278,6 +279,7 @@ function makeMaterial({ dust = false, glow = false, model } = {}) {
       uniform float uPointSize;
       uniform vec3 uCameraGalactic;
       uniform float uSunDistance;
+      uniform float uDustHeight;
       uniform float uExtinction;
       uniform float uGlow;
       varying vec3 vColour;
@@ -294,7 +296,7 @@ function makeMaterial({ dust = false, glow = false, model } = {}) {
         // when the user zooms out beyond the selected catalogue range.
         vVisible = 1.0;
         vColour = color;
-        // A short optical-depth integral through the synthetic dust disk.
+        // Optical-depth proxy at the ray's closest approach to the dust plane.
         // These are physical light-years in the same frame as the geometry.
         vec3 e = vec3(position.x, -position.z, position.y);
         vec3 g = vec3(uSunDistance - dot(vec3(-.0548755604,-.8734370902,-.4838350155),e),
@@ -306,9 +308,10 @@ function makeMaterial({ dust = false, glow = false, model } = {}) {
         float radius = length(crossing.xy);
         float dustPatch = .55 + .22*sin(crossing.x*.0012 + sin(crossing.y*.0017)) +
           .16*sin(crossing.y*.0031 + crossing.x*.0014);
-        float column = exp(-radius/26000.0) * exp(-abs(crossing.z)/240.0) *
-          min(7.0, length(ray)/max(240.0,abs(ray.z))) * dustPatch;
-        vTransmission = exp(-column * uExtinction * uLinear);
+        float column = exp(-radius/26000.0) * exp(-abs(crossing.z)/(uDustHeight*1.6)) *
+          min(7.0, length(ray)/max(uDustHeight*1.6,abs(ray.z))) * dustPatch;
+        float embeddedLane = 1.0 + 2.0 * exp(-abs(g.z)/(uDustHeight*1.2));
+        vTransmission = exp(-column * uExtinction * uLinear * embeddedLane);
         vec4 mvPosition = modelViewMatrix * vec4(shownPosition, 1.0);
         gl_Position = projectionMatrix * mvPosition;
         gl_PointSize = vVisible * uPointSize * clamp(155.0 / max(18.0, -mvPosition.z), .65, 2.7);
@@ -388,6 +391,7 @@ function classifyPosition(position, object, model) {
   const centreDistance = Math.hypot(galactic.x, galactic.y, galactic.z);
 
   if (/sagittarius a/i.test(name)) return { label: 'Galactic Centre', confidence: 'high', modelVersion: model.modelVersion };
+  if (/^(sun|sol)/i.test(name)) return { label: 'Local (Orion) Arm', confidence: 'literature-supported; approximate position', modelVersion: model.modelVersion };
   if (/globular/.test(type)) return { label: 'Galactic halo/bulge population', confidence: 'not arm-classified', modelVersion: model.modelVersion };
   if (centreDistance < model.bulge.radiusLy) return { label: 'Galactic bulge', confidence: 'medium', modelVersion: model.modelVersion };
 
@@ -488,13 +492,13 @@ export async function createMilkyWay({ scene, modelUrl, displayDistance, initial
     return label;
   }
   referenceLabel('☉ Sun · ≈8.2 kpc', [0, 0, 0], 'universe-galaxy-sun');
-  referenceLabel('Galactic Center', galactocentricToScene(0, 0, 0, model.sunDistanceFromCentreLy));
+  referenceLabel('Galactic Center', galactocentricToScene(0, 0, 0, model.sunDistanceFromCentreLy), 'universe-galaxy-center');
   const scaleStart = galactocentricToScene(-36000, -36000, 0, model.sunDistanceFromCentreLy);
-  const scaleEnd = galactocentricToScene(-26000, -36000, 0, model.sunDistanceFromCentreLy);
+  const scaleEnd = galactocentricToScene(-36000, -26000, 0, model.sunDistanceFromCentreLy);
   const scaleGroup = new THREE.Group();
   physicalLine([scaleStart, scaleEnd], 0xb5c4d5, .7, scaleGroup);
   group.add(scaleGroup);
-  const scaleLabel = referenceLabel('10,000 ly · linear scale', scaleStart);
+  const scaleLabel = referenceLabel('10,000 ly · linear scale', scaleStart, 'universe-galaxy-scale');
 
   const labels = [...model.arms, ...model.spurs].map(structure => {
     const element = document.createElement('span');
@@ -595,7 +599,7 @@ export async function createMilkyWay({ scene, modelUrl, displayDistance, initial
       arms.material.uniforms.uPointSize.value = profile.pointSize;
       disk.material.uniforms.uOpacity.value = profile.opacity * richness * 1.10;
       disk.material.uniforms.uPointSize.value = profile.pointSize * .92;
-      core.material.uniforms.uOpacity.value = profile.opacity * richness * .64;
+      core.material.uniforms.uOpacity.value = profile.opacity * richness * .42;
       core.material.uniforms.uPointSize.value = profile.pointSize * .90;
       dust.material.uniforms.uOpacity.value = .12;
       halo.material.uniforms.uOpacity.value = .20;

@@ -30,7 +30,9 @@
 .universe-galaxy-info summary { cursor: pointer; color: #c7e2ff; padding: .35rem 0; }
 .universe-galaxy-info p { margin: .6rem 0; }
 .universe-galaxy-info a { color: #9fcfff; text-decoration: underline; }
-.universe-galaxy-sun { color: #ffe2a6; font-size: .65rem; }
+.universe-galaxy-sun { color: #ffe2a6; font-size: .65rem; margin-top: 22px; }
+.universe-galaxy-center { margin-top: -22px; }
+.universe-galaxy-scale { margin-top: 42px; }
 .universe-galaxy-presets button:focus-visible, .universe-controls select:focus-visible, .universe-controls summary:focus-visible { outline: 2px solid #c9e6ff; outline-offset: 3px; }
 @media (min-width: 1121px) and (max-width: 2199px) {
   .universe-workspace { height: clamp(740px, calc(100svh - 150px), 1050px); }

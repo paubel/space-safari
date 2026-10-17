@@ -1,564 +1,213 @@
-# Vintergatsmodell för Space Safari
-
-## Syfte
-
-Det här dokumentet är implementationsspecifikationen för ett visuellt och vetenskapligt motiverat Vintergatslager i `3d-universe.html`.
-
-## Implementerad version
-
-Den aktiva modellen är **Space Safari Milky Way 2026.3**. Den ersätter den första
-prototypens långa, jämnstarka logaritmiska spiraler med en data-driven,
-stavspiralformad modell:
-
-- Scutum–Centaurus och Perseus återges som de två tydligaste huvudarmarna.
-- Sagittarius–Carina och Norma–Outer återges svagare och bredare där
-  observationsläget är osäkrare.
-- Local (Orion) Arm är en böjd spline som förgrenas från Sagittarius–Carina,
-  passerar solens galaktocentriska position och tonar ut mot området innanför
-  Perseusarmen. Den är alltså inte längre ett fristående band ovanpå galaxen.
-- den centrala staven är cirka 20 000 ljusår lång, vinklad 27 grader i modellens
-  sol–centrum-plan och renderas i ett eget partikellager,
-- armarnas densitet är klumpig och ojämn för att undvika perfekta ringar,
-- stoftbanden ligger förskjutna mot armarnas insidor,
-- inga jetstrålar, ljuskäglor eller andra utflöden skapas från Sagittarius A*.
-
-### Visuell huvudreferens
-
-Utseendet följer i första hand ESA/Gaia/DPAC:s båda illustrationer från januari
-2025:
-
-- [The best Milky Way map, by Gaia – labelled](https://www.esa.int/ESA_Multimedia/Images/2025/01/The_best_Milky_Way_map_by_Gaia_labelled)
-  styr den ovanifrån sedda helheten, den relativt svaga armkontrasten och den
-  silvergrå/lila färgpaletten.
-- [The best Milky Way map, by Gaia – edge-on](https://www.esa.int/ESA_Multimedia/Images/2025/01/The_best_Milky_Way_map_by_Gaia_edge-on)
-  styr skivans vertikala profil: en tunn stjärnskiva, ett mörkbrunt centralt
-  stoftband, en svag tjock skiva, en lätt yttre warp och en mjuk pärlvit/
-  varmgul central bula.
-
-Paletten ska vara dämpad. Spiralarmarna ska huvudsakligen bestå av kalla
-silver-, grå- och lavendeltoner med ett mindre antal blå unga stjärnor och få
-röda stjärnbildningsområden. Orange får inte vara armarnas dominerande färg.
-
-Knappen `View whole Milky Way` visar en ren galaxöversikt. Den döljer tillfälligt
-förstorade katalogstjärnor, deep-sky-markörer, koordinatnät och riktningspilar så
-att de inte kan misstolkas som galaxstruktur eller utflöden från det svarta
-hålet. Lagren kan fortfarande slås på igen via `View controls`.
-
-Knappen `View Milky Way edge-on` använder samma tredimensionella partiklar men
-placerar kameran i galaxplanet längs riktningen mellan solen och centrum. Den
-visar därmed den tunna skivan, den svagare tjocka skivan, warpen, stoftbandet och
-den centrala bulan utan att byta till en separat bakgrundsbild.
-
-Modellen ska:
-
-- ge användaren ett galaktiskt sammanhang för stjärnor, nebulosor, stjärnhopar och Sagittarius A*,
-- fungera i både logaritmisk och linjär avståndsskala,
-- vara tillräckligt lätt för vanliga datorer och mobila enheter,
-- använda den befintliga automatiska kvalitetsregleringen,
-- kunna slås på och av av användaren,
-- vara tekniskt isolerad och enkel att avlägsna,
-- skilja mellan observerade positioner, modellerad armgeometri och konstnärlig visualisering,
-- aldrig flytta ett verkligt objekt för att få det att passa en spiralarm.
-
-## Grundbeslut
-
-Vintergatan implementeras som ett separat kartlager och inte som en importerad GLB-modell. En färdig polygonmodell kan inte deformeras korrekt när planetariet växlar mellan linjär och logaritmisk skala.
-
-Modellen byggs i stället av GPU-renderade partiklar och enkla procedurgenererade komponenter:
-
-1. spiralarmar,
-2. central stav,
-3. galaktisk bula,
-4. tunn stjärnskiva,
-5. ett sparsamt stoftlager,
-6. valfria namn på spiralarmarna.
-
-Partiklarna lagrar fysiska positioner i ljusår. Deras visningsposition beräknas med samma skalomvandling som planetariets övriga objekt.
-
-Dan Greenhecks WebGPU Galaxy används som teknisk och visuell inspiration, men hela simuleringen importeras inte. Den innehåller upp till cirka 750 000 partiklar, kontinuerliga GPU-beräkningar, muskrafter, stoft och bloom. Space Safari behöver en statisk kartmodell, inte en fysisk galaxsimulering.
-
-Källa och inspiration:
-
-- [Dan Greenheck – WebGPU Galaxy](https://github.com/dgreenheck/webgpu-galaxy)
-- [Interaktiv demonstration](https://dgreenheck.github.io/webgpu-galaxy/)
-
-Greenhecks projekt har MIT-licens. Om kod eller tydligt härledda algoritmer används ska Dan Greenheck anges i gränssnittet och i projektets licens-/källinformation.
-
-## Vetenskaplig modell
-
-Det finns ingen fullständigt säker och slutgiltig karta över hela Vintergatan. Jorden ligger inne i galaxens skiva, interstellärt stoft skymmer sikten och galaxens bortre sida har betydligt sämre observationstäckning.
-
-Space Safari ska därför använda en versionsmärkt hybridmodell. Den ska sammanföra modern armgeometri från flera typer av observationer i stället för att framställa en enskild konstnärlig bild som exakt.
-
-### Primära underlag
-
-- [ESA Gaia – Milky Way map (2025)](https://www.cosmos.esa.int/web/gaia/milky-way)
-  är den övergripande visuella referensen. Gaia-bilden visar en mindre regelbunden
-  flerarmsstruktur än äldre skolboksbilder och en tydligt vinklad centralstav.
-- [NASA – The Milky Way Galaxy](https://science.nasa.gov/resource/the-milky-way-galaxy/)
-  används för armhierarkin: Scutum–Centaurus och Perseus är de två framträdande
-  huvudarmarna som utgår från stavens ändar; Sagittarius och Norma är svagare
-  mellanliggande strukturer.
-- [NASA – Sun facts](https://science.nasa.gov/sun/facts/) och
-  [NASA – Milky Way and Our Location](https://science.nasa.gov/asset/webb/milky-way-and-our-location/)
-  används för solens placering i Orion-sporren, mellan Sagittarius- och
-  Perseusarmarna.
-- BeSSeL/VLBI-mätningar av maserparallaxer används för den grundläggande
-  flerarmsstrukturen och massiva stjärnbildningsområden:
-  [Reid med flera, 2019](https://arxiv.org/abs/1910.03357).
-- Gaia DR3:s unga stjärnpopulationer används för närliggande armsegment och
-  lokal struktur:
-  [Gaia DR3-resultat i MNRAS](https://academic.oup.com/mnras/article/527/1/1472/7337334).
-- Chandra- och XMM-Newton-mätningar används som underlag för de yttre armarnas
-  avstånd och bredd:
-  [NASA Chandra – Milky Way at Arms' Length](https://science.nasa.gov/missions/chandra/nasas-chandra-examines-milky-way-at-arms-length/).
-- [ESA – Guide to our galaxy](https://www.esa.int/Science_Exploration/Space_Science/Gaia/Guide_to_our_galaxy)
-  används som stöd för en cirka 10 000 ljusår lång halvstav och en boxig/
-  jordnötsformad central bula.
-
-### Modellerade strukturer
-
-Följande strukturer ska kunna representeras:
-
-- Perseusarmen,
-- Sagittarius–Carina-armen,
-- Scutum–Centaurus-armen,
-- Norma-/Outer-armens relevanta segment,
-- den lokala Orionarmen/-sporren som en fysisk förgrening från
-  Sagittarius–Carina,
-- den centrala galaktiska staven,
-- den centrala bulan,
-- den tunna stjärnskivan,
-- ett tjockare och mycket svagare skiv-/halolager.
-
-Armarnas form lagras som data och hårdkodas inte i renderingslogiken.
-Huvudarmarna beskrivs av begränsade spiralavsnitt med startvinkel, svep,
-start-/slutradie, lokal bredd, prominens och klumpighet. Orionstrukturen är en
-Catmull–Rom-spline som börjar exakt på Sagittarius–Carinas centrumlinje. Den
-lösningen gör lokala förgreningar möjliga utan att återgå till perfekta
-koncentriska spiraler.
-
-### Versionsinformation
-
-Modellfilen ska innehålla metadata i denna form:
-
-```json
-{
-  "modelVersion": "Space Safari Milky Way 2026.3",
-  "coordinateSystem": "galactocentric-cartesian-light-years",
-  "sunDistanceFromCentreLy": 26400,
-  "updated": "2026-10",
-  "sources": [
-    "ESA Gaia Milky Way map 2025",
-    "NASA Milky Way structure",
-    "BeSSeL/VLBI",
-    "Chandra/XMM-Newton outer-arm constraints"
-  ]
-}
-```
-
-Datum och versionsnummer ska synas i modellens informationsruta. Det gör framtida vetenskapliga uppdateringar spårbara.
-
-## Föreslagen filstruktur
-
-All funktionalitet ska hållas isolerad:
-
-```text
-data/
-  milky-way-model.json
-js/
-  milky-way.js
-  3d-universe.js
-css/
-  3d-universe.css
-3d-universe.html
-MILKY-WAY-MODEL-IMPLEMENTATION.md
-```
-
-Ansvarsfördelning:
-
-- `data/milky-way-model.json` innehåller armsegment, bredd, osäkerhet, källor, central stav och modellmetadata.
-- `js/milky-way.js` skapar, uppdaterar, visar, döljer och avvecklar Vintergatslagret.
-- `js/3d-universe.js` gör endast det lilla integrationsanropet och vidarebefordrar skala, kvalitet och synlighet.
-- `3d-universe.html` innehåller kryssrutorna i `View controls`.
-- `css/3d-universe.css` innehåller endast gränssnittets styling.
-
-## Modulgränssnitt
-
-Modulen bör exportera ett litet och stabilt API:
-
-```js
-const milkyWay = await createMilkyWay({
-  scene,
-  renderer,
-  modelUrl: 'data/milky-way-model.json',
-  displayDistance,
-  initialQuality: 'medium'
-});
-
-milkyWay.setVisible(true);
-milkyWay.setLabelsVisible(false);
-milkyWay.setScaleMode('logarithmic');
-milkyWay.setQuality('medium');
-milkyWay.update(camera);
-milkyWay.dispose();
-```
-
-Alla objekt som modulen skapar placeras i en enda `THREE.Group` med namnet `milkyWayGroup`.
-
-Modulen får inte:
-
-- skriva över globala variabler,
-- ändra stjärnornas eller nebulosornas katalogdata,
-- ändra kamerakontrollerna,
-- skapa en egen render loop,
-- kräva WebGPU för planetariets huvudvy,
-- göra nätverksanrop efter att modellfilen har laddats.
-
-## Enkel av- och påslagning
-
-Under `View controls` läggs minst följande kontroll:
-
-```text
-☑ Show Milky Way
-☐ Show spiral-arm names
-```
-
-Krav:
-
-- Inställningen ska fungera i normalt läge och fullskärmsläge.
-- Valet sparas i `localStorage`.
-- När lagret är dolt ska dess animationer och onödiga uppdateringar stoppas.
-- Användaren ska alltid kunna stänga av lagret, oberoende av kvalitetsläge.
-- Om laddningen misslyckas ska resten av planetariet fortsätta fungera.
-- Ett laddningsfel ska ge en diskret statusrad, inte blockera sidan.
-
-Möjlig lagringsnyckel:
-
-```text
-space-safari-show-milky-way
-```
-
-## Koordinatsystem
-
-Modellen lagras i galaktocentriska kartesiska koordinater med ljusår som fysisk enhet.
-
-För rendering behöver varje punkt kunna omvandlas till en heliocentrisk vektor:
-
-```text
-heliocentrisk position = galaktocentrisk position − solens galaktocentriska position
-```
-
-Sagittarius A* ska definiera galaxens centrum. Solens placering ska följa samma koordinatkonvention som planetariets befintliga Sagittarius A*-position. Alla axelrotationer mellan astronomiska koordinater och Three.js-världen ska dokumenteras i modulen och testas mot kända riktningar.
-
-### Viktig regel
-
-Objektens observerade koordinater är facit för deras placering. Spiralarmarna är modellen som jämförs med objekten. Objekt får aldrig flyttas eller fästas vid en arm för att förbättra utseendet.
-
-## Linjär och logaritmisk skala
-
-En vanlig skalning av hela `milkyWayGroup` är inte tillräcklig. Logaritmisk skala är en icke-linjär deformation.
-
-Varje partikel ska behålla sin fysiska heliocentriska position. Visningspositionen beräknas från riktningen och det transformerade avståndet:
-
-```text
-riktning = normalize(fysiskPosition)
-visningsPosition = riktning × displayDistance(length(fysiskPosition))
-```
-
-`displayDistance()` måste vara samma avståndsfunktion som används för stjärnor, nebulosor, stjärnhopar, avståndscirklar och Sagittarius A*.
-
-Omvandlingen bör ske i vertex-shadern så att JavaScript inte behöver flytta tiotusentals partiklar när användaren byter skala.
-
-Krav vid skalväxling:
-
-- Spiralarmarna och katalogobjekten ska fortsätta ligga i samma riktningar.
-- Avståndet till centrum ska matcha Sagittarius A*.
-- Modellen ska uppdateras utan omladdning.
-- Ingen ny partikelgeometri ska behöva genereras.
-- Övergången får gärna interpoleras kort, men ett direkt byte är acceptabelt om det är stabilare.
-
-## Partikelmodell
-
-### Lager
-
-Modellen delas upp i separata draw calls eller logiska lager:
-
-1. `Milky Way spiral arms` – ljusa och unga stjärnpopulationer längs
-   spiralarmarna och Orionförgreningen.
-2. `Milky Way stellar disk` – svag, bred exponentiell stjärnskiva.
-3. `Milky Way central bar and bulge` – ett eget lager där 73 procent av
-   partiklarna bygger den avlånga staven och resten den boxiga bulan.
-4. `Milky Way dust lanes` – sparsamma, mörkare stoftband förskjutna mot
-   spiralarmarnas insidor.
-5. `armLabels` – valfria CSS2D-etiketter eller motsvarande.
-
-### Visuell princip
-
-- Partiklar ska vara subtila och inte konkurrera med katalogstjärnor.
-- Katalogstjärnor och valbara objekt ska alltid ligga visuellt över bakgrundsmodellen.
-- Spiralarmarna ska uppfattas som sannolikhets-/täthetsområden, inte som fasta rör.
-- Osäkra armsegment kan göras svagare eller bredare.
-- Den bortre sidan får inte ges falskt hög detaljgrad.
-- Den centrala bulan ska vara synlig men inte täcka Sagittarius A*.
-- Centrum får inte innehålla jetstrålar, strålkäglor eller radiella
-  dekorationslinjer. Sagittarius A* markeras endast som ett katalogobjekt när
-  användaren aktiverar deep-sky-lagret.
-- I edge-on-vy ska den tunna skivan fortfarande kunna urskiljas från den
-  svagare tjocka skivan. Stoftet ska bilda ett sammanhängande men ojämnt mörkt
-  band genom skivplanet.
-- Den yttre skivan får ha en liten sinusformad warp. Den ska inte deformera den
-  centrala staven eller bulan.
-
-## Prestanda och adaptiv kvalitet
-
-Modellen ska använda planetariets befintliga lägen `Auto`, `High`, `Medium` och `Low`.
-
-Rekommenderade startvärden:
-
-| Kvalitet | Armstjärnor | Skiva och bula | Stoft | Eftereffekter |
-|---|---:|---:|---:|---|
-| Low | 9 000 | 12 000 skiva + 5 000 centrum | 0 | Ingen bloom |
-| Medium | 25 000 | 30 000 skiva + 11 000 centrum | 5 000 | Enkel punktglöd |
-| High | 56 000 | 60 000 skiva + 24 000 centrum | 11 000 | Begränsad punktglöd |
-
-Den första implementationen ska hellre börja i den nedre delen av intervallen och därefter mätas på verklig hårdvara.
-
-### Prestandaregler
-
-- Använd `THREE.Points`, buffergeometrier och shaderbaserad punktstorlek.
-- Skapa inte ett Three.js-objekt per partikel.
-- Använd inga JavaScript-loopar per partikel i varje bildruta.
-- Återanvänd samma geometri mellan kvalitetsnivåerna när det är möjligt.
-- Växla antal synliga partiklar med `geometry.setDrawRange()`.
-- Undvik kontinuerlig galaxfysik; strukturen ska vara en kartmodell.
-- Uppdatera endast uniforms för skala, tid, kamera och synlighet.
-- Stäng av eller reducera glöd och stoft före armarnas grundstruktur när prestandan sjunker.
-- Respektera `prefers-reduced-motion`.
-- Pausa tidsbaserade effekter när fliken inte är synlig.
-
-### Auto-läget
-
-Auto ska kopplas till den befintliga bildtidsmätningen. Vid försämrad prestanda ska modellen i denna ordning:
-
-1. minska eller stänga av stoft,
-2. minska extra skivpartiklar,
-3. minska armarnas partikelantal,
-4. reducera glöd,
-5. behålla armarnas grundform så länge som möjligt.
-
-Användarens manuella `High`, `Medium` eller `Low` ska ha företräde framför automatiken.
-
-## Spiralarmstillhörighet för objekt
-
-Armstillhörighet ska vara metadata och inte en positionskorrigering.
-
-### Beräkningsmetod
-
-För varje katalogobjekt:
-
-1. Läs RA, deklination och avstånd.
-2. Omvandla till galaktisk longitud och latitud.
-3. Omvandla till heliocentriska kartesiska koordinater.
-4. Omvandla vidare till modellens galaktocentriska koordinater.
-5. Beräkna kortaste avståndet till varje relevant spiralsegments centrumlinje.
-6. Jämför avståndet med armens lokala bredd och osäkerhet.
-7. Spara närmaste arm, avstånd till armcentrum, metod och säkerhetsgrad.
-8. Kontrollera kända objekt manuellt mot publicerade kataloguppgifter.
-
-Föreslagen metadata:
-
-```json
-{
-  "galacticStructure": {
-    "classification": "Local (Orion) Arm",
-    "confidence": "high",
-    "method": "position-and-literature",
-    "modelVersion": "Space Safari Milky Way 2026.3"
-  }
-}
-```
-
-### Säkerhetsnivåer
-
-- `high` – publicerad tillhörighet och positionen ligger tydligt inom armens modellerade bredd.
-- `medium` – positionen överensstämmer med modellen men litteraturen är inte entydig.
-- `low` – objektet ligger nära en möjlig arm men avstånd eller armgeometri är osäker.
-- `not applicable` – objektstypen ska inte ges spiralarmstillhörighet.
-
-Informationspanelen kan visa:
-
-```text
-Galactic structure: Orion Spur
-Confidence: High
-Model: Space Safari Milky Way 2026.3
-```
-
-eller:
-
-```text
-Nearest modeled arm: Perseus
-Membership: Uncertain
-```
-
-### Objektstyper måste behandlas olika
-
-- Unga massiva stjärnor är goda spiralarmsspårare.
-- Stjärnbildningsnebulosor och unga öppna stjärnhopar är ofta relevanta för armklassificering.
-- Äldre stjärnor kan ha rört sig långt från födelsearmen.
-- Planetariska nebulosor ska normalt inte få en säker armklassificering enbart från närhet.
-- Supernovarester bedöms efter stamstjärna, ålder, position och litteratur.
-- Klotformiga stjärnhopar tillhör huvudsakligen den galaktiska halon och ska inte pressas in i spiralarmarna.
-- Sagittarius A* klassificeras som `Galactic Centre`, inte som medlem i en arm.
-
-### Förväntade exempel att verifiera
-
-Följande är startantaganden och måste kontrolleras mot källor före publicering:
-
-- Orionnebulosan: Orion-sporren/lokala armen.
-- Plejaderna: lokal galaktisk struktur; exakt etikett ska källkontrolleras.
-- Rho Ophiuchi: lokal struktur nära solen; säkerhetsgrad ska anges.
-- Carinanebulosan och Eta Carinae: Sagittarius–Carina-strukturen.
-- Krabbnebulosan: jämför positionen med Perseusarmen och publicerad klassificering.
-- planetariska nebulosor som Ring-, Helix-, Owl- och Dumbbellnebulosan: normalt ingen stark armklassificering.
-- klotformiga stjärnhopar: galaktisk halo eller bula beroende på population och position.
-
-## Gränssnitt och information
-
-### View controls
-
-Kontrollerna placeras tillsammans med övriga visningsinställningar, längst upp i panelen även i fullskärmsläge.
-
-Minimikrav:
-
-- `Show Milky Way`
-- `Show spiral-arm names`
-- status som vid behov visar att modellen kör reducerad kvalitet
-
-Möjliga senare kontroller:
-
-- `Milky Way opacity`
-- `Show dust lanes`
-- `Show model uncertainty`
-
-Den första versionen bör inte innehålla för många reglage.
-
-### Kredit
-
-Informationsrutan bör innehålla en kort kredit:
-
-```text
-Milky Way structure: Space Safari model based on BeSSeL/VLBI,
-Gaia DR3, Cepheid and X-ray constraints. Visual technique inspired
-by Dan Greenheck's WebGPU Galaxy.
-```
-
-Länkar ska gå till modellens källor och Greenhecks källkod.
-
-## Felhantering
-
-- Modellfilen laddas asynkront efter att grundplanetariet har startat.
-- Ett fel får inte stoppa stjärnkatalogen, kameran eller objektvalet.
-- Vid JSON-fel visas planetariet utan Vintergatslagret.
-- Om shaders inte kan kompileras ska modulen avveckla delvis skapade resurser.
-- `dispose()` ska vara säker att anropa även efter en ofullständig initiering.
-- WebGL context loss ska inte orsaka en oändlig återladdningsloop.
-
-## Säker borttagningsplan
-
-Funktionen implementeras i en separat, avgränsad Git-commit.
-
-För att avlägsna den manuellt ska det räcka att:
-
-1. ta bort importen och `createMilkyWay()`-anropet i `js/3d-universe.js`,
-2. ta bort Vintergatskontrollerna i `3d-universe.html`,
-3. ta bort tillhörande CSS-regler,
-4. radera `js/milky-way.js`,
-5. radera `data/milky-way-model.json`.
-
-Inga befintliga stjärn- eller nebulosdata ska behöva återställas eftersom modellen aldrig får ändra dem.
-
-Git-committen ska kunna återställas separat utan att påverka Sagittarius A*-simuleringen eller den adaptiva kvalitetsfunktionen.
-
-## Implementationsordning
-
-### Fas 1 – vetenskaplig och teknisk prototyp
-
-- Definiera koordinatkonventionen.
-- Skapa den versionsmärkta JSON-modellen.
-- Rendera ett mycket glest spiralarmsskelett.
-- Kontrollera solens och Sagittarius A*:s relativa positioner.
-- Verifiera linjär och logaritmisk skala.
-
-### Fas 2 – visuella lager
-
-- Lägg till armstjärnor.
-- Lägg till tunn skiva, central stav och bula.
-- Lägg till begränsat stoft.
-- Säkerställ att katalogobjekten förblir tydligast.
-
-### Fas 3 – gränssnitt och kvalitet
-
-- Lägg till `Show Milky Way`.
-- Lägg till armnamn.
-- Koppla `Low`, `Medium`, `High` och `Auto` till draw ranges och effekter.
-- Spara användarens val.
-
-### Fas 4 – objektklassificering
-
-- Beräkna närmaste modellerade arm för katalogobjekt.
-- Kontrollera vetenskapligt relevanta objekt manuellt.
-- Lägg till säkerhetsgrad och modellversion i informationspanelen.
-- Undanta objekt där armmedlemskap inte är meningsfullt.
-
-### Fas 5 – test och publicering
-
-- Testa på dator och mobil.
-- Testa med och utan WebGL-hårdvaruacceleration där det är möjligt.
-- Mät bildtid i samtliga kvalitetslägen.
-- Testa fullskärm och normal vy.
-- Testa av/på upprepade gånger och kontrollera GPU-minne.
-- Testa direkt växling mellan linjär och logaritmisk skala.
-- Publicera som en separat commit.
-
-## Acceptanskriterier
-
-Implementationen är färdig när följande är uppfyllt:
-
-- Vintergatan kan slås på och av utan omladdning.
-- Planetariet fungerar även om Vintergatsmodulen eller modellfilen saknas.
-- Linjär och logaritmisk skala använder samma fysiska koordinater.
-- Sagittarius A* ligger i modellens centrum.
-- Solen ligger på avsedd plats i Orion-sporren.
-- Katalogobjekt behåller sina observerade positioner.
-- Armklassificering visar säkerhetsgrad och modellversion.
-- Klotformiga stjärnhopar felklassificeras inte som armobjekt.
-- `Low`, `Medium`, `High` och `Auto` påverkar partikelantal och effekter.
-- `Low` fungerar utan bloom och med reducerat stoft.
-- Dold modell orsakar inga kontinuerliga onödiga uppdateringar.
-- Alla skapade GPU-resurser frigörs av `dispose()`.
-- Dan Greenheck och de vetenskapliga huvudkällorna krediteras.
-- Funktionen kan återställas som en separat Git-ändring.
-
-## Sådant som inte ingår i första versionen
-
-- full gravitations- eller N-kroppssimulering,
-- 750 000 kontinuerligt simulerade partiklar,
-- individuell simulering av galaxens verkliga stjärnor,
-- påståenden om exakt armgeometri där observationsunderlaget är svagt,
-- fysisk modellering av varje molekylmoln,
-- automatisk förflyttning av objekt till närmaste spiralarm,
-- krav på WebGPU i huvudplanetariet.
-
-## Framtida utbyggnader
-
-När grundmodellen är stabil kan följande läggas till:
-
-- visualisering av armarnas osäkerhetsområden,
-- valbara vetenskapliga modellversioner,
-- guidad resa från solen till galaxens centrum,
-- filtrering efter galaktisk struktur,
-- särskild halovisning för klotformiga stjärnhopar,
-- jämförelse mellan unga stjärnor, gas, stoft och äldre stjärnpopulationer,
-- delbara länkar som sparar skala, kamera, markerat objekt och Vintergatslagrets synlighet.
-
+# Space Safari Milky Way reconstruction
+
+Active model: **2026.4**, October 2026. This document describes the implemented
+model, its evidence, display choices, limitations and verification.
+
+## Existing pipeline and implementation plan
+
+The existing `3d-universe.html` uses Three.js/WebGL, OrbitControls, CSS2D labels,
+a real star catalogue, procedural deep-sky objects and a separate close-up
+Sagittarius A* viewer. The existing render loop controls adaptive quality and
+pauses when the page is hidden. No framework or ESA image asset was added.
+
+The implementation extends the isolated `createMilkyWay()` module:
+
+1. Correct the synthetic disk and bulge probability distributions.
+2. Add unequal, curved and interrupted arm enhancements, an elongated bar,
+   thick disk, sparse halo, soft density glow and approximate dust extinction.
+3. Add four camera presets, two appearance modes and optional map layers.
+4. Preserve the catalogue, existing navigation, full-screen panels, logarithmic
+   scale and close-up black-hole viewer.
+5. Document physical assumptions separately from artistic transfer functions.
+
+## Startup and navigation
+
+At the user's explicit request, a normal page load and Reset start **centered
+on the Sun in logarithmic scale, with the 3D deep-sky objects enabled**.
+An explicit return from the black-hole viewer can restore the saved view.
+The Milky Way visibility preference remains separately saved.
+
+The four galaxy camera presets all select linear scale and a 100,000 ly
+catalogue range, center the target on the model's Galactic Center and hide
+enlarged catalogue markers, coordinate grids and directional arrows:
+
+- View whole Milky Way: face-on; the Sun is below the center.
+- View Milky Way edge-on: looks along the Sun–center direction, with Galactic
+  north up and a small vertical offset to avoid an exactly singular view.
+- Oblique: shows the bar, bulge and thin disk together.
+- View from Sun: camera at the physical Sun, looking toward the Galactic Center.
+
+Orbit, pan and zoom remain available after choosing a preset. Reset restores
+the stellar neighborhood. All flights respect `prefers-reduced-motion`.
+There is no continuous fly-around or added animation.
+
+## Evidence hierarchy and attribution
+
+The primary **visual** reference is ESA/Gaia/DPAC, Stefan Payne-Wardenaar (2025):
+
+- [Gaia Milky Way overview](https://www.cosmos.esa.int/web/gaia/milky-way)
+- [Face-on labelled illustration](https://www.esa.int/ESA_Multimedia/Images/2025/01/The_best_Milky_Way_map_by_Gaia_labelled)
+- [Edge-on illustration](https://www.esa.int/ESA_Multimedia/Images/2025/01/The_best_Milky_Way_map_by_Gaia_edge-on)
+
+These are artist impressions informed by observations. They are neither direct
+photographs from outside the Galaxy nor a released, verified 3D mesh. ESA states
+that Gaia supports more than two arms and less conspicuous arms than many older
+depictions, with revised bar orientation. Our model uses those qualitative
+constraints, not coordinates inferred by tracing image pixels.
+
+Independent structural evidence:
+
+- [Reid et al. 2019, maser parallaxes](https://arxiv.org/abs/1910.03357):
+  about 200 high-mass star-forming regions; supports a four-arm interpretation.
+  That interpretation is not presented as a uniquely established taxonomy.
+- [GRAVITY Collaboration 2019](https://arxiv.org/abs/1904.05721):
+  geometric center distance 8178 ±13 statistical ±22 systematic pc.
+- [Wegg, Gerhard & Portail 2015](https://arxiv.org/abs/1504.01401):
+  long-bar angle 28–33°, half length about 4.6–5.0 kpc depending on fit.
+- [Bland-Hawthorn & Gerhard 2016](https://arxiv.org/abs/1602.07702):
+  review of bar, bulge, stellar disk and halo structure and populations.
+- [Chen et al. 2019](https://arxiv.org/abs/1902.00998):
+  Cepheid evidence for the outer-disk warp; the implementation is a restrained
+  illustrative warp, not their fitted surface.
+
+The interface links ESA and Reid and explicitly marks procedural stars/clouds
+as synthetic. No ESA image/video pixels are copied, embedded or redistributed.
+If such assets are added later, retain their displayed licence and exact
+attribution (ESA lists CC BY-SA 3.0 IGO or its Standard Licence).
+
+Dan Greenheck's [WebGPU Galaxy](https://github.com/dgreenheck/webgpu-galaxy)
+remains credited as visual/technical inspiration. This module does not import
+that simulation and does not require WebGPU.
+
+## Scale, coordinates and parameter provenance
+
+The central configuration is `data/milky-way-model.json`.
+`parameterNotes` contains source URLs and distinguishes evidence from choices.
+Sampling settings are in `sampling`. One kpc = about 3261.56 light-years.
+
+| Parameter | Adopted value | Meaning and evidence |
+|---|---:|---|
+| Sun–center distance | 26,700 ly ≈8.19 kpc | Rounded 8.2 kpc convention, consistent with GRAVITY 2019; not a new precision measurement |
+| Stellar-disk diameter | ≈112,000 ly | Visualization convention in requested 100–120k range; Galaxy has no unique sharp edge |
+| Disk exponential scale length | 8,500 ly ≈2.61 kpc | Approximation informed by Bland-Hawthorn & Gerhard |
+| Old thin-disk vertical exponential scale | 850 ly ≈261 pc | Representative population, informed by the review |
+| Thick-disk vertical exponential scale | 2,700 ly ≈828 pc | Representative older population; synthetic particle fraction 16%, not a measured mass fraction |
+| Full bar length | 30,000 ly ≈9.20 kpc | Low end of Wegg et al. long-bar estimates |
+| Bar angle | 30° | Within Wegg et al. range; projected appearance varies with camera orientation |
+| Bar width / vertical sampling parameter | 6,800 / 2,100 ly | Illustrative ellipsoid parameters, not observational boundaries |
+| Bulge radial / vertical sampling parameters | 6,500 / 2,600 ly | Illustrative triaxial density, not a spherical light ball |
+| Warp start / maximum height | 28,500 / 850 ly | Restrained artistic amplitude inspired by Cepheid warp evidence |
+| Warp phase | 18° | Illustrative choice, not a fitted precession measurement |
+| Outer flare | up to 50% increase | Smooth illustrative flare of the sampled old disk |
+| Synthetic halo sampling limit | 85,000 ly radius | Display cutoff; real stellar halo extends farther |
+| Arm widths, gaps, bends, junctions | Per segment in JSON | Illustrative reconstruction; no fitted astrometric coefficients claimed |
+| Dust thickness, opacity, colours, glow | JSON and shader transfer | Artistic extinction approximation, not calibrated photometry |
+
+The model's physical origin is the Galactic Center, disk in XY, Z perpendicular.
+The Sun is at (26700, 0, 0) ly; the small real solar height is ignored. Positive
+Y follows positive heliocentric Galactic longitude in the adopted transformation.
+The frame uses the standard Galactic/equatorial rotation matrix in the module.
+Scene positions are heliocentric equatorial vectors mapped to Three.js as
+(equatorial X, equatorial Z, −equatorial Y).
+
+Sagittarius A* uses the same adopted distance. Its observed RA/Dec differs
+slightly from the ideal Galactic-coordinate origin; the offset is small at this
+map scale and is not hidden by moving catalogue objects onto modeled arms.
+
+The log mode applies r' = 30 log10(1+r) around the Sun; linear mode applies
+r' = 80r / selectedMaximumDistance. Both preserve directions. Only linear mode
+preserves the Galaxy's shape. The scale bar is hidden in log mode. Dust's
+physical line-of-sight approximation is disabled in the distorted log view.
+
+## Density sampling and morphology
+
+Seeded LCG randomization makes reloads reproducible. Synthetic particles are
+render samples, not individually observed Gaia stars or a dynamical simulation.
+
+- Disk: R follows a Gamma(shape=2) distribution, equivalent to surface density
+  exp(−R/h) with the cylindrical area factor R dR. Radii outside the cutoff are
+  rejected, never clamped into a bright artificial outer ring.
+- Thin/thick disk: symmetric exponential vertical sampling with an outer flare.
+- Bar: truncated Gaussian along its major axis, Gaussian transverse density
+  tapered at its ends; no clamping of samples into point piles.
+- Bulge: correlated triaxial Gaussian rotated with the bar, slightly enhanced
+  thickness off-center to suggest a box/peanut population. It avoids the former
+  cylindrical sampling cusp that looked like a vertical jet.
+- Arms: four nonidentical bounded spiral segments with smooth bend terms,
+  variable width, filament offsets, nonperiodic density modulation and gaps.
+  Rejection sampling tapers ends without building endpoint piles.
+- Orion: shorter curved spline through the adopted Sun location. Its connection
+  to Sagittarius is an illustrative hypothesis, not established membership.
+- Halo: sparse isotropic directions, flattened Z and log-uniform radii, which
+  approximate an r⁻³ density over the displayed interval. It is intentionally faint.
+
+The older major/secondary arm flags are sampling weights only. The model is not
+an exact reproduction of Reid's fitted spiral segments or all named Gaia arms.
+In particular the far-side junctions and inner 3-kpc structures remain schematic.
+
+## Rendering, dust and appearance modes
+
+Six bounded particle draw calls: arms, disk, bar/bulge, halo, diffuse density
+splats and dust. Soft density splats reuse samples from the same geometry.
+No particle positions are updated every frame.
+
+Extinction is evaluated in the vertex shader using the nearest point of a
+camera-to-particle ray to the dust midplane, an exponential radial/vertical
+density and irregular modulation. This produces a dark lane in edge-on and
+inside-disk views without a foreground image or a fixed painted ribbon.
+It is a cheap optical-depth proxy, not a radiative-transfer solution. Dust
+particles add restrained brown fine structure; they do not form an opaque
+screen covering unrelated catalogue objects.
+
+Scientific is the default: neutral older starlight, warm ivory center, localized
+blue associations and sparse pink/red emission. Cinematic increases diffuse
+glow and brightness through uniforms. **No buffers, arm locations, seed,
+coordinates or membership results change when switching modes.**
+
+Optional layers: arm names, centerlines, Sun/center/scale labels and illustrative
+uncertainty bounds. The bounds expand around less secure segments; they are
+not statistical confidence intervals. Nearby real objects remain available
+through the existing catalogue/deep-sky toggles.
+
+## Performance and maintenance
+
+| Quality | Arms | Disk | Core | Halo | Glow | Dust | Total |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Low | 9,000 | 16,000 | 6,000 | 350 | 2,000 | 0 | 33,350 |
+| Medium | 25,000 | 40,000 | 14,000 | 800 | 5,000 | 3,000 | 87,800 |
+| High | 50,000 | 80,000 | 28,000 | 1,500 | 9,000 | 6,500 | 175,000 |
+
+The maximum particle position/color buffers total about 4.2 MB before driver
+overhead; temporary JS arrays are released after initialization. Draw ranges
+reuse those buffers. Point opacity roughly compensates for count changes.
+The existing Auto controller also reduces renderer resolution. Dust and halo
+are reduced first through the profiles. Mobile defaults to reduced quality
+on low-core devices; actual Auto behavior depends on measured frame time.
+
+Per frame, the module changes six camera uniforms. Layer/scale changes project
+only the small overlay line arrays on CPU. Hidden layers skip updates.
+`dispose()` removes labels and releases all particle/line geometries/materials.
+An unavailable JSON/module must not block the underlying planetarium.
+
+Core files: `js/milky-way.js`, `data/milky-way-model.json`,
+`js/3d-universe.js`, `3d-universe.html`, `css/3d-universe.css`.
+Removal is isolated to the module import/initialization, controls and matching
+styles. Star catalogue data are not modified by procedural arm assignment.
+
+## Verification and intentional differences
+
+JavaScript syntax, JSON parsing and whitespace checks are run locally.
+Browser checks cover the four presets, both appearance modes, layer toggles,
+quality levels, scale switching, hidden Milky Way, Reset and the requested
+Sun/log/deep-sky startup. Browser shader errors discovered during development
+must be resolved before handoff.
+
+The reference images contain much finer unresolved texture and more complex
+dust than this browser point-cloud approximation. Our face-on arm junctions,
+gaps and outer extent remain illustrative. Edge-on views use the very same
+3D particles; there is no alternate flat image. Oblique views expose the bar
+and thickness; the Sun preset is an inside-disk educational view without a
+direct outside-Galaxy photographic counterpart.
+
+Formal low-end phone/GPU timing and cross-browser benchmarking are separate
+from local desktop smoke verification; no unmeasured FPS guarantee is made.

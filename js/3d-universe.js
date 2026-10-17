@@ -4,7 +4,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { STARS } from '../data/astrophoto/interactive-stars.js?v=3d-prototype-1';
 import { createSagittariusAVisualizer } from './sagittarius-a-webgpu.js?v=adaptive-quality-1';
-import { createMilkyWay } from './milky-way.js?v=11';
+import { createMilkyWay } from './milky-way.js?v=12';
 
 if (sessionStorage.getItem('space-safari-universe-return')) {
   document.body.classList.add('is-arriving-universe');
@@ -1241,7 +1241,7 @@ function setDetailLabels(labels) {
 function galacticStructureText(object) {
   const structure = object?.galacticStructure;
   if (!structure) return milkyWay ? 'Outside the classified model' : 'Loading Milky Way model…';
-  const qualifier = /uncertain|not arm-classified|unverified/.test(structure.confidence)
+  const qualifier = /uncertain|not arm-classified|unverified|literature-supported/.test(structure.confidence)
     ? structure.confidence
     : `${structure.confidence} confidence`;
   return `${structure.label} · ${qualifier}`;
@@ -1307,6 +1307,7 @@ function selectNebula(nebula, fly = false) {
   const item = nebulaObjects.find(candidate => candidate.nebula === nebula);
   if (!item) return;
   galaxyOverviewActive = false;
+  controlsUi.nebulae.checked = true;
   if (nebula.distance > maximumDistance()) {
     controlsUi.distance.value = Math.min(
       Number(controlsUi.distance.max),
@@ -1383,6 +1384,7 @@ function updateFlight(time) {
 function saveUniverseReturnState() {
   const state = {
     camera: camera.position.toArray(),
+    cameraUp: camera.up.toArray(),
     target: orbit.target.toArray(),
     scaleMode,
     distance: controlsUi.distance.value,
@@ -1420,6 +1422,7 @@ function restoreUniverseReturnState() {
     controlsUi.milkyWayLabels.disabled = !controlsUi.milkyWay.checked;
     controlsUi.nebulae.checked = state.nebulae !== false;
     camera.position.fromArray(state.camera);
+    if (state.cameraUp) camera.up.fromArray(state.cameraUp);
     orbit.target.fromArray(state.target);
     updatePositions();
     if (controlsUi.milkyWay.checked) {
@@ -1609,6 +1612,7 @@ async function prepareMilkyWayOverview() {
 
 async function viewWholeMilkyWay() {
   const centre = await prepareMilkyWayOverview();
+  if (!milkyWay) return;
   const north = physicalPositionForCoordinates(192.8595, 27.1283, 1).normalize();
   const sunward = centre.clone().negate().normalize();
   camera.up.copy(sunward).negate();
@@ -1624,6 +1628,7 @@ async function viewWholeMilkyWay() {
 
 async function viewMilkyWayEdgeOn() {
   const centre = await prepareMilkyWayOverview();
+  if (!milkyWay) return;
   const sunward = centre.clone().negate().normalize();
   const north = physicalPositionForCoordinates(192.8595, 27.1283, 1).normalize();
   camera.up.copy(north);
@@ -1639,6 +1644,7 @@ async function viewMilkyWayEdgeOn() {
 
 async function viewMilkyWayOblique() {
   const centre = await prepareMilkyWayOverview();
+  if (!milkyWay) return;
   const north = milkyWay.getPhysicalPosition(0, 0, 1).sub(milkyWay.getPhysicalPosition(0, 0, 0)).normalize();
   const sunward = centre.clone().negate().normalize();
   camera.up.copy(north);
@@ -1652,6 +1658,7 @@ async function viewMilkyWayOblique() {
 
 async function viewMilkyWayFromSun() {
   const centre = await prepareMilkyWayOverview();
+  if (!milkyWay) return;
   const north = milkyWay.getPhysicalPosition(0, 0, 1).sub(milkyWay.getPhysicalPosition(0, 0, 0)).normalize();
   camera.up.copy(north);
   flight = {
@@ -1706,7 +1713,10 @@ function bindEvents() {
       ? (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4 ? 'low' : 'medium')
       : qualityMode);
   });
-  controlsUi.labels.addEventListener('change', updateVisibleStars);
+  controlsUi.labels.addEventListener('change', () => {
+    if (controlsUi.labels.checked) galaxyOverviewActive = false;
+    updateVisibleStars();
+  });
   controlsUi.labelMagnitude.addEventListener('input', updateVisibleStars);
   controlsUi.plane.addEventListener('change', () => { planeGrid.visible = controlsUi.plane.checked; });
   controlsUi.earthGuide.addEventListener('change', () => { earthGuideGroup.visible = controlsUi.earthGuide.checked; });
@@ -1794,7 +1804,7 @@ async function loadMilkyWay() {
   controlsUi.milkyWayStatus.textContent = 'Building the Milky Way map on your device…';
   milkyWayLoadPromise = createMilkyWay({
     scene,
-    modelUrl: new URL('../data/milky-way-model.json?v=2026.4', import.meta.url),
+    modelUrl: new URL('../data/milky-way-model.json?v=2026.4b', import.meta.url),
     displayDistance,
     initialQuality: activeQuality
   }).then(instance => {
@@ -1832,7 +1842,7 @@ try {
   resize();
   applyQuality(qualityMode === 'auto' ? activeQuality : qualityMode);
   resetView();
-  if (controlsUi.milkyWay.checked && !sessionStorage.getItem('space-safari-universe-return')) viewWholeMilkyWay();
+  if (controlsUi.milkyWay.checked) loadMilkyWay();
   loadNebulae().then(() => {
     updateGalacticClassifications();
     restoreUniverseReturnState();
