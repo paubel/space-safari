@@ -5,6 +5,8 @@ import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { STARS } from '../data/astrophoto/interactive-stars.js?v=3d-prototype-1';
 import { createSagittariusAVisualizer } from './sagittarius-a-webgpu.js?v=adaptive-quality-1';
 import { createMilkyWay } from './milky-way.js?v=12';
+import { createPillarsOfCreation } from './eagle-nebula.js?v=2';
+import { createHorseheadNebula } from './horsehead-nebula.js?v=1';
 
 if (sessionStorage.getItem('space-safari-universe-return')) {
   document.body.classList.add('is-arriving-universe');
@@ -57,6 +59,7 @@ const controlsUi = {
   fly: document.querySelector('#universe-fly')
 };
 controlsUi.flyHint = document.querySelector('#universe-fly-hint');
+controlsUi.pillars = document.querySelector('#universe-view-pillars');
 
 const details = {
   name: document.querySelector('#universe-object-name'),
@@ -152,6 +155,22 @@ const NEBULAE = [
     constellation: 'Cepheus', type: 'H II region with a dark star-forming globule', format: 'volume', colour: 0xd98772,
     description: "A broad ionised cloud surrounds the long, dense IC 1396A globule. The model cuts a crooked, dark trunk through the glowing H II region and outlines its irradiated rim, with knots and embedded young stars near the compressed head. NASA measurements place the complex about 2,450 light-years away, more than 100 light-years across, while the trunk itself is roughly 20–30 light-years long. Its depth is a science-informed interpretation rather than a measured density reconstruction.",
     sourceUrl: 'https://www.jpl.nasa.gov/images/pia14103-blowin-in-the-stellar-wind/', sourceLabel: 'Open NASA/JPL reference →', modelSource: 'NASA/JPL distance and size · SIMBAD IC 1396 position', representation: 'Procedural face-on H II complex with IC 1396A as an offset hooked globule', volumeShape: 'elephant', displayScale: [12.5, 12.0, 4.8], physicalSizeLy: 105
+  },
+  {
+    name: 'Horsehead Nebula (Barnard 33)', shortName: 'Horsehead Nebula (B33)', ra: 85.2458333, dec: -2.4583333, distance: 1300,
+    aliases: ['Barnard 33', 'Barnard33', 'B 33', 'Hästhuvudnebulosan'],
+    constellation: 'Orion', type: 'Dark molecular cloud silhouetted against IC 434', format: 'volume', colour: 0xe46a79,
+    description: 'Barnard 33 is a dense, dark projection of the Orion B molecular cloud, silhouetted against the red emission of IC 434. Its curved head and muzzle rise from a broader dust ridge. This model adopts a roughly 4-light-year height for the protruding pillar, within an 8-light-year local field—not the size of the whole IC 434 nebula. Distance follows NASA’s 2024 Webb account (about 1,300 light-years); published sizes and distances differ, so dimensions are approximate. The visible-light silhouette guides this procedural volume; its depth and fine turbulence are illustrative, not measured tomography.',
+    sourceUrl: 'https://science.nasa.gov/missions/webb/webb-captures-top-of-iconic-horsehead-nebula-in-unprecedented-detail/', sourceLabel: 'NASA Horsehead observations and distance →',
+    modelSource: 'NASA/Hubble/Webb references · SIMBAD B33 position', representation: 'Opaque 3D dust head and ridge in front of a red IC 434 sheet', volumeShape: 'horsehead', displayScale: [9,9,6], physicalSizeLy: 8, featureHeightLy: 4
+  },
+  {
+    name: 'Eagle Nebula (M16 · IC 4703)', shortName: 'Eagle Nebula (M16)', ra: 274.7, dec: -13.8167, distance: 7000,
+    aliases: ['M 16', 'Messier 16', 'NGC 6611', 'Pillars of Creation', 'Skapelsens pelare'],
+    constellation: 'Serpens', type: 'Emission nebula and young open cluster', format: 'volume', colour: 0xd6a66c,
+    description: 'The Eagle Nebula is a stellar nursery about 7,000 light-years away and roughly 70 × 55 light-years across. Inside it, the much smaller Pillars of Creation are sculpted by radiation from young stars. Use “View Pillars of Creation” to explore their three-dimensional shape. The pillars adapt NASA’s published printable mesh by Leah Hustak and Ralf Crawford (STScI), with its printing lattice removed and geometry simplified. Surrounding gas, false-colour shading, cluster markers, and fine placement are illustrative, not a measured density map.',
+    sourceUrl: 'https://science.nasa.gov/3d-resources/pillars-of-creation/', sourceLabel: 'NASA Pillars 3D model · credits and source →',
+    modelSource: 'NASA · Leah Hustak & Ralf Crawford (STScI)', representation: 'Adapted 3D Pillars mesh inside a procedural H II cloud', volumeShape: 'eagle', displayScale: [12, 9.43, 7], physicalSizeLy: 70
   },
   {
     name: 'Carina Nebula (NGC 3372)', shortName: 'Carina Nebula (NGC 3372)', ra: 161.2854, dec: -59.8678, distance: 7500,
@@ -534,11 +553,12 @@ function createDiffuseNebulaVolume(nebula) {
     uMaxSteps: { value: activeQuality === 'high' ? 58 : activeQuality === 'low' ? 26 : 42 },
     uShape: { value: nebula.volumeShape === 'ring' ? 1 : nebula.volumeShape === 'cluster' ? 2 : nebula.volumeShape === 'dumbbell' ? 3 : nebula.volumeShape === 'rho' ? 4 : nebula.volumeShape === 'crab' ? 5 : nebula.volumeShape === 'carina' ? 7 : nebula.volumeShape === 'northamerica' ? 8 : nebula.volumeShape === 'owl' ? 9 : nebula.volumeShape === 'helix' ? 10 : nebula.volumeShape === 'vela' ? 11 : nebula.volumeShape === 'crescent' ? 12 : nebula.volumeShape === 'elephant' ? 13 : 0 }
   };
+  if (nebula.volumeShape === 'eagle') uniforms.uShape.value = 14;
   const material = new THREE.ShaderMaterial({
     uniforms,
     transparent: true,
     depthWrite: false,
-    side: THREE.FrontSide,
+    side: nebula.volumeShape === 'eagle' ? THREE.BackSide : THREE.FrontSide,
     blending: THREE.NormalBlending,
     vertexShader: `
       varying vec3 vLocalPosition;
@@ -722,6 +742,17 @@ function createDiffuseNebulaVolume(nebula) {
           float glowingGas = hiiEnvelope * (.2 + billows * .58 + fineClouds * .2) * (1.0 - darkGlobule * .97) * (1.0 - centralCavity * .46) * (1.0 - upperLane * .32);
           return (glowingGas + brightRim * (.16 + fineClouds * .12) + compressedHead * .045) * depthFade;
         }
+        if (uShape == 14) {
+          float billows = fbm(p*4.7+vec3(1.3,4.6,2.1));
+          float filaments = fbm(p*13.0);
+          // Broad asymmetric wings around the bright NGC 6611 cavity, rather
+          // than a faint spherical haze. Depth remains genuinely volumetric.
+          vec3 q = p + (billows-.5)*.16;
+          float envelope = 1.0-smoothstep(.5,1.0,length(q));
+          float leftWing = exp(-4.5*dot((q-vec3(-.32,-.12,0))*vec3(1.0,1.1,1.25),(q-vec3(-.32,-.12,0))*vec3(1.0,1.1,1.25)));
+          float rightWing = exp(-6.0*dot(q-vec3(.3,-.08,.02),q-vec3(.3,-.08,.02)));
+          return envelope*(.25+leftWing*.75+rightWing*.65)*(.18+billows*.85+smoothstep(.46,.75,filaments)*.65)*mix(.3,1.3,smoothstep(.32,.7,billows));
+        }
         vec3 q = vec3(p.x * .78, p.y * 1.12, p.z * .9);
         float envelope = smoothstep(1.0, .18, length(q));
         float cavity = smoothstep(.12, .55, length((p - vec3(-.18,.08,.04)) * vec3(1.0,1.35,1.0)));
@@ -733,7 +764,16 @@ function createDiffuseNebulaVolume(nebula) {
         vec3 rayDirection = normalize(vLocalPosition - uCameraLocal);
         vec3 samplePoint = vLocalPosition;
         vec4 accumulated = vec4(0.0);
-        const float stepSize = .037;
+        float stepSize = .037;
+        if (uShape == 14) {
+          // Integrate the whole sphere even at Low quality and from inside.
+          float b = dot(uCameraLocal,rayDirection);
+          float discriminant = max(0.0,b*b-dot(uCameraLocal,uCameraLocal)+1.0);
+          float entry = max(0.0,-b-sqrt(discriminant));
+          float exitDistance = -b+sqrt(discriminant);
+          stepSize = max(.0001,(exitDistance-entry)/float(uMaxSteps));
+          samplePoint = uCameraLocal+rayDirection*(entry+stepSize*.5);
+        }
         for (int i = 0; i < 58; i++) {
           if (i >= uMaxSteps) break;
           if (length(samplePoint) > 1.03 && i > 2) break;
@@ -764,15 +804,35 @@ function createDiffuseNebulaVolume(nebula) {
                                 : uShape == 13
                                   ? mix(vec3(.42,.07,.09), vec3(1.0,.38,.34), smoothstep(-.52,.6,samplePoint.x + noise(samplePoint * 3.7) * .34))
                                 : mix(vec3(.12,.28,.82), vec3(1.0,.28,.18), warm);
-          colour = mix(colour, vec3(.76,.91,1.0), pow(density, 2.2) * .55);
-          float alpha = density * (uShape == 4 ? .16 : uShape == 11 ? .075 : .095) * (1.0 - accumulated.a);
+          if (uShape == 14) {
+            float texture = noise(samplePoint*9.0);
+            float core = exp(-5.5*dot((samplePoint-vec3(.22,-.12,0))*vec3(1.25,1.0,.75),(samplePoint-vec3(.22,-.12,0))*vec3(1.25,1.0,.75)));
+            colour = mix(vec3(.85,.075,.18),vec3(1.0,.38,.53),texture);
+            colour = mix(colour,vec3(.65,.8,1.0),core*.86);
+            // Wide upper dust bay tapering towards the central pillars, plus
+            // an irregular filament crossing the lower-left emission wing.
+            float bayWidth = .065+max(0.0,samplePoint.y+.1)*.42;
+            float bay = (1.0-smoothstep(bayWidth,bayWidth+.075,abs(samplePoint.x+.08-samplePoint.y*.26+(texture-.5)*.13))) * smoothstep(-.25,.22,samplePoint.y);
+            float lane = (1.0-smoothstep(.018,.06,abs(samplePoint.y+.35+samplePoint.x*.4+(texture-.5)*.065))) * (1.0-smoothstep(-.12,.35,samplePoint.x));
+            float dust = max(bay,lane*.9);
+            colour = mix(colour,vec3(.018,.008,.012),dust*.97);
+            density *= 1.0+dust*.7;
+          }
+          if (uShape != 14) colour = mix(colour, vec3(.76,.91,1.0), pow(density, 2.2) * .55);
+          float opacity = uShape == 14 ? 1.0-exp(-density*stepSize*2.8) : density*(uShape == 4 ? .16 : uShape == 11 ? .075 : .095);
+          float alpha = opacity * (1.0 - accumulated.a);
           accumulated.rgb += colour * alpha;
           accumulated.a += alpha;
           samplePoint += rayDirection * stepSize;
         }
         accumulated.rgb += vec3(.16,.3,.75) * pow(max(0.0, 1.0 - length(vLocalPosition)), 3.0) * .12;
         if (accumulated.a < .012) discard;
-        gl_FragColor = vec4(accumulated.rgb, min(accumulated.a, .82));
+        if (uShape == 14) {
+          // NormalBlending expects straight RGB, not RGB multiplied by alpha.
+          gl_FragColor = vec4(accumulated.rgb/max(accumulated.a,.001),min(accumulated.a,.94));
+          #include <tonemapping_fragment>
+          #include <colorspace_fragment>
+        } else gl_FragColor = vec4(accumulated.rgb, min(accumulated.a, .82));
       }
     `
   });
@@ -1037,11 +1097,50 @@ function createSagittariusAModel() {
 }
 
 async function loadNebulaModel(nebula) {
-  const model = nebula.volumeShape === 'eta'
+  const horsehead = nebula.volumeShape === 'horsehead'
+    ? createHorseheadNebula(nebula, QUALITY_PROFILES[activeQuality].volumeSteps) : null;
+  if (horsehead) volumeMaterials.push(horsehead);
+  let model = nebula.volumeShape === 'eta'
     ? await createHomunculusModel(nebula)
     : nebula.volumeShape === 'sagittarius-a'
       ? createSagittariusAModel()
-      : createDiffuseNebulaVolume(nebula);
+      : horsehead?.mesh || createDiffuseNebulaVolume(nebula);
+
+  if (horsehead) {
+    const root = new THREE.Group();
+    root.add(model);
+    const towardSun = directionFromRaDec(nebula.ra,nebula.dec).negate();
+    const right = new THREE.Vector3(0,1,0).cross(towardSun).normalize();
+    const up = towardSun.clone().cross(right).normalize();
+    root.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(right,up,towardSun));
+    model = root;
+  }
+
+  if (nebula.volumeShape === 'eagle') {
+    const root = new THREE.Group();
+    root.add(model);
+    model.rotation.set(0, 0, 0);
+    root.add(await createPillarsOfCreation());
+    const localGas = createDiffuseNebulaVolume({ ...nebula, displayScale: [2.6, 2.2, 3] });
+    localGas.position.set(0, -.65, .7);
+    localGas.rotation.set(0, 0, 0);
+    root.add(localGas);
+    const texture = createStarTexture();
+    // Illustrative NGC 6611 markers, not individually measured star positions.
+    [[1.5,1.8,-.6,.3],[2.2,2.4,-.9,.24],[1.1,1.5,-.4,.22],[2.7,3.1,-.8,.2],[1.8,2.6,-1.1,.25],[3,1.3,-.3,.18],[2.4,.9,-.7,.16],[3.3,2.5,-.4,.17],[.8,2.8,-.5,.15],[1.7,3.5,-1,.14],[2.8,1.9,-.8,.15]].forEach(([x,y,z,size]) => {
+      const star = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, color: 0xb8d9ff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+      star.position.set(x,y,z);
+      star.scale.setScalar(size);
+      star.renderOrder = 2;
+      root.add(star);
+    });
+    // Preserve the source mesh's Earth-facing silhouette when approaching.
+    const towardSun = directionFromRaDec(nebula.ra, nebula.dec).negate();
+    const right = new THREE.Vector3(0,1,0).cross(towardSun).normalize();
+    const up = towardSun.clone().cross(right).normalize();
+    root.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(right, up, towardSun));
+    model = root;
+  }
 
   if (nebula.volumeShape === 'helix') {
     // The barrel's local +Z axis points almost back toward the Sun. The small
@@ -1196,7 +1295,7 @@ function updatePositions() {
       item.model.scale.setScalar(Math.max(.0005, physicalDisplayDiameter / navigationDiameter));
     } else {
       // The embedded Homunculus keeps its measured scale relative to the 300 ly Carina volume.
-      item.model.scale.setScalar(item.nebula.volumeShape === 'eta' ? .004375 : 1);
+      item.model.scale.setScalar(item.nebula.volumeShape === 'eta' ? .004375 : item.nebula.volumeShape === 'horsehead' ? (8/70)*(24/18) : 1);
     }
   });
   if (selected) updateSelectionLine();
@@ -1292,6 +1391,7 @@ function selectStar(star, fly = false) {
   details.source.hidden = true;
   controlsUi.fly.textContent = 'Fly to selected star';
   controlsUi.flyHint.hidden = true;
+  controlsUi.pillars.hidden = true;
   controlsUi.search.value = isSun ? 'Sun' : star.name;
   if (rangeChanged && scaleMode === 'linear') updatePositions();
   else {
@@ -1329,6 +1429,10 @@ function selectNebula(nebula, fly = false) {
   details.temperature.textContent = nebula.modelSource || (nebula.format === 'volume' ? 'NASA visualization reference' : 'NASA 3D Resources');
   details.luminosity.textContent = nebula.representation || 'Scientific reconstruction';
   details.radius.textContent = isBlackHole ? '< 1 AU (enlarged here)' : `≈ ${number.format(nebula.physicalSizeLy)} ly`;
+  if (nebula.volumeShape === 'horsehead') {
+    document.querySelector('#universe-label-radius').textContent = 'Pillar height / local field';
+    details.radius.textContent = `≈ ${nebula.featureHeightLy} ly tall / ${nebula.physicalSizeLy} ly field`;
+  }
   details.galacticStructure.textContent = galacticStructureText(nebula);
   details.hr.hidden = true;
   details.source.href = nebula.sourceUrl;
@@ -1338,6 +1442,7 @@ function selectNebula(nebula, fly = false) {
     ? 'Zoom in on Homunculus and Eta A/B'
     : isBlackHole ? 'Enter Sagittarius A* simulation' : 'Fly to selected object';
   controlsUi.flyHint.hidden = !isBlackHole;
+  controlsUi.pillars.hidden = nebula.volumeShape !== 'eagle';
   updatePositions();
   if (fly) flyToStar(nebula);
 }
@@ -1349,16 +1454,18 @@ function flyToStar(star) {
   if (!targetObject) return;
   const destinationTarget = targetObject.position.clone();
   const currentViewDirection = camera.position.clone().sub(orbit.target).normalize();
-  const direction = ['helix', 'elephant'].includes(nebulaItem?.nebula.volumeShape)
+  const direction = ['helix', 'elephant', 'eagle', 'horsehead'].includes(nebulaItem?.nebula.volumeShape)
     ? destinationTarget.clone().negate().normalize()
     : currentViewDirection;
   const etaDiameter = nebulaItem?.nebula.volumeShape === 'eta'
     ? Math.max(...nebulaItem.nebula.displayScale) * 2 * nebulaItem.model.scale.x
     : 0;
-  const offset = /^(sun|sol)/i.test(star.name)
+  const offset = nebulaItem?.nebula.volumeShape === 'horsehead'
+    ? Math.max(.012,27*nebulaItem.model.scale.x)/Math.min(1,camera.aspect)
+    : /^(sun|sol)/i.test(star.name)
     ? 105
     : nebulaItem
-      ? (nebulaItem.nebula.volumeShape === 'eta' ? Math.max(.012, etaDiameter * 1.7) : nebulaItem.nebula.volumeShape === 'sagittarius-a' ? 18 : scaleMode === 'linear' ? 5 : nebulaItem.nebula.volumeShape === 'elephant' ? 27 : 28)
+      ? (nebulaItem.nebula.volumeShape === 'eagle' ? Math.max(.012, 32 * nebulaItem.model.scale.x) : nebulaItem.nebula.volumeShape === 'eta' ? Math.max(.012, etaDiameter * 1.7) : nebulaItem.nebula.volumeShape === 'sagittarius-a' ? 18 : scaleMode === 'linear' ? 5 : nebulaItem.nebula.volumeShape === 'elephant' ? 27 : 28)
       : 22;
   flight = {
     started: performance.now(),
@@ -1367,6 +1474,25 @@ function flyToStar(star) {
     toTarget: destinationTarget,
     fromCamera: camera.position.clone(),
     toCamera: destinationTarget.clone().add(direction.multiplyScalar(offset))
+  };
+}
+
+function viewPillarsOfCreation() {
+  const item = nebulaObjects.find(candidate => candidate.nebula === selected && candidate.nebula.volumeShape === 'eagle');
+  const pillars = item?.model.getObjectByName('pillars-of-creation');
+  if (!pillars) return;
+  selectNebula(item.nebula);
+  item.model.updateWorldMatrix(true, true);
+  const target = pillars.getWorldPosition(new THREE.Vector3());
+  const height = 24 * 4 / 70 * item.model.scale.x;
+  const direction = directionFromRaDec(item.nebula.ra, item.nebula.dec).negate();
+  // Fit the narrowest viewport dimension and keep the observer in front of
+  // the deepest part of the mesh. OrbitControls continues to target the pillars.
+  const fit = height * 1.5 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / Math.min(1, camera.aspect);
+  flight = {
+    started: performance.now(), duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 900,
+    fromTarget: orbit.target.clone(), toTarget: target,
+    fromCamera: camera.position.clone(), toCamera: target.clone().addScaledVector(direction, Math.max(.012, fit))
   };
 }
 
@@ -1441,11 +1567,13 @@ function findStar() {
   if (!query) return;
   const deepSkyObject = NEBULAE.find(object =>
     object.name.toLowerCase() === query || object.shortName.toLowerCase() === query ||
-    object.name.toLowerCase().includes(query) || object.shortName.toLowerCase().includes(query)
+    object.name.toLowerCase().includes(query) || object.shortName.toLowerCase().includes(query) ||
+    object.aliases?.some(alias => alias.toLowerCase().includes(query))
   );
   if (deepSkyObject) {
     if (deepSkyObject.volumeShape === 'sagittarius-a') saveUniverseReturnState();
     selectNebula(deepSkyObject, true);
+    if (deepSkyObject.volumeShape === 'eagle' && /pillars|pelare/.test(query)) viewPillarsOfCreation();
     return;
   }
   const exact = catalogue.find(star => star.name.toLowerCase() === query || (query === 'sun' && star.name === 'Sun (Sol)'));
@@ -1752,6 +1880,7 @@ function bindEvents() {
     if (selected?.volumeShape === 'sagittarius-a') saveUniverseReturnState();
     flyToStar(selected);
   });
+  controlsUi.pillars.addEventListener('click', viewPillarsOfCreation);
   controlsUi.fullscreen.addEventListener('click', async () => {
     if (document.fullscreenElement) await document.exitFullscreen();
     else await workspace.requestFullscreen();

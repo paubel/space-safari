@@ -109,7 +109,8 @@ body::after { content: ''; position: fixed; z-index: 9999; inset: 0; background:
 body.is-leaving-universe::after, body.is-arriving-universe::after { opacity: 1; pointer-events: auto; }
 #universe-hr-link { display: block; margin-top: .6rem; padding: .55rem; color: var(--accent); border: 1px solid rgba(74, 158, 255, .28); border-radius: 5px; text-align: center; text-decoration: none; font-size: .7rem; }
 .universe-source-link { display: block; margin-top: .6rem; padding: .55rem; color: #c4adff; border: 1px solid rgba(166, 126, 255, .32); border-radius: 5px; text-align: center; text-decoration: none; font-size: .7rem; }
-.universe-source-link[hidden], #universe-hr-link[hidden] { display: none; }
+.universe-source-link[hidden], #universe-hr-link[hidden], #universe-view-pillars[hidden] { display: none; }
+#universe-view-pillars { display: block; width: 100%; margin-top: .55rem; padding: .6rem; color: #ffe2b7; background: #38291b; border: 1px solid #bd8a46; border-radius: 5px; cursor: pointer; }
 .universe-prototype-note { max-width: 900px; padding: 2rem .25rem 3rem; }
 .universe-prototype-note h2 { margin: .2rem 0 .5rem; font-size: 1.5rem; }
 .universe-prototype-note p:not(.section-label) { color: var(--text-muted); line-height: 1.65; }

@@ -6,7 +6,7 @@
     <meta name="description" content="Explore the three-dimensional positions of nearby and famous stars in the Space Safari stellar catalogue.">
     <title>3D Universe - Space Safari</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/3d-universe.css?v=fullscreen-toolbar-1">
+    <link rel="stylesheet" href="css/3d-universe.css?v=eagle-nebula-1">
     <link rel="icon" type="image/webp" href="assets/images/cats-eye-icon.webp">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SL7KJ6J4ZZ"></script>
     <script>
@@ -144,7 +144,7 @@
                     <p>Scientific and Cinematic use identical positions. Linear scale preserves the galaxy’s shape; logarithmic scale distorts distances around the Sun.</p>
                 </details>
                 <p class="universe-model-status" id="universe-milky-way-status">Loading the Milky Way model…</p>
-                <label class="universe-check universe-model-toggle"><input id="universe-nebulae" type="checkbox" checked><span>Show fifteen deep-sky objects</span></label>
+                <label class="universe-check universe-model-toggle"><input id="universe-nebulae" type="checkbox" checked><span>Show deep-sky objects</span></label>
                 <p class="universe-model-status" id="universe-model-status">Building deep-sky visualisations in your browser…</p>
                 <div class="universe-nebula-list" id="universe-nebula-list" hidden></div>
 
@@ -179,6 +179,7 @@
                     <div><dt>Galactic structure</dt><dd id="universe-object-galactic-structure">Orion Spur · high confidence near the Sun</dd></div>
                 </dl>
                 <button id="universe-fly" type="button">Fly to selected star</button>
+                <button id="universe-view-pillars" type="button" hidden>View Pillars of Creation</button>
                 <p id="universe-fly-hint" class="universe-fly-hint" hidden>Opens an interactive relativistic close-up with its own orbit camera.</p>
                 <a id="universe-hr-link" href="hr-diagram.html?star=Sol">Find in the H–R diagram →</a>
                 <a id="universe-source-link" class="universe-source-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Open NASA model source →</a>
@@ -195,6 +196,6 @@
     </main>
 
     <script src="js/main.js"></script>
-  <script type="module" src="js/3d-universe.js?v=72"></script>
+  <script type="module" src="js/3d-universe.js?v=75"></script>
 </body>
 </html>

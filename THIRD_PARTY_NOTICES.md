@@ -1,5 +1,16 @@
 # Third-party notices
 
+## Pillars of Creation — NASA/STScI
+
+`assets/models/pillars-of-creation.bin` adapts the printable **Pillars of Creation
+(positions).stl**, published by NASA. Model creators: **Leah Hustak and Ralf
+Crawford (STScI)**. [Original model and credits](https://science.nasa.gov/3d-resources/pillars-of-creation/).
+
+Space Safari removed the lower printing lattice/ends, simplified the mesh,
+changed its axes/scale, and added illustrative shading. This adaptation is not
+the unmodified original, a complete density reconstruction, or NASA endorsement.
+See `EAGLE-NEBULA-MODEL.md` for source, processing and limitations.
+
 ## WebGPU Black Hole
 
 The Sagittarius A* visual design and earlier raymarching research referenced
