@@ -7,6 +7,7 @@ import { createSagittariusAVisualizer } from './sagittarius-a-webgpu.js?v=adapti
 import { createMilkyWay } from './milky-way.js?v=12';
 import { createPillarsOfCreation } from './eagle-nebula.js?v=2';
 import { createHorseheadNebula } from './horsehead-nebula.js?v=1';
+import { createOpenStarCluster } from './open-star-clusters.js?v=1';
 
 if (sessionStorage.getItem('space-safari-universe-return')) {
   document.body.classList.add('is-arriving-universe');
@@ -111,8 +112,16 @@ const NEBULAE = [
   {
     name: 'The Pleiades (M45)', shortName: 'The Pleiades (M45)', ra: 56.75, dec: 24.1167, distance: 445,
     constellation: 'Taurus', type: 'Open star cluster and reflection nebulosity', format: 'volume', colour: 0x83b9ff,
-    description: 'The Seven Sisters embedded in wisps of blue reflection nebulosity. The bright stars are arranged to evoke the familiar cluster, while the dust is a science-informed procedural interpretation rather than a measured three-dimensional density map.',
-    sourceUrl: 'https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-45/', representation: 'Procedural reflection nebulosity and cluster stars', volumeShape: 'cluster', displayScale: [10.5, 8.5, 7.5], physicalSizeLy: 13
+    aliases: ['Pleiades','Plejaderna','Plejanderna','M 45','Seven Sisters'],
+    description: 'The Pleiades are a young open cluster about 445 light-years away. Ten bright members follow SIMBAD sky positions and V magnitudes, including Alcyone, Atlas, Electra, Maia and Merope. Blue reflection wisps concentrate around the illuminating stars, with a fan south of Merope. The dust is an interstellar cloud the cluster is passing through, not leftover birth material. This 13-light-year central field is not the entire extended cluster. Stellar depths, faint population and dust density are illustrative, not a measured full 3D reconstruction.',
+    sourceUrl: 'https://science.nasa.gov/mission/hubble/science/explore-the-night-sky/hubble-messier-catalog/messier-45/', modelSource: 'SIMBAD bright-star astrometry · NASA reflection-dust references', representation: 'Catalogue-positioned bright stars, faint population and star-lit blue dust', volumeShape: 'cluster', displayScale: [10.5, 10.5, 6.8], physicalSizeLy: 13
+  },
+  {
+    name: 'Hyades (Caldwell 41 · Melotte 25)', shortName: 'Hyades (Caldwell 41)', ra: 66.75, dec: 16, distance: 153,
+    aliases: ['Hyaderna','C41','C 41','Caldwell41','Melotte 25','Mel 25'],
+    constellation: 'Taurus', type: 'Nearby open star cluster', format: 'volume', colour: 0xffd9aa,
+    description: 'The nearest open star cluster, about 153 light-years away, has a loose V-shaped bright-star pattern and several warm giant stars. Eight bright members follow SIMBAD sky positions and V magnitudes. This view shows a 24-light-year central field around the roughly 18-light-year core, not the full tidal extent or long Gaia-discovered tails. Aldebaran is a separate foreground star, not a Hyades member. No bright gas nebula is added. Member depths and the faint population are illustrative rather than a complete Gaia membership reconstruction.',
+    sourceUrl: 'https://www.esa.int/Science_Exploration/Space_Science/Gaia/Is_the_nearest_star_cluster_to_the_Sun_being_destroyed', sourceLabel: 'ESA/Gaia Hyades observations →', modelSource: 'ESA/Gaia cluster reference · SIMBAD bright-star astrometry', representation: 'Sparse 3D cluster with catalogue-positioned bright members; no gas cloud', volumeShape: 'hyades', displayScale: [12,12,12], physicalSizeLy: 24
   },
   {
     name: 'Dumbbell Nebula (M27)', shortName: 'Dumbbell Nebula (M27)', ra: 299.90108, dec: 22.721, distance: 1240,
@@ -980,24 +989,7 @@ function createDiffuseNebulaVolume(nebula) {
     });
     return group;
   }
-  if (nebula.volumeShape !== 'cluster') return mesh;
-
-  const group = new THREE.Group();
-  group.add(mesh);
-  const starTexture = createStarTexture();
-  const sisters = [
-    [-3.1, 1.1, .2, 1.25], [-1.5, 2.4, -.4, 1.05], [.15, 1.35, .3, 1.2],
-    [1.65, 2.15, -.15, 1.0], [2.7, .45, .35, 1.15], [.7, -.65, -.5, .95], [-1.55, -.9, .45, .9]
-  ];
-  sisters.forEach(([x, y, z, size]) => {
-    const star = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: starTexture, color: 0xc5dcff, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
-    }));
-    star.position.set(x, y, z);
-    star.scale.setScalar(size);
-    group.add(star);
-  });
-  return group;
+  return mesh;
 }
 
 async function createHomunculusModel(nebula) {
@@ -1097,6 +1089,10 @@ function createSagittariusAModel() {
 }
 
 async function loadNebulaModel(nebula) {
+  const cluster = ['cluster','hyades'].includes(nebula.volumeShape)
+    ? createOpenStarCluster(nebula,QUALITY_PROFILES[activeQuality].volumeSteps) : null;
+  if (cluster?.volume) volumeMaterials.push(cluster.volume);
+  if (cluster) cluster.faintStars.geometry.setDrawRange(0,activeQuality === 'high' ? 360 : activeQuality === 'low' ? 120 : 220);
   const horsehead = nebula.volumeShape === 'horsehead'
     ? createHorseheadNebula(nebula, QUALITY_PROFILES[activeQuality].volumeSteps) : null;
   if (horsehead) volumeMaterials.push(horsehead);
@@ -1104,7 +1100,7 @@ async function loadNebulaModel(nebula) {
     ? await createHomunculusModel(nebula)
     : nebula.volumeShape === 'sagittarius-a'
       ? createSagittariusAModel()
-      : horsehead?.mesh || createDiffuseNebulaVolume(nebula);
+      : cluster?.group || horsehead?.mesh || createDiffuseNebulaVolume(nebula);
 
   if (horsehead) {
     const root = new THREE.Group();
@@ -1208,6 +1204,14 @@ async function loadNebulaModel(nebula) {
   hitTarget.userData.nebula = nebula;
   scene.add(hitTarget);
   const item = { nebula, model: pivot, hitTarget, label, labelElement };
+  if (cluster) {
+    item.cluster = cluster;
+    // Do not change the global catalogue: fade oversized map symbols at the
+    // same measured sky coordinates as a resolved member only in close-up.
+    item.clusterOverlays = starObjects.filter(({star}) => cluster.members.some(([,ra,dec]) =>
+      Math.hypot((star.ra-ra)*Math.cos(THREE.MathUtils.degToRad(dec)),star.dec-dec)<.02
+    ));
+  }
   nebulaObjects.push(item);
   if (nebula.volumeShape === 'sagittarius-a') {
     item.blackHoleLod = model.userData.blackHoleLod;
@@ -1295,7 +1299,11 @@ function updatePositions() {
       item.model.scale.setScalar(Math.max(.0005, physicalDisplayDiameter / navigationDiameter));
     } else {
       // The embedded Homunculus keeps its measured scale relative to the 300 ly Carina volume.
-      item.model.scale.setScalar(item.nebula.volumeShape === 'eta' ? .004375 : item.nebula.volumeShape === 'horsehead' ? (8/70)*(24/18) : 1);
+      item.model.scale.setScalar(item.nebula.volumeShape === 'eta' ? .004375 : item.nebula.volumeShape === 'horsehead' ? (8/70)*(24/18) : ['cluster','hyades'].includes(item.nebula.volumeShape) ? (item.nebula.physicalSizeLy/70)*(24/(Math.max(...item.nebula.displayScale)*2)) : 1);
+    }
+    if (item.cluster) {
+      // PointsMaterial does not inherit object scale for point diameter.
+      item.cluster.faintStars.material.size=.11*item.cluster.group.scale.x*item.model.scale.x;
     }
   });
   if (selected) updateSelectionLine();
@@ -1433,6 +1441,9 @@ function selectNebula(nebula, fly = false) {
     document.querySelector('#universe-label-radius').textContent = 'Pillar height / local field';
     details.radius.textContent = `≈ ${nebula.featureHeightLy} ly tall / ${nebula.physicalSizeLy} ly field`;
   }
+  if (['cluster','hyades'].includes(nebula.volumeShape)) {
+    document.querySelector('#universe-label-radius').textContent = 'Displayed central field';
+  }
   details.galacticStructure.textContent = galacticStructureText(nebula);
   details.hr.hidden = true;
   details.source.href = nebula.sourceUrl;
@@ -1454,13 +1465,15 @@ function flyToStar(star) {
   if (!targetObject) return;
   const destinationTarget = targetObject.position.clone();
   const currentViewDirection = camera.position.clone().sub(orbit.target).normalize();
-  const direction = ['helix', 'elephant', 'eagle', 'horsehead'].includes(nebulaItem?.nebula.volumeShape)
+  const direction = ['helix', 'elephant', 'eagle', 'horsehead','cluster','hyades'].includes(nebulaItem?.nebula.volumeShape)
     ? destinationTarget.clone().negate().normalize()
     : currentViewDirection;
   const etaDiameter = nebulaItem?.nebula.volumeShape === 'eta'
     ? Math.max(...nebulaItem.nebula.displayScale) * 2 * nebulaItem.model.scale.x
     : 0;
-  const offset = nebulaItem?.nebula.volumeShape === 'horsehead'
+  const offset = ['cluster','hyades'].includes(nebulaItem?.nebula.volumeShape)
+    ? Math.max(.012,Math.max(...nebulaItem.nebula.displayScale)*3.2*nebulaItem.model.scale.x)/Math.min(1,camera.aspect)
+    : nebulaItem?.nebula.volumeShape === 'horsehead'
     ? Math.max(.012,27*nebulaItem.model.scale.x)/Math.min(1,camera.aspect)
     : /^(sun|sol)/i.test(star.name)
     ? 105
@@ -1616,6 +1629,9 @@ function applyQuality(level) {
   const profile = QUALITY_PROFILES[level];
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, profile.pixelRatio));
   volumeMaterials.forEach(({ uniforms }) => { uniforms.uMaxSteps.value = profile.volumeSteps; });
+  nebulaObjects.forEach(({model}) => model.traverse(child => {
+    child.userData.clusterPoints?.geometry.setDrawRange(0,level === 'high' ? 360 : level === 'low' ? 120 : 220);
+  }));
   backgroundStars?.geometry.setDrawRange(0, profile.backgroundStars);
   milkyWay?.setQuality(level);
   controlsUi.qualityOutput.textContent = `${qualityMode === 'auto' ? 'Auto · ' : ''}${level[0].toUpperCase()}${level.slice(1)}`;
@@ -1673,6 +1689,28 @@ function animate(time) {
   animationFrame = requestAnimationFrame(animate);
   updateFlight(time);
   orbit.update();
+  let clusterCloseAmount=0;
+  nebulaObjects.forEach(item => {
+    if (!item.cluster || !item.model.visible) return;
+    const diameter=Math.max(...item.nebula.displayScale)*2*item.model.scale.x;
+    clusterCloseAmount=Math.max(clusterCloseAmount,1-THREE.MathUtils.clamp((camera.position.distanceTo(item.model.position)/diameter-2)/2,0,1));
+  });
+  starObjects.forEach(({star,sprite}) => {
+    // Nearby catalogue navigation symbols must not engulf a cluster close-up
+    // (notably foreground Aldebaran when approaching the Hyades).
+    const base=markerSize(star);
+    const pointSize=Math.min(base,camera.position.distanceTo(sprite.position)*.008);
+    sprite.scale.setScalar(THREE.MathUtils.lerp(base,pointSize,clusterCloseAmount));
+  });
+  nebulaObjects.forEach(item => {
+    if (!item.clusterOverlays?.length) return;
+    const diameter=Math.max(...item.nebula.displayScale)*2*item.model.scale.x;
+    const distance=camera.position.distanceTo(item.model.position);
+    const fade=item.model.visible ? THREE.MathUtils.clamp((distance/diameter-2)/2,0,1) : 1;
+    item.clusterOverlays.forEach(({sprite}) => {
+      sprite.material.opacity=(scaleMode === 'linear' ? .92 : 1)*fade;
+    });
+  });
   updateAdaptiveQuality(time);
   updateBlackHoleLod(time);
   if (milkyWay?.group.visible) milkyWay.update(camera, time);
