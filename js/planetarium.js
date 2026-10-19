@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { STARS as interactiveStars } from '../data/astrophoto/interactive-stars.js?v=brightest-stars-1';
+import { buildPlanetariumLink, readPlanetariumLink } from './planetarium-links.js?v=1';
 
 const observations = [
   {
@@ -871,6 +872,7 @@ let viewDirection = celestialVector(0.712, 41.269, 1).normalize();
 let targetDirection = viewDirection.clone();
 let animation = null;
 let selected = null;
+let restoringLink = false;
 let dragging = false;
 let dragged = false;
 let previousX = 0;
@@ -953,6 +955,9 @@ function selectInteractiveStar(star) {
   starDetailFields.age.textContent = `${starNumber.format(star.age)} billion years`;
   starDetailFields.position.textContent = `RA ${position.ra} · Dec ${position.dec}`;
   starPanel.querySelector('.star-hr-link').href = `hr-diagram.html?star=${encodeURIComponent(star.name)}`;
+  const permalink = buildPlanetariumLink(location.href, { star: star.name });
+  starPanel.querySelector('.star-permalink').href = permalink;
+  if (!restoringLink) history.replaceState(null, '', permalink);
   starPanel.hidden = false;
   starPanel.classList.remove('is-visible');
   requestAnimationFrame(() => starPanel.classList.add('is-visible'));
@@ -983,6 +988,9 @@ function selectObservation(observation) {
     : 'Angular size describes the photographed object, not the camera frame. One full Moon is approximately 0.5° across.';
   panel.querySelector('.object-position').textContent = `RA ${formatPosition(targetDirection).ra} · Dec ${formatPosition(targetDirection).dec}`;
   fullImageLink.href = observation.image;
+  const permalink = buildPlanetariumLink(location.href, { object: observation.id });
+  panel.querySelector('.object-permalink').href = permalink;
+  if (!restoringLink) history.replaceState(null, '', permalink);
 }
 
 function overview() {
@@ -992,6 +1000,7 @@ function overview() {
   const startDirection = viewDirection.clone();
   targetDirection = celestialVector(0.712, 41.269, 1).normalize();
   animation = { start: performance.now(), duration: 1500, startDirection, startFov: camera.fov, targetFov: 75 };
+  if (!restoringLink) history.replaceState(null, '', buildPlanetariumLink(location.href));
 }
 
 function adjustZoom(delta) {
@@ -1149,6 +1158,89 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 resize();
+
+const copyViewButton = document.querySelector('#copy-sky-link');
+const sharePanel = document.querySelector('#sky-share-panel');
+const shareInput = document.querySelector('#sky-share-url');
+const shareStatus = document.querySelector('#sky-share-status');
+
+function finishViewAnimation() {
+  if (!animation) return;
+  viewDirection.copy(targetDirection);
+  camera.fov = animation.targetFov;
+  animation = null;
+  camera.updateProjectionMatrix();
+  pointCamera();
+}
+
+function currentViewLink() {
+  finishViewAnimation();
+  const ra = ((THREE.MathUtils.radToDeg(Math.atan2(-viewDirection.z,viewDirection.x))/15)+24)%24;
+  const dec = THREE.MathUtils.radToDeg(Math.asin(THREE.MathUtils.clamp(viewDirection.y,-1,1)));
+  return buildPlanetariumLink(location.href, {
+    object: panel.classList.contains('is-visible') ? selected?.id : undefined,
+    star: starPanel.classList.contains('is-visible') ? selectedStar?.name : undefined,
+    view: { ra, dec, fov: camera.fov }, mode: interactiveStarLayer.visible ? 'stars' : 'photos',
+    grid: grid.visible, photos: showStarPhotos.checked,
+    constellations: showStarConstellations.checked, photoMenu: showPhotoMenu.checked, mainMenu: showMainMenu.checked
+  });
+}
+
+copyViewButton.addEventListener('click', async () => {
+  const url = currentViewLink();
+  shareInput.value = url;
+  sharePanel.hidden = false;
+  copyViewButton.setAttribute('aria-expanded','true');
+  history.replaceState(null,'',url);
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+    await navigator.clipboard.writeText(url);
+    shareStatus.textContent = 'Link copied. Opening it restores this sky position, zoom and display layers.';
+  } catch {
+    shareStatus.textContent = 'Select and copy the link below to share this view.';
+    shareInput.focus();
+    shareInput.select();
+  }
+});
+document.querySelector('#close-sky-share').addEventListener('click', () => {
+  sharePanel.hidden = true;
+  copyViewButton.setAttribute('aria-expanded','false');
+  copyViewButton.focus();
+});
+
+function restoreSharedView() {
+  const state = readPlanetariumLink(location.search,observations.map(item=>item.id),interactiveStars.map(star=>star.name));
+  restoringLink = true;
+  try {
+    closePhotoPanel(); closeStarPanel(); closeStarTools();
+    for (const [key,control] of [['photos',showStarPhotos],['constellations',showStarConstellations],['photoMenu',showPhotoMenu],['mainMenu',showMainMenu]]) {
+      if (typeof state[key] === 'boolean') control.checked = state[key];
+    }
+    grid.visible = state.grid ?? true;
+    const gridButton=document.querySelector('[data-sky-action="labels"]');
+    gridButton.classList.toggle('is-active',grid.visible);
+    gridButton.setAttribute('aria-pressed',String(grid.visible));
+    setInteractiveStars((state.mode || (state.star ? 'stars' : 'photos')) === 'stars');
+    closeStarTools();
+    if (state.object) selectObservation(observations.find(item=>item.id===state.object));
+    else if (state.star) selectInteractiveStar(interactiveStars.find(star=>star.name===state.star));
+    else {
+      animation = null;
+      viewDirection.copy(celestialVector(.712,41.269,1).normalize());
+      camera.fov = 75;
+    }
+    finishViewAnimation();
+    if (state.view) {
+      viewDirection.copy(celestialVector(state.view.ra,state.view.dec,1).normalize());
+      camera.fov = state.view.fov;
+    }
+    targetDirection.copy(viewDirection);
+    camera.updateProjectionMatrix();
+    pointCamera();
+  } finally { restoringLink = false; }
+}
+window.addEventListener('popstate', restoreSharedView);
+restoreSharedView();
 
 function animate(time) {
   if (animation) {
