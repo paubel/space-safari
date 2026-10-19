@@ -87,8 +87,17 @@ const observations = [
     summary: 'A compact stellar nursery where glowing hydrogen, blue reflected starlight and dark molecular dust surround a young embedded star cluster. The dark nebula Barnard 168 extends westward from the bright Cocoon.'
   },
   {
+    id: 'sadr-region', title: 'Area around Sadr', catalogue: 'Sadr · IC 1318 · NGC 6888', constellation: 'Cygnus',
+    ra: 20.370472732, dec: 40.256679156, image: 'assets/images/astrophoto/Area%20around%20Sadr.jpg', frame: [4.403, 7.819], feather: .08, renderOrder: -1, maxFitFov: 12,
+    // Approximate two-landmark registration, not a full astrometric plate solve.
+    registration: { pixels: [900,1600], anchorPixel: [404,854], referencePixel: [805,1242], referenceRa: 20.2018172, referenceDec: 38.35494 },
+    type: 'Wide-field emission nebulae and foreground star',
+    distance: 'Sadr: about 1,800 ly · IC 1318: about 4,900 ly', size: 'about 4.4° × 7.8° (photographed field)', moons: 'about 8.8 × 15.6 Moon diameters (field)', sizeIsFrame: true,
+    summary: 'Red hydrogen clouds and dark dust lanes surround the line of sight to Sadr (Gamma Cygni), at the heart of the Swan. Sadr is a foreground star, not physically embedded in the much more distant IC 1318 complex. The Crescent Nebula (NGC 6888) is visible near the lower right. The photograph is approximately registered using Sadr and WR 136 in the Crescent.'
+  },
+  {
     id: 'ngc6888', title: 'The Crescent Nebula', catalogue: 'NGC 6888 · Caldwell 27', constellation: 'Cygnus',
-    ra: 20.2083, dec: 38.4167, image: 'assets/images/astrophoto/Ngc-6888.jpg', frame: [2.25, 4.0],
+    ra: 20.2083, dec: 38.4167, image: 'assets/images/astrophoto/Ngc-6888.jpg', frame: [2.25, 4.0], feather: .14,
     type: 'Wind-blown emission nebula',
     distance: 'about 4,700 light-years', size: 'about 0.30° × 0.20°', moons: 'about 0.6 × 0.4 Moon diameters',
     summary: 'A glowing shell of gas driven outward by fierce winds from WR 136, the massive Wolf-Rayet star near its centre.'
@@ -537,6 +546,37 @@ function makeFeatherMap(edgeFraction) {
   return texture;
 }
 
+function observationPlaneLayout(observation) {
+  const center = celestialVector(observation.ra, observation.dec, 90);
+  const fallback = {
+    center,
+    width: 180*Math.tan(THREE.MathUtils.degToRad(observation.frame[0])/2),
+    height: 180*Math.tan(THREE.MathUtils.degToRad(observation.frame[1])/2)
+  };
+  const registration=observation.registration;
+  if (!registration) return fallback;
+  const normal=center.clone().normalize();
+  const towardObserver=normal.clone().negate();
+  const right=new THREE.Vector3(0,1,0).cross(towardObserver).normalize();
+  const up=towardObserver.clone().cross(right).normalize();
+  const reference=celestialVector(registration.referenceRa,registration.referenceDec,1);
+  const offset=reference.multiplyScalar(90/reference.dot(normal)).sub(center);
+  const sx=offset.dot(right),sy=offset.dot(up);
+  const dx=registration.referencePixel[0]-registration.anchorPixel[0];
+  const dy=registration.anchorPixel[1]-registration.referencePixel[1];
+  const squared=dx*dx+dy*dy;
+  const a=(sx*dx+sy*dy)/squared,b=(sy*dx-sx*dy)/squared;
+  const pixelScale=Math.hypot(a,b);
+  const photoRight=right.clone().multiplyScalar(a).addScaledVector(up,b).divideScalar(pixelScale);
+  const photoUp=right.clone().multiplyScalar(-b).addScaledVector(up,a).divideScalar(pixelScale);
+  center.addScaledVector(photoRight,(registration.pixels[0]/2-registration.anchorPixel[0])*pixelScale)
+    .addScaledVector(photoUp,(registration.anchorPixel[1]-registration.pixels[1]/2)*pixelScale);
+  return {
+    center,width:registration.pixels[0]*pixelScale,height:registration.pixels[1]*pixelScale,
+    quaternion:new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(photoRight,photoUp,towardObserver))
+  };
+}
+
 observations.forEach((observation, index) => {
   const button = document.createElement('button');
   button.type = 'button';
@@ -545,10 +585,8 @@ observations.forEach((observation, index) => {
   button.addEventListener('click', () => selectObservation(observation));
   targetList.append(button);
 
-  const center = celestialVector(observation.ra, observation.dec, 90);
-  const width = 2 * 90 * Math.tan(THREE.MathUtils.degToRad(observation.frame[0]) / 2);
-  const height = 2 * 90 * Math.tan(THREE.MathUtils.degToRad(observation.frame[1]) / 2);
-  const geometry = new THREE.PlaneGeometry(width, height);
+  const layout = observationPlaneLayout(observation);
+  const geometry = new THREE.PlaneGeometry(layout.width, layout.height);
   const material = new THREE.MeshBasicMaterial({
     transparent: true,
     opacity: observation.feather ? 1 : .9,
@@ -557,8 +595,9 @@ observations.forEach((observation, index) => {
     depthWrite: false
   });
   const plane = new THREE.Mesh(geometry, material);
-  plane.position.copy(center);
-  plane.lookAt(0, 0, 0);
+  plane.position.copy(layout.center);
+  if (layout.quaternion) plane.quaternion.copy(layout.quaternion);
+  else plane.lookAt(0, 0, 0);
   plane.renderOrder = observation.renderOrder || 0;
   plane.userData.observation = observation;
   scene.add(plane);
@@ -927,7 +966,7 @@ function selectObservation(observation) {
   targetDirection = celestialVector(observation.ra, observation.dec, 1).normalize();
   const startDirection = viewDirection.clone();
   const startFov = camera.fov;
-  const targetFov = THREE.MathUtils.clamp(Math.max(...observation.frame) * 1.4, 4.8, 7.2);
+  const targetFov = THREE.MathUtils.clamp(Math.max(...observation.frame) * 1.4, 4.8, observation.maxFitFov || 7.2);
   animation = { start: performance.now(), duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 2400, startDirection, startFov, targetFov };
   panel.hidden = false;
   panel.classList.remove('is-visible');
@@ -939,6 +978,9 @@ function selectObservation(observation) {
   panel.querySelector('.object-distance').textContent = observation.distance;
   panel.querySelector('.object-size').textContent = observation.size;
   panel.querySelector('.object-moons').textContent = observation.moons;
+  panel.querySelector('.object-note').textContent = observation.sizeIsFrame
+    ? 'Angular size and Moon comparison describe this photographed field. Registration is approximate, based on two identified landmarks, not a full plate solve. One full Moon is approximately 0.5° across.'
+    : 'Angular size describes the photographed object, not the camera frame. One full Moon is approximately 0.5° across.';
   panel.querySelector('.object-position').textContent = `RA ${formatPosition(targetDirection).ra} · Dec ${formatPosition(targetDirection).dec}`;
   fullImageLink.href = observation.image;
 }
