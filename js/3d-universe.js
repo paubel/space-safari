@@ -8,6 +8,7 @@ import { createMilkyWay } from './milky-way.js?v=12';
 import { createPillarsOfCreation } from './eagle-nebula.js?v=2';
 import { createHorseheadNebula } from './horsehead-nebula.js?v=1';
 import { createOpenStarCluster } from './open-star-clusters.js?v=1';
+import { createAndromeda, M31 } from './andromeda.js?v=2';
 
 if (sessionStorage.getItem('space-safari-universe-return')) {
   document.body.classList.add('is-arriving-universe');
@@ -47,6 +48,8 @@ const controlsUi = {
   galaxyOutlines: document.querySelector('#universe-galaxy-outlines'),
   galaxyUncertainty: document.querySelector('#universe-galaxy-uncertainty'),
   milkyWayStatus: document.querySelector('#universe-milky-way-status'),
+  andromeda: document.querySelector('#universe-andromeda'),
+  viewAndromeda: document.querySelector('#universe-view-andromeda'),
   nebulae: document.querySelector('#universe-nebulae'),
   nebulaStatus: document.querySelector('#universe-model-status'),
   nebulaList: document.querySelector('#universe-nebula-list'),
@@ -228,6 +231,7 @@ let isAnimating = false;
 let flight = null;
 let sagittariusAVisualizer = null;
 let milkyWay = null;
+let andromeda = null;
 let milkyWayLoadPromise = null;
 let galaxyOverviewActive = false;
 let backgroundStars = null;
@@ -325,7 +329,10 @@ function updateGalacticCentreGuide() {
 function guideDistances() {
   // Reference rings are context, independent of the catalogue distance filter.
   const thousands = Array.from({ length: 20 }, (_, index) => (index + 1) * 1000);
-  return scaleMode === 'linear' ? thousands : [1, 10, 100, ...thousands];
+  return scaleMode === 'linear' ? thousands : [
+    1, 10, 100, ...thousands,
+    50000, 100000, 200000, 500000, 1000000, 2000000, M31.distance
+  ];
 }
 
 function clearEarthGuide() {
@@ -351,7 +358,7 @@ function createDistanceRing(distance, colour = 0x4d91c9, labelAngle = 0) {
 
   const labelElement = document.createElement('span');
   labelElement.className = 'universe-scale-label';
-  labelElement.textContent = `${integer.format(Math.round(distance))} ly`;
+  labelElement.textContent = `${integer.format(Math.round(distance))} ly${scaleMode !== 'linear' && distance === M31.distance ? ' · Andromeda distance' : ''}`;
   const label = new CSS2DObject(labelElement);
   label.position.set(Math.cos(labelAngle) * radius, .12, Math.sin(labelAngle) * radius);
   earthGuideGroup.add(label);
@@ -361,7 +368,8 @@ function updateEarthGuide() {
   if (!earthGuideGroup) return;
   clearEarthGuide();
   const maximum = maximumDistance();
-  const outerRadius = displayDistance(Math.max(maximum, 20000));
+  const ringDistances = guideDistances();
+  const outerRadius = displayDistance(Math.max(maximum, ...ringDistances));
   const disk = new THREE.Mesh(
     new THREE.CircleGeometry(outerRadius, 128),
     new THREE.MeshBasicMaterial({ color: 0x367bb6, transparent: true, opacity: .025, side: THREE.DoubleSide, depthWrite: false })
@@ -369,7 +377,6 @@ function updateEarthGuide() {
   disk.rotation.x = -Math.PI / 2;
   earthGuideGroup.add(disk);
 
-  const ringDistances = guideDistances();
   ringDistances.forEach((distance, index) => {
     // Spread labels around eight directions to keep compressed rings readable.
     const labelAngle = (index % 8) * Math.PI / 4;
@@ -1310,6 +1317,7 @@ function updatePositions() {
   updateEarthGuide();
   updateGalacticCentreGuide();
   milkyWay?.setScaleMode(scaleMode, maximumDistance());
+  andromeda?.setScaleMode(scaleMode, maximumDistance());
   updateVisibleStars();
   controlsUi.scaleNote.innerHTML = scaleMode === 'linear'
     ? `<strong>Linear distance · ${integer.format(Math.round(maximumDistance()))} ly volume</strong><span>Distances and deep-sky spans are proportional. Invisible hit areas and labels keep physically tiny objects selectable.</span>`
@@ -1357,7 +1365,7 @@ function updateGalacticClassifications() {
   [...catalogue, ...NEBULAE].forEach(object => {
     if (object.physicalPosition) object.galacticStructure = milkyWay.classifyPosition(object.physicalPosition, object);
   });
-  if (selected) details.galacticStructure.textContent = galacticStructureText(selected);
+  if (selected) details.galacticStructure.textContent = selected === M31 ? 'External galaxy · not a Milky Way spiral arm' : galacticStructureText(selected);
 }
 
 function selectStar(star, fly = false) {
@@ -1459,6 +1467,7 @@ function selectNebula(nebula, fly = false) {
 }
 
 function flyToStar(star) {
+  if (star === M31) { viewAndromeda(); return; }
   const starItem = starObjects.find(candidate => candidate.star === star);
   const nebulaItem = nebulaObjects.find(candidate => candidate.nebula === star);
   const targetObject = starItem?.sprite || nebulaItem?.model;
@@ -1578,6 +1587,10 @@ function restoreUniverseReturnState() {
 function findStar() {
   const query = controlsUi.search.value.trim().toLowerCase();
   if (!query) return;
+  if (query === M31.name.toLowerCase() || /^(m\s?31|ngc\s?224|andromeda(?: galaxy)?|andromedagalaxen)$/.test(query)) {
+    viewAndromeda();
+    return;
+  }
   const deepSkyObject = NEBULAE.find(object =>
     object.name.toLowerCase() === query || object.shortName.toLowerCase() === query ||
     object.name.toLowerCase().includes(query) || object.shortName.toLowerCase().includes(query) ||
@@ -1634,6 +1647,7 @@ function applyQuality(level) {
   }));
   backgroundStars?.geometry.setDrawRange(0, profile.backgroundStars);
   milkyWay?.setQuality(level);
+  andromeda?.setQuality(level);
   controlsUi.qualityOutput.textContent = `${qualityMode === 'auto' ? 'Auto · ' : ''}${level[0].toUpperCase()}${level.slice(1)}`;
   resize();
 }
@@ -1714,6 +1728,7 @@ function animate(time) {
   updateAdaptiveQuality(time);
   updateBlackHoleLod(time);
   if (milkyWay?.group.visible) milkyWay.update(camera, time);
+  if (andromeda?.group.visible) andromeda.update(camera, stage.clientHeight);
   volumeMaterials.forEach(({ mesh, uniforms }) => {
     uniforms.uTime.value = time * .001;
     uniforms.uCameraLocal.value.copy(mesh.worldToLocal(camera.position.clone()));
@@ -1744,6 +1759,50 @@ function resetView() {
   orbit.target.set(0, 0, 0);
   updatePositions();
   selectStar(catalogue.find(star => /^(sun|sol)/i.test(star.name)) || catalogue[0]);
+}
+
+function selectAndromeda() {
+  selected = M31;
+  controlsUi.andromeda.checked = true;
+  localStorage.setItem('space-safari-show-andromeda', 'true');
+  andromeda?.setVisible(true);
+  setDetailLabels({distance:'Distance',constellation:'Constellation',spectral:'Object type',temperature:'Orientation',luminosity:'Representation',radius:'Illustrative disk diameter'});
+  details.name.textContent = M31.name;
+  details.description.textContent = 'A neighbouring galaxy, outside the Milky Way. A diffuse old stellar disk and warm 3D bulge are crossed by patchy dust lanes, star-forming rings and subdued arm fragments—not two regular glowing spirals. This remains an illustration, not a measured density map. In logarithmic mode every point is distance-mapped from the Sun, so the galaxy is strongly compressed in depth. Use Linear to inspect its undistorted physical shape. Drag to orbit; scroll to zoom.';
+  details.distance.textContent = '≈ 2,500,000 ly';
+  details.constellation.textContent = 'Andromeda';
+  details.spectral.textContent = 'Spiral galaxy · Local Group';
+  details.temperature.textContent = 'Inclination ≈77° · position angle ≈38°';
+  details.luminosity.textContent = 'Procedural 3D draft · adaptive detail';
+  details.radius.textContent = '≈ 220,000 ly (outer extent is uncertain)';
+  details.galacticStructure.textContent = 'External galaxy · not a Milky Way spiral arm';
+  details.hr.hidden = true;
+  details.source.hidden = false;
+  details.source.href = M31.source;
+  details.source.textContent = 'Open NASA Andromeda reference →';
+  controlsUi.fly.textContent = 'Approach Andromeda (M31)';
+  controlsUi.flyHint.hidden = true;
+  controlsUi.pillars.hidden = true;
+  updateSelectionLine();
+}
+
+function viewAndromeda() {
+  if (!andromeda) return;
+  selectAndromeda();
+  camera.up.set(0, 1, 0);
+  // Keep the active scale. In linear mode include the Local Group distance
+  // without letting the model fall beyond the camera's navigation range.
+  if (scaleMode === 'linear' && maximumDistance() < 3000000) {
+    controlsUi.distance.value = '6.50';
+    updatePositions();
+  }
+  flight = {
+    started: performance.now(),
+    duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 1000,
+    fromTarget: orbit.target.clone(), toTarget: andromeda.group.position.clone(),
+    fromCamera: camera.position.clone(),
+    toCamera: andromeda.group.position.clone().addScaledVector(andromeda.direction, -andromeda.getRadius()*3.1/Math.min(1,camera.aspect))
+  };
 }
 
 async function prepareMilkyWayOverview() {
@@ -1836,6 +1895,7 @@ function bindEvents() {
   if (!['auto', 'high', 'medium', 'low'].includes(qualityMode)) qualityMode = 'auto';
   controlsUi.quality.value = qualityMode;
   const searchableObjects = [
+    M31.name,
     ...catalogue.map(star => star.name === 'Sun (Sol)' ? 'Sun' : star.name),
     ...NEBULAE.map(object => object.shortName)
   ].sort((a, b) => a.localeCompare(b));
@@ -1859,6 +1919,7 @@ function bindEvents() {
   controlsUi.scale.forEach(input => input.addEventListener('change', () => {
     scaleMode = input.value;
     updatePositions();
+    if (selected === M31 && controlsUi.andromeda.checked) viewAndromeda();
   }));
   controlsUi.distance.addEventListener('input', () => {
     if (scaleMode === 'linear') updatePositions();
@@ -1866,6 +1927,7 @@ function bindEvents() {
       updateEarthGuide();
       updateVisibleStars();
       milkyWay?.setScaleMode(scaleMode, maximumDistance());
+      andromeda?.setScaleMode(scaleMode, maximumDistance());
     }
   });
   controlsUi.spectral.addEventListener('change', updateVisibleStars);
@@ -1896,6 +1958,11 @@ function bindEvents() {
     milkyWay?.setLabelsVisible(controlsUi.milkyWayLabels.checked);
   });
   controlsUi.viewMilkyWay.addEventListener('click', viewWholeMilkyWay);
+  controlsUi.viewAndromeda.addEventListener('click', viewAndromeda);
+  controlsUi.andromeda.addEventListener('change', () => {
+    localStorage.setItem('space-safari-show-andromeda', String(controlsUi.andromeda.checked));
+    andromeda?.setVisible(controlsUi.andromeda.checked);
+  });
   controlsUi.viewMilkyWayEdge.addEventListener('click', viewMilkyWayEdgeOn);
   controlsUi.viewMilkyWayOblique.addEventListener('click', viewMilkyWayOblique);
   controlsUi.viewMilkyWaySun.addEventListener('click', viewMilkyWayFromSun);
@@ -1999,6 +2066,17 @@ async function loadMilkyWay() {
 
 try {
   buildScene();
+  try {
+    andromeda = createAndromeda({scene, onSelect: selectAndromeda});
+    controlsUi.andromeda.checked = localStorage.getItem('space-safari-show-andromeda') !== 'false';
+    andromeda.setVisible(controlsUi.andromeda.checked);
+  } catch (error) {
+    console.warn('Andromeda layer unavailable; the rest of the viewer remains usable.', error);
+    controlsUi.andromeda.checked = false;
+    controlsUi.andromeda.disabled = true;
+    controlsUi.viewAndromeda.disabled = true;
+    document.querySelector('#universe-andromeda-status').textContent = 'Andromeda layer unavailable; the planetarium continues normally.';
+  }
   bindEvents();
   const storedMilkyWay = localStorage.getItem('space-safari-show-milky-way');
   const storedMilkyWayLabels = localStorage.getItem('space-safari-show-milky-way-labels');

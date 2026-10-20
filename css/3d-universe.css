@@ -104,6 +104,8 @@
 .universe-details dt { color: #7f8ca1; font-size: .63rem; text-transform: uppercase; }
 .universe-details dd { margin: 0; color: #dce7f5; font-size: .7rem; font-weight: 700; text-align: right; }
 #universe-fly { width: 100%; }
+#universe-view-andromeda { width: 100%; margin-top: .15rem; padding: .55rem .65rem; color: #e9f3ff; background: rgba(74, 158, 255, .12); border: 1px solid rgba(74, 158, 255, .38); border-radius: 5px; cursor: pointer; }
+#universe-view-andromeda:focus-visible { outline: 2px solid #bfe4ff; outline-offset: 3px; }
 .universe-fly-hint { margin: -.18rem 0 .55rem; color: #91a7be; font-size: .62rem; line-height: 1.4; }
 body::after { content: ''; position: fixed; z-index: 9999; inset: 0; background: #000; opacity: 0; pointer-events: none; transition: opacity .32s ease; }
 body.is-leaving-universe::after, body.is-arriving-universe::after { opacity: 1; pointer-events: auto; }
