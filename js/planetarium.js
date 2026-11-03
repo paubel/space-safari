@@ -112,7 +112,7 @@ const observations = [
   },
   {
     id: 'sh2-155', title: 'The Cave Nebula', catalogue: 'Sh2-155 · Caldwell 9', constellation: 'Cepheus',
-    ra: 22.95164, dec: 62.63583, image: 'assets/images/astrophoto/cave%20nebula.jpg', frame: [2.25, 4.0],
+    ra: 22.95164, dec: 62.63583, image: 'assets/images/astrophoto/cave%20nebula.jpg', frame: [2.25, 4.0], renderOrder: 1,
     type: 'Emission nebula · star-forming region',
     distance: 'about 2,400 light-years', size: 'about 0.83° × 0.5°', moons: 'about 1.7 × 1 Moon diameters',
     summary: 'A stellar nursery on the edge of the Cepheus B molecular cloud. Hot young stars illuminate glowing gas beside dark dust, creating the bright rim and shadowy opening that give the Cave Nebula its name.'
@@ -140,7 +140,7 @@ const observations = [
   },
   {
     id: 'ngc7635', title: 'Bubble Nebula & friends', catalogue: 'NGC 7635 · M52 · Sh2-157', constellation: 'Cassiopeia',
-    ra: 23.300, dec: 61.10, image: 'assets/images/astrophoto/ngc 7635.jpg', frame: [3.8, 3.8],
+    ra: 23.300, dec: 61.10, image: 'assets/images/astrophoto/ngc 7635.jpg', frame: [3.8, 3.8], renderOrder: 2,
     type: 'Wind-blown emission nebula',
     distance: 'about 7,100 light-years', size: 'about 0.05° across (bubble)', moons: 'about 0.1 Moon diameters',
     summary: 'A bubble of gas inflated by the fierce wind from a massive hot star. This wide field also shows open cluster M52 and the larger Lobster Claw region, Sh2-157.'
@@ -624,6 +624,51 @@ observations.forEach((observation, index) => {
   });
 
 });
+
+// Blend only the shared area of these photographs; keep their outer edges intact.
+const cavePhoto = selectable.find(plane => plane.userData.observation.id === 'sh2-155');
+const bubblePhoto = selectable.find(plane => plane.userData.observation.id === 'ngc7635');
+if (cavePhoto && bubblePhoto) {
+  cavePhoto.updateMatrixWorld(true);
+  bubblePhoto.updateMatrixWorld(true);
+  const size = 512;
+  const blendCanvas = document.createElement('canvas');
+  blendCanvas.width = blendCanvas.height = size;
+  const context = blendCanvas.getContext('2d');
+  const pixels = context.createImageData(size, size);
+  const caveSize = cavePhoto.geometry.parameters;
+  const bubbleSize = bubblePhoto.geometry.parameters;
+  const point = new THREE.Vector3();
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const u = x / (size - 1), v = 1 - y / (size - 1);
+      point.set((u - .5) * bubbleSize.width, (v - .5) * bubbleSize.height, 0);
+      bubblePhoto.localToWorld(point);
+      // Project from the observer onto the Cave photograph's plane.
+      const normal = new THREE.Vector3(0, 0, 1).transformDirection(cavePhoto.matrixWorld);
+      const denominator = point.dot(normal);
+      let alpha = 1;
+      if (Math.abs(denominator) > 1e-6) {
+        point.multiplyScalar(cavePhoto.position.dot(normal) / denominator);
+        cavePhoto.worldToLocal(point);
+        const caveEdge = Math.min(.5 - Math.abs(point.x / caveSize.width), .5 - Math.abs(point.y / caveSize.height));
+        if (caveEdge > 0) {
+          const bubbleEdge = Math.min(u, v, 1 - u, 1 - v);
+          const overlap = THREE.MathUtils.smoothstep(caveEdge, 0, .025);
+          alpha = 1 - overlap * (1 - THREE.MathUtils.smoothstep(bubbleEdge, 0, .18));
+        }
+      }
+      const offset = (y * size + x) * 4;
+      pixels.data[offset] = pixels.data[offset + 2] = pixels.data[offset + 3] = 255;
+      pixels.data[offset + 1] = Math.round(alpha * 255);
+    }
+  }
+  context.putImageData(pixels, 0, 0);
+  const blendTexture = new THREE.CanvasTexture(blendCanvas);
+  blendTexture.colorSpace = THREE.NoColorSpace;
+  bubblePhoto.material.alphaMap = blendTexture;
+  bubblePhoto.material.needsUpdate = true;
+}
 
 const starLayerButton = document.querySelector('[data-sky-action="stars"]');
 const starToolsButton = document.querySelector('[data-sky-action="star-tools"]');
