@@ -125,8 +125,8 @@ const observations = [
     summary: 'The bright eastern arc of the Veil Nebula, a filamentary shell of gas expanding from a supernova that exploded thousands of years ago.'
   },
   {
-    id: 'ngc7822', title: 'Question Mark Nebula', catalogue: 'NGC 7822 · Sh2-171 · V398 Cephei', constellation: 'Cepheus',
-    ra: 0.061, dec: 67.15, image: 'assets/images/astrophoto/V398 Cephei - NGC 7822.jpg', frame: [2.67, 4.0],
+    id: 'ngc7822', title: 'NGC 7822 · Question Mark Nebula', catalogue: 'NGC 7822 · Sh2-171 · V398 Cephei', constellation: 'Cepheus',
+    ra: 0.061, dec: 67.15, image: 'assets/images/astrophoto/NGC%207822.jpg', frame: [2.25, 4.0],
     type: 'Emission nebula · star-forming complex',
     distance: 'about 3,000 light-years', size: 'about 3° across', moons: 'about 6 Moon diameters',
     summary: 'A vast cloud of ionised hydrogen and dark dust shaped like a question mark. The field includes the young NGC 7822 complex and the region around variable star V398 Cephei.'
@@ -144,6 +144,13 @@ const observations = [
     type: 'Wind-blown emission nebula',
     distance: 'about 7,100 light-years', size: 'about 0.05° across (bubble)', moons: 'about 0.1 Moon diameters',
     summary: 'A bubble of gas inflated by the fierce wind from a massive hot star. This wide field also shows open cluster M52 and the larger Lobster Claw region, Sh2-157.'
+  },
+  {
+    id: 'ngc1499', title: 'The California Nebula', catalogue: 'NGC 1499 · Sh2-220', constellation: 'Perseus',
+    ra: 4.05, dec: 36.37, image: 'assets/images/astrophoto/california%20nebula.jpg', frame: [2.25, 4.0],
+    type: 'Emission nebula',
+    distance: 'about 1,000 light-years', size: 'about 2.5° long', moons: 'about 5 Moon diameters',
+    summary: 'A long cloud of glowing hydrogen in Perseus, named for its resemblance to the outline of California. Ultraviolet radiation from the hot star Menkib (Xi Persei) powers its red emission.'
   },
   {
     id: 'gamma-cassiopeiae', title: 'Gamma Cassiopeiae Nebulae', catalogue: 'IC 59 · IC 63 · Sh2-185', constellation: 'Cassiopeia',
