@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { STARS } from '../data/astrophoto/interactive-stars.js?v=3d-prototype-1';
+import { ETA_CARINAE_STARS } from '../data/astrophoto/eta-carinae-stars.js?v=1';
 import { createSagittariusAVisualizer } from './sagittarius-a-webgpu.js?v=adaptive-quality-1';
 import { createMilkyWay } from './milky-way.js?v=12';
 import { createPillarsOfCreation } from './eagle-nebula.js?v=2';
@@ -209,7 +210,7 @@ const blackHoleObjects = [];
 
 const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 const integer = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
-const catalogue = STARS.filter(star =>
+const catalogue = [...STARS, ...ETA_CARINAE_STARS.filter(component => !STARS.some(star => star.name === component.name))].filter(star =>
   Number.isFinite(Number(star.ra)) && Number.isFinite(Number(star.dec)) &&
   Number.isFinite(Number(star.distance)) && Number(star.distance) >= 0
 );
@@ -253,6 +254,7 @@ function spectralLetter(star) {
 }
 
 function starColour(star) {
+  if (star.etaCarinaeComponent === 'A') return 0xffe0a8;
   const temperature = Number(star.temperature);
   if (temperature >= 30000) return 0x759bff;
   if (temperature >= 10000) return 0xa7c2ff;
@@ -517,6 +519,16 @@ function buildScene() {
     const labelElement = document.createElement('span');
     labelElement.className = 'universe-star-label';
     labelElement.textContent = star.name === 'Sun (Sol)' ? 'Sun' : star.name;
+    if (star.etaCarinaeComponent) {
+      labelElement.classList.add(`eta-component-${star.etaCarinaeComponent.toLowerCase()}`);
+      labelElement.role = 'button';
+      labelElement.tabIndex = 0;
+      labelElement.title = `Select ${star.name} (shared system position)`;
+      labelElement.addEventListener('click', event => { event.stopPropagation(); selectStar(star); });
+      labelElement.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectStar(star); }
+      });
+    }
     const label = new CSS2DObject(labelElement);
     label.position.set(0, 0, 0);
     sprite.add(label);
@@ -1047,16 +1059,24 @@ async function createHomunculusModel(nebula) {
     { name: 'Eta Carinae B', x: .18, size: .5, colour: 0xb9d8ff }
   ];
   components.forEach(component => {
+    const catalogueStar = catalogue.find(star => star.name === component.name);
     const star = new THREE.Sprite(new THREE.SpriteMaterial({
       map: starTexture, color: component.colour, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
     }));
     star.position.set(component.x, 0, .08);
     star.scale.setScalar(component.size);
+    star.userData.star = catalogueStar;
     group.add(star);
 
     const labelElement = document.createElement('span');
     labelElement.className = 'universe-component-label';
     labelElement.textContent = component.name;
+    labelElement.role = 'button';
+    labelElement.tabIndex = 0;
+    labelElement.addEventListener('click', event => { event.stopPropagation(); selectStar(catalogueStar); });
+    labelElement.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectStar(catalogueStar); }
+    });
     const label = new CSS2DObject(labelElement);
     label.position.set(component.x, component.name.endsWith('A') ? .28 : -.28, .08);
     group.add(label);
@@ -1276,7 +1296,7 @@ function updateVisibleStars() {
     const matchesSpectral = spectral === 'all' || spectralLetter(item.star) === spectral;
     item.sprite.visible = !galaxyOverviewActive && matchesDistance && matchesSpectral;
     item.label.visible = item.sprite.visible && controlsUi.labels.checked &&
-      (Number(item.star.magnitude) <= labelMagnitude || item.star === selected || /^(sun|sol)/i.test(item.star.name));
+      (item.star.etaCarinaeComponent || Number(item.star.magnitude) <= labelMagnitude || item.star === selected || /^(sun|sol)/i.test(item.star.name));
     item.labelElement.classList.toggle('is-selected', item.star === selected);
     if (item.sprite.visible) visible++;
     if (item.label.visible) visibleLabels++;
@@ -1334,7 +1354,7 @@ function updateSelectionLine() {
   }
   const starTarget = starObjects.find(item => item.star === selected);
   const nebulaTarget = nebulaObjects.find(item => item.nebula === selected);
-  const targetPosition = starTarget?.sprite.position || nebulaTarget?.model.position;
+  const targetPosition = starTarget?.sprite.position || nebulaTarget?.model.position || (selected === M31 ? andromeda?.group.position : null);
   if (!targetPosition || targetPosition.lengthSq() === 0) return;
   const geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), targetPosition.clone()]);
   const material = new THREE.LineDashedMaterial({ color: 0x74b7ff, transparent: true, opacity: .65, dashSize: 2, gapSize: 1 });
@@ -1468,6 +1488,15 @@ function selectNebula(nebula, fly = false) {
 
 function flyToStar(star) {
   if (star === M31) { viewAndromeda(); return; }
+  if (star?.etaCarinaeComponent) {
+    const homunculus = nebulaObjects.find(item => item.nebula.volumeShape === 'eta');
+    if (homunculus) {
+      controlsUi.nebulae.checked = true;
+      updatePositions();
+      flyToStar(homunculus.nebula);
+      return;
+    }
+  }
   const starItem = starObjects.find(candidate => candidate.star === star);
   const nebulaItem = nebulaObjects.find(candidate => candidate.nebula === star);
   const targetObject = starItem?.sprite || nebulaItem?.model;
@@ -1587,8 +1616,13 @@ function restoreUniverseReturnState() {
 function findStar() {
   const query = controlsUi.search.value.trim().toLowerCase();
   if (!query) return;
+  // Find identifies an object; travel is reserved for the explicit Fly/Approach
+  // buttons. Also cancel any earlier unfinished flight without moving camera.
+  flight = null;
+  const component = catalogue.find(star => star.etaCarinaeComponent && star.name.toLowerCase() === query);
+  if (component) { selectStar(component); return; }
   if (query === M31.name.toLowerCase() || /^(m\s?31|ngc\s?224|andromeda(?: galaxy)?|andromedagalaxen)$/.test(query)) {
-    viewAndromeda();
+    selectAndromeda();
     return;
   }
   const deepSkyObject = NEBULAE.find(object =>
@@ -1597,14 +1631,12 @@ function findStar() {
     object.aliases?.some(alias => alias.toLowerCase().includes(query))
   );
   if (deepSkyObject) {
-    if (deepSkyObject.volumeShape === 'sagittarius-a') saveUniverseReturnState();
-    selectNebula(deepSkyObject, true);
-    if (deepSkyObject.volumeShape === 'eagle' && /pillars|pelare/.test(query)) viewPillarsOfCreation();
+    selectNebula(deepSkyObject);
     return;
   }
   const exact = catalogue.find(star => star.name.toLowerCase() === query || (query === 'sun' && star.name === 'Sun (Sol)'));
   const partial = catalogue.find(star => star.name.toLowerCase().includes(query));
-  selectStar(exact || partial, true);
+  selectStar(exact || partial);
 }
 
 function pointerSelection(event) {
@@ -1612,7 +1644,7 @@ function pointerSelection(event) {
   pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
   raycaster.setFromCamera(pointer, camera);
-  const starCandidates = starObjects.filter(item => item.sprite.visible).map(item => item.sprite);
+  const starCandidates = starObjects.filter(item => item.sprite.visible && item.sprite.material.opacity > .02).map(item => item.sprite);
   const nebulaCandidates = nebulaObjects.filter(item => item.model.visible).flatMap(item => [item.hitTarget, item.model]);
   const hit = raycaster.intersectObjects([...starCandidates, ...nebulaCandidates], true)[0];
   if (hit?.object?.userData?.star) selectStar(hit.object.userData.star);
@@ -1709,12 +1741,20 @@ function animate(time) {
     const diameter=Math.max(...item.nebula.displayScale)*2*item.model.scale.x;
     clusterCloseAmount=Math.max(clusterCloseAmount,1-THREE.MathUtils.clamp((camera.position.distanceTo(item.model.position)/diameter-2)/2,0,1));
   });
-  starObjects.forEach(({star,sprite}) => {
+  starObjects.forEach(({star,sprite,label}) => {
     // Nearby catalogue navigation symbols must not engulf a cluster close-up
     // (notably foreground Aldebaran when approaching the Hyades).
     const base=markerSize(star);
     const pointSize=Math.min(base,camera.position.distanceTo(sprite.position)*.008);
     sprite.scale.setScalar(THREE.MathUtils.lerp(base,pointSize,clusterCloseAmount));
+    if (star.etaCarinaeComponent) {
+      const homunculus = nebulaObjects.find(item => item.nebula.volumeShape === 'eta');
+      const span = homunculus ? 16 * homunculus.model.scale.x : 0;
+      const fade = homunculus?.model.visible && span > 0
+        ? THREE.MathUtils.clamp((camera.position.distanceTo(homunculus.model.position)/span-3)/3,0,1) : 1;
+      sprite.material.opacity = (scaleMode === 'linear' ? .92 : 1)*fade;
+      if (label) label.visible = sprite.visible && controlsUi.labels.checked && fade > .5;
+    }
   });
   nebulaObjects.forEach(item => {
     if (!item.clusterOverlays?.length) return;

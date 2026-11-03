@@ -111,6 +111,13 @@ const observations = [
     summary: 'A dense pillar of gas and dust inside the much larger IC 1396 star-forming region, sculpted by nearby massive stars.'
   },
   {
+    id: 'sh2-155', title: 'The Cave Nebula', catalogue: 'Sh2-155 · Caldwell 9', constellation: 'Cepheus',
+    ra: 22.95164, dec: 62.63583, image: 'assets/images/astrophoto/cave%20nebula.jpg', frame: [2.25, 4.0],
+    type: 'Emission nebula · star-forming region',
+    distance: 'about 2,400 light-years', size: 'about 0.83° × 0.5°', moons: 'about 1.7 × 1 Moon diameters',
+    summary: 'A stellar nursery on the edge of the Cepheus B molecular cloud. Hot young stars illuminate glowing gas beside dark dust, creating the bright rim and shadowy opening that give the Cave Nebula its name.'
+  },
+  {
     id: 'ngc6992', title: 'Eastern Veil Nebula', catalogue: 'NGC 6992 · Caldwell 33', constellation: 'Cygnus',
     ra: 20.940, dec: 31.72, image: 'assets/images/astrophoto/NGC 6992.jpg', frame: [2.25, 2.25],
     type: 'Supernova remnant',
