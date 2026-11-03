@@ -146,6 +146,14 @@ const observations = [
     summary: 'A bubble of gas inflated by the fierce wind from a massive hot star. This wide field also shows open cluster M52 and the larger Lobster Claw region, Sh2-157.'
   },
   {
+    id: 'gamma-cassiopeiae', title: 'Gamma Cassiopeiae Nebulae', catalogue: 'IC 59 · IC 63 · Sh2-185', constellation: 'Cassiopeia',
+    // Approximate field centre, allowing for Gamma Cas below and right of centre.
+    ra: .988, dec: 60.93, image: 'assets/images/astrophoto/Gamma%20cassiopeiae%20nebula.jpg', frame: [2.25, 4.0],
+    type: 'Emission and reflection nebulae',
+    distance: 'about 550 light-years', size: 'about 2.25° × 4° (photographed field)', moons: 'about 4.5 × 8 Moon diameters (field)', sizeIsFrame: true,
+    summary: 'IC 59 and IC 63 are clouds of gas and dust illuminated by Gamma Cassiopeiae. Blue reflected starlight contrasts with red hydrogen emission, especially in IC 63, the Ghost of Cassiopeia. Angular size describes the photographed field.'
+  },
+  {
     id: 'ngc281', title: 'The Pacman Nebula', catalogue: 'NGC 281 · IC 1590', constellation: 'Cassiopeia',
     ra: 0.8832, dec: 56.622, image: 'assets/images/astrophoto/Ngc-281.jpg', frame: [3.8, 3.8],
     type: 'Emission nebula · star-forming region',
