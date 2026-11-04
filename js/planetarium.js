@@ -118,11 +118,12 @@ const observations = [
     summary: 'A stellar nursery on the edge of the Cepheus B molecular cloud. Hot young stars illuminate glowing gas beside dark dust, creating the bright rim and shadowy opening that give the Cave Nebula its name.'
   },
   {
-    id: 'ngc6992', title: 'Eastern Veil Nebula', catalogue: 'NGC 6992 · Caldwell 33', constellation: 'Cygnus',
-    ra: 20.940, dec: 31.72, image: 'assets/images/astrophoto/NGC 6992.jpg', frame: [2.25, 2.25],
+    id: 'veil-nebula', title: 'The Veil Nebula', catalogue: 'NGC 6960 · NGC 6992 · NGC 6995 · Cygnus Loop', constellation: 'Cygnus',
+    // Approximate wide-field placement; the photograph includes both main arcs.
+    ra: 20.85, dec: 31.5, image: 'assets/images/astrophoto/veil%20nebula.jpg', frame: [3.8, 6.756], maxFitFov: 10,
     type: 'Supernova remnant',
-    distance: 'about 2,000 light-years', size: 'about 1.3° × 0.2°', moons: '2.7 × 0.4 Moon diameters',
-    summary: 'The bright eastern arc of the Veil Nebula, a filamentary shell of gas expanding from a supernova that exploded thousands of years ago.'
+    distance: 'about 2,400 light-years', size: 'about 3° across', moons: 'about 6 Moon diameters',
+    summary: 'The expanding remains of a massive star that exploded thousands of years ago. This wide view brings together the Eastern and Western Veil with the faint filaments between them, all part of the Cygnus Loop supernova remnant.'
   },
   {
     id: 'ngc7822', title: 'NGC 7822 · Question Mark Nebula', catalogue: 'NGC 7822 · Sh2-171 · V398 Cephei', constellation: 'Cepheus',
@@ -130,13 +131,6 @@ const observations = [
     type: 'Emission nebula · star-forming complex',
     distance: 'about 3,000 light-years', size: 'about 3° across', moons: 'about 6 Moon diameters',
     summary: 'A vast cloud of ionised hydrogen and dark dust shaped like a question mark. The field includes the young NGC 7822 complex and the region around variable star V398 Cephei.'
-  },
-  {
-    id: 'ngc6960', title: 'Western Veil Nebula', catalogue: 'NGC 6960 · Caldwell 34', constellation: 'Cygnus',
-    ra: 20.760, dec: 30.70, image: 'assets/images/astrophoto/ngc 6960.jpg', frame: [2.25, 2.25],
-    type: 'Supernova remnant',
-    distance: 'about 2,000 light-years', size: 'about 1.2° × 0.1°', moons: '2.3 × 0.2 Moon diameters',
-    summary: 'The western arc of the Veil Nebula, also called the Witch’s Broom. Its glowing filaments are a shock front moving through interstellar gas.'
   },
   {
     id: 'ngc7635', title: 'Bubble Nebula & friends', catalogue: 'NGC 7635 · M52 · Sh2-157', constellation: 'Cassiopeia',
