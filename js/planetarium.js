@@ -4,6 +4,15 @@ import { buildPlanetariumLink, readPlanetariumLink } from './planetarium-links.j
 
 const observations = [
   {
+    id: 'auriga-nebulae', title: 'Tadpole & Spider Nebulae with M38', catalogue: 'NGC 1893 · IC 410 · IC 417 · M38 · NGC 1907', constellation: 'Auriga',
+    ra: 5.379, dec: 33.411, image: 'assets/images/astrophoto/ngc1893%20M38%20IC417%20NGC1907.jpg', frame: [2.6, 5.0], maxFitFov: 9,
+    // Approximate two-landmark registration using NGC 1893 and M38, not a full plate solve.
+    registration: { pixels: [754,1446], anchorPixel: [520,800], referencePixel: [137,94], referenceRa: 5.4785, referenceDec: 35.855 },
+    type: 'Emission nebulae and open star clusters',
+    distance: 'Objects at different distances along the line of sight', size: 'about 2.6° × 5° (photographed field)', moons: 'about 5.2 × 10 Moon diameters (field)', sizeIsFrame: true,
+    summary: 'At the upper left, M38 is the large, loose gathering of stars; the smaller, more compact open cluster NGC 1907 lies just below and slightly to its right. The Spider Nebula (IC 417) is the red glowing patch on the left, about a third of the way down the image. Farther down and to the right, the larger red cloud is the Tadpole Nebula (IC 410), surrounding the young star cluster NGC 1893. All lie in the constellation Auriga.'
+  },
+  {
     id: 'm31', title: 'The Andromeda Galaxy', catalogue: 'M31 · M32 · M110', constellation: 'Andromeda',
     ra: 0.712, dec: 41.269, image: 'assets/images/astrophoto/M33-M110-M32.jpg', frame: [2.25, 4.0],
     type: 'Galaxy group',
